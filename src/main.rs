@@ -7,7 +7,6 @@ mod media;
 mod system;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Use winit-software renderer on Windows for better text quality
     #[cfg(target_os = "windows")]
     unsafe {
         std::env::set_var("SLINT_BACKEND", "winit-software");
@@ -18,7 +17,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let window = StatusBar::new()?;
 
-    // Set window to start at top-left corner using inner API
     let win = window.window();
     win.set_size(slint::PhysicalSize::new(1920, 32));
     win.set_position(slint::PhysicalPosition::new(0, 0));
@@ -34,36 +32,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         },
     );
-
-    let window_weak = window.as_weak();
-    window.on_volume_up(move || {
-        if let Ok(_) = system::increase_volume() {
-            log::info!("Volume up");
-        }
-        if let Some(w) = window_weak.upgrade() {
-            update_status(&w);
-        }
-    });
-
-    let window_weak = window.as_weak();
-    window.on_volume_down(move || {
-        if let Ok(_) = system::decrease_volume() {
-            log::info!("Volume down");
-        }
-        if let Some(w) = window_weak.upgrade() {
-            update_status(&w);
-        }
-    });
-
-    let window_weak = window.as_weak();
-    window.on_volume_toggle_mute(move || {
-        if let Ok(muted) = system::toggle_mute() {
-            log::info!("Mute toggled: {}", muted);
-        }
-        if let Some(w) = window_weak.upgrade() {
-            update_status(&w);
-        }
-    });
 
     window.on_media_play_pause(move || {
         if let Ok(_) = media::play_pause() {
@@ -99,12 +67,7 @@ fn update_status(window: &StatusBar) {
     window.set_network_status(data.network_status.into());
     window.set_network_connected(data.network_connected);
     window.set_network_icon(data.network_icon.into());
-    window.set_volume(data.volume);
-    window.set_volume_muted(data.volume_muted);
-    window.set_volume_icon(data.volume_icon.into());
-    window.set_top_process(data.top_process.into());
-    window.set_media_title(data.media_title.into());
-    window.set_media_artist(data.media_artist.into());
     window.set_media_status(data.media_status.into());
     window.set_media_has_player(data.media_has_player);
+    window.set_active_workspace(1);
 }

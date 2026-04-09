@@ -1,0 +1,28 @@
+import { Theme } from "../styles/theme.slint";
+
+export component WorkspacesWidget {
+    in-out property <int> active-workspace: 1;
+    in-out property <int> total-workspaces: 8;
+    
+    Rectangle {
+    background: Theme.background;
+    border-radius: 12px;
+
+    VerticalLayout {
+        alignment: center;
+
+        HorizontalLayout {
+            alignment: center;
+            spacing: 8px;
+
+            for i in root.total-workspaces : Rectangle {
+                width: 8px;
+                height: 8px;
+                border-radius: 4px;
+                background: i == root.active-workspace ? Theme.accent : Theme.foreground;
+                opacity: i == root.active-workspace ? 1.0 : 0.3;
+            }
+        }
+    }
+}
+}

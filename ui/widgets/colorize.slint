@@ -1,0 +1,18 @@
+import { Theme } from "../styles/theme.slint";
+
+export component ColorizeWidget {
+    callback clicked();
+    
+    Rectangle {
+        TouchArea {
+            clicked => { root.clicked(); }
+        }
+        
+        Text {
+            text: "colorize";
+            font-family: Theme.icon-font-family;
+            font-size: 16px;
+            color: Theme.foreground;
+        }
+    }
+}

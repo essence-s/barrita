@@ -2,10 +2,11 @@ import { Theme } from "styles/theme.slint";
 import { ClockWidget } from "widgets/clock.slint";
 import { BatteryWidget } from "widgets/battery.slint";
 import { NetworkWidget } from "widgets/network.slint";
-import { VolumeWidget } from "widgets/volume.slint";
-import { ProcessWidget } from "widgets/processes.slint";
-import { MediaPlayerWidget } from "widgets/media_player.slint";
 import { BluetoothWidget } from "widgets/bluetooth.slint";
+import { WorkspacesWidget } from "widgets/workspaces.slint";
+import { ScreenshotWidget } from "widgets/screenshot.slint";
+import { ColorizeWidget } from "widgets/colorize.slint";
+import { MusicIconWidget } from "widgets/music_icon.slint";
 
 export component StatusBar inherits Window {
     title: "Status Bar";
@@ -18,32 +19,23 @@ export component StatusBar inherits Window {
     height: Theme.bar-height;
     
     in-out property <string> time: "12:00 PM";
-    in-out property <string> date: "Mon Apr 8";
+    in-out property <string> date: "Mon 04/09";
     
     in-out property <string> battery-percentage: "100%";
     in-out property <bool> battery-charging: false;
-    in-out property <string> battery-icon: "🔋";
+    in-out property <string> battery-icon: "battery_6_bar";
     
     in-out property <string> network-status: "WiFi";
     in-out property <bool> network-connected: true;
-    in-out property <string> network-icon: "📶";
-    
-    in-out property <int> volume: 50;
-    in-out property <bool> volume-muted: false;
-    in-out property <string> volume-icon: "🔊";
-    
-    in-out property <string> top-process: "chrome 15%";
-    
-    in-out property <string> media-title: "";
-    in-out property <string> media-artist: "";
-    in-out property <string> media-status: "stopped";
-    in-out property <bool> media-has-player: false;
+    in-out property <string> network-icon: "wifi";
     
     in-out property <bool> bluetooth-connected: false;
     
-    callback volume-up();
-    callback volume-down();
-    callback volume-toggle-mute();
+    in-out property <string> media-status: "stopped";
+    in-out property <bool> media-has-player: false;
+    
+    in-out property <int> active-workspace: 1;
+    
     callback media-play-pause();
     callback media-next();
     callback media-previous();
@@ -53,8 +45,28 @@ export component StatusBar inherits Window {
         opacity: 0.95;
         
         HorizontalLayout {
-            spacing: Theme.spacing;
+            spacing: 12px;
             padding: Theme.padding;
+            
+            // Columna 1: Música
+            MusicIconWidget {
+                status: root.media-status;
+                has-player: root.media-has-player;
+                play-pause => { root.media-play-pause(); }
+                next => { root.media-next(); }
+                previous => { root.media-previous(); }
+            }
+            
+            // Columna 2: Workspaces (centrado, expandido)
+            WorkspacesWidget {
+                active-workspace: root.active-workspace;
+                horizontal-stretch: 1;
+            }
+            
+            // Columna 3: Sistema (derecha)
+            ScreenshotWidget { }
+            
+            ColorizeWidget { }
             
             ClockWidget {
                 time: root.time;
@@ -71,31 +83,6 @@ export component StatusBar inherits Window {
                 status: root.network-status;
                 connected: root.network-connected;
                 icon: root.network-icon;
-            }
-            
-            VolumeWidget {
-                volume: root.volume;
-                muted: root.volume-muted;
-                icon: root.volume-icon;
-                volume-up => { root.volume-up(); }
-                volume-down => { root.volume-down(); }
-                toggle-mute => { root.volume-toggle-mute(); }
-            }
-            
-            ProcessWidget {
-                top-process: root.top-process;
-            }
-            
-            Rectangle { horizontal-stretch: 1; }
-            
-            MediaPlayerWidget {
-                title: root.media-title;
-                artist: root.media-artist;
-                status: root.media-status;
-                has-player: root.media-has-player;
-                play-pause => { root.media-play-pause(); }
-                next => { root.media-next(); }
-                previous => { root.media-previous(); }
             }
             
             BluetoothWidget {
