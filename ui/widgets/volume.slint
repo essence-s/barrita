@@ -1,0 +1,37 @@
+import { Theme } from "../styles/theme.slint";
+
+export component VolumeWidget {
+    in-out property <int> volume: 50;
+    in-out property <bool> muted: false;
+    in-out property <string> icon: "volume_up";
+    
+    callback volume-up();
+    callback volume-down();
+    callback toggle-mute();
+    
+    Rectangle {
+        TouchArea {
+            clicked => { root.toggle-mute(); }
+        }
+        
+        HorizontalLayout {
+            spacing: 4px;
+            padding: 0px;
+            alignment: center;
+            
+            Text {
+                text: root.muted ? "volume_off" : root.icon;
+                font-family: Theme.icon-font-family;
+                font-size: 16px;
+                color: root.muted ? Theme.error : Theme.foreground;
+            }
+            
+            Text {
+                text: root.muted ? "0%" : root.volume + "%";
+                font-family: Theme.font-family;
+                font-size: Theme.font-size;
+                color: root.muted ? Theme.error : Theme.foreground;
+            }
+        }
+    }
+}

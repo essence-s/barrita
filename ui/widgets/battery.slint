@@ -1,0 +1,29 @@
+import { Theme } from "../styles/theme.slint";
+
+export component BatteryWidget {
+    in-out property <string> percentage: "100%";
+    in-out property <bool> is-charging: false;
+    in-out property <string> icon: "battery_6_bar";
+    
+    Rectangle {
+        HorizontalLayout {
+            spacing: 4px;
+            padding: 0px;
+            alignment: center;
+            
+            Text {
+                text: root.icon;
+                font-family: Theme.icon-font-family;
+                font-size: 16px;
+                color: Theme.foreground;
+            }
+            
+            Text {
+                text: root.percentage;
+                font-family: Theme.font-family;
+                font-size: Theme.font-size;
+                color: root.is-charging ? Theme.warning : Theme.foreground;
+            }
+        }
+    }
+}

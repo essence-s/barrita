@@ -1,0 +1,28 @@
+import { Theme } from "../styles/theme.slint";
+
+export component ProcessWidget {
+    in-out property <string> top-process: "chrome 15%";
+    in-out property <int> cpu-usage: 15;
+    
+    Rectangle {
+        HorizontalLayout {
+            spacing: 4px;
+            padding: 0px;
+            alignment: center;
+            
+            Text {
+                text: "memory";
+                font-family: Theme.icon-font-family;
+                font-size: 16px;
+                color: Theme.foreground;
+            }
+            
+            Text {
+                text: root.top-process;
+                font-family: Theme.font-family;
+                font-size: Theme.font-size;
+                color: Theme.foreground;
+            }
+        }
+    }
+}

@@ -1,0 +1,78 @@
+import { Theme } from "../styles/theme.slint";
+
+export component MediaPlayerWidget {
+    in-out property <string> title: "Song Title";
+    in-out property <string> artist: "Artist Name";
+    in-out property <string> status: "playing";
+    in-out property <bool> has-player: false;
+    
+    callback play-pause();
+    callback next();
+    callback previous();
+    
+    Rectangle {
+        opacity: root.has-player ? 1.0 : 0.5;
+        
+        HorizontalLayout {
+            spacing: 4px;
+            padding: 0px;
+            alignment: center;
+            
+            TouchArea {
+                clicked => { root.previous(); }
+                Rectangle {
+                    width: 24px;
+                    height: 24px;
+                    Text {
+                        text: "skip_previous";
+                        font-family: Theme.icon-font-family;
+                        font-size: 18px;
+                        color: Theme.foreground;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+            
+            TouchArea {
+                clicked => { root.play-pause(); }
+                Rectangle {
+                    width: 24px;
+                    height: 24px;
+                    Text {
+                        text: root.has-player ? (root.status == "playing" ? "pause" : "play_arrow") : "play_arrow";
+                        font-family: Theme.icon-font-family;
+                        font-size: 18px;
+                        color: Theme.accent;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+            
+            TouchArea {
+                clicked => { root.next(); }
+                Rectangle {
+                    width: 24px;
+                    height: 24px;
+                    Text {
+                        text: "skip_next";
+                        font-family: Theme.icon-font-family;
+                        font-size: 18px;
+                        color: Theme.foreground;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+            
+            Text {
+                text: root.has-player ? root.title + " - " + root.artist : "Sin música";
+                font-family: Theme.font-family;
+                font-size: Theme.font-size;
+                color: Theme.foreground;
+                max-width: 150px;
+            }
+        }
+    }
+}

@@ -1,0 +1,25 @@
+import { Theme } from "../styles/theme.slint";
+
+export component ClockWidget {
+    in-out property <string> time: "12:00 PM";
+    in-out property <string> date: "Mon Apr 8";
+    
+    HorizontalLayout {
+        spacing: 4px;
+        
+        Text {
+            text: root.time;
+            font-family: Theme.font-family;
+            font-size: Theme.font-size;
+            color: Theme.foreground;
+        }
+        
+        Text {
+            text: root.date;
+            font-family: Theme.font-family;
+            font-size: Theme.font-size;
+            color: Theme.foreground;
+            opacity: 0.7;
+        }
+    }
+}
