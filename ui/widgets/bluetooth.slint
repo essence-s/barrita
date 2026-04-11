@@ -4,11 +4,17 @@ export component BluetoothWidget {
     in-out property <bool> connected: false;
     
     Rectangle {
-        Text {
-            text: "bluetooth";
-            font-family: Theme.icon-font-family;
-            font-size: 16px;
-            color: root.connected ? Theme.success : Theme.foreground;
+        vertical-stretch: 1;
+        
+        VerticalLayout {
+            alignment: center;
+            
+            Text {
+                text: "bluetooth";
+                font-family: Theme.icon-font-family;
+                font-size: 16px;
+                color: root.connected ? Theme.success : Theme.foreground;
+            }
         }
     }
 }

@@ -4,15 +4,21 @@ export component ColorizeWidget {
     callback clicked();
     
     Rectangle {
-        TouchArea {
-            clicked => { root.clicked(); }
-        }
+        vertical-stretch: 1;
         
-        Text {
-            text: "colorize";
-            font-family: Theme.icon-font-family;
-            font-size: 16px;
-            color: Theme.foreground;
+        VerticalLayout {
+            alignment: center;
+            
+            TouchArea {
+                clicked => { root.clicked(); }
+            }
+            
+            Text {
+                text: "colorize";
+                font-family: Theme.icon-font-family;
+                font-size: 16px;
+                color: Theme.foreground;
+            }
         }
     }
 }
