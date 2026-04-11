@@ -557,6 +557,7 @@ dependencies = [
  "battery",
  "chrono",
  "env_logger",
+ "image",
  "log",
  "mpris",
  "serde",

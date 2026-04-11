@@ -8,8 +8,8 @@ import { ScreenshotWidget } from "widgets/screenshot.slint";
 import { ColorizeWidget } from "widgets/colorize.slint";
 import { MusicIconWidget } from "widgets/music_icon.slint";
 
-export component StatusBar inherits Window {
-    title: "Status Bar";
+export component StatusBarWindow inherits Window {
+    title: "Barrita";
     no-frame: true;
     background: transparent;
     always-on-top: true;
@@ -33,39 +33,57 @@ export component StatusBar inherits Window {
     
     in-out property <string> media-status: "stopped";
     in-out property <bool> media-has-player: false;
+    in-out property <string> media-title: "Sin música";
+    in-out property <string> media-artist: "";
+    in-out property <image> media-album-art;
+    in-out property <float> media-progress: 0.0;
+    in-out property <string> media-progress-time: "0:00";
+    in-out property <string> media-total-time: "0:00";
     
     in-out property <int> active-workspace: 1;
+    in-out property <bool> music-popup-visible: false;
     
-    callback media-play-pause();
-    callback media-next();
-    callback media-previous();
+    callback popup_toggle();
+    callback media_play_pause();
+    callback media_next();
+    callback media_previous();
     
     Rectangle {
+        min-height: Theme.bar-height;
         background: Theme.background;
         opacity: 0.95;
         
         HorizontalLayout {
             spacing: 12px;
-            padding: Theme.padding;
+            padding: 0px;
             
-            // Columna 1: Música
-            MusicIconWidget {
-                status: root.media-status;
-                has-player: root.media-has-player;
-                play-pause => { root.media-play-pause(); }
-                next => { root.media-next(); }
-                previous => { root.media-previous(); }
+            VerticalLayout {
+                spacing: 0px;
+                vertical-stretch: 1;
+                alignment: center;
+                
+                music-touch-area := TouchArea {
+                    width: 130px;
+                    height: Theme.bar-height;
+                    
+                    MusicIconWidget {
+                        status: root.media-status;
+                        has-player: root.media-has-player;
+                        title: root.media-title;
+                        artist: root.media-artist;
+                        album-art: root.media-album-art;
+                    }
+                    
+                    clicked => { root.popup_toggle(); }
+                }
             }
             
-            // Columna 2: Workspaces (centrado, expandido)
             WorkspacesWidget {
                 active-workspace: root.active-workspace;
                 horizontal-stretch: 1;
             }
             
-            // Columna 3: Sistema (derecha)
             ScreenshotWidget { }
-            
             ColorizeWidget { }
             
             ClockWidget {

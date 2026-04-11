@@ -65,6 +65,10 @@ pub struct StatusBarData {
     pub media_artist: String,
     pub media_status: String,
     pub media_has_player: bool,
+    pub media_album_art: Vec<u8>,
+    pub media_progress: f32,
+    pub media_progress_time: String,
+    pub media_total_time: String,
 }
 
 impl StatusBarData {
@@ -112,11 +116,19 @@ impl StatusBarData {
             self.media_artist = info.artist;
             self.media_status = info.status;
             self.media_has_player = info.has_player;
+            self.media_album_art = info.album_art;
+            self.media_progress = info.progress;
+            self.media_progress_time = info.progress_time;
+            self.media_total_time = info.total_time;
         } else {
-            self.media_title = String::new();
+            self.media_title = "Sin música".to_string();
             self.media_artist = String::new();
             self.media_status = "stopped".to_string();
             self.media_has_player = false;
+            self.media_album_art = Vec::new();
+            self.media_progress = 0.0;
+            self.media_progress_time = "0:00".to_string();
+            self.media_total_time = "0:00".to_string();
         }
     }
 }

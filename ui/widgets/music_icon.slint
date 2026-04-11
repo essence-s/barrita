@@ -3,69 +3,69 @@ import { Theme } from "../styles/theme.slint";
 export component MusicIconWidget {
     in-out property <string> status: "stopped";
     in-out property <bool> has-player: false;
+    in-out property <string> title: "Sin música";
+    in-out property <string> artist: "";
+    in-out property <image> album-art;
     
     callback play-pause();
     callback next();
     callback previous();
     
     Rectangle {
+        vertical-stretch: 1;
         opacity: root.has-player ? 1.0 : 0.5;
         
-        HorizontalLayout {
-            spacing: 4px;
+        VerticalLayout {
             alignment: center;
             
-            Text {
-                text: root.has-player ? "music_note" : "music_off";
-                font-family: Theme.icon-font-family;
-                font-size: 16px;
-                color: Theme.foreground;
-            }
-            
-            TouchArea {
-                clicked => { root.previous(); }
+            HorizontalLayout {
+                spacing: 6px;
+                alignment: center;
+                
+                Text {
+                    text: root.has-player ? "music_note" : "music_off";
+                    font-family: Theme.icon-font-family;
+                    font-size: 16px;
+                    color: Theme.foreground;
+                }
+                
+                // Album art container
                 Rectangle {
-                    width: 20px;
-                    height: 20px;
-                    Text {
-                        text: "skip_previous";
-                        font-family: Theme.icon-font-family;
-                        font-size: 16px;
-                        color: Theme.foreground;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 4px;
+                    background: Theme.background;
+                    
+                    // Image or placeholder
+                    Image {
+                        source: root.album-art;
+                        width: 24px;
+                        height: 24px;
+                        visible: root.album-art.width > 0;
                     }
                 }
-            }
-            
-            TouchArea {
-                clicked => { root.play-pause(); }
-                Rectangle {
-                    width: 20px;
-                    height: 20px;
+                
+                // Artist and Title
+                VerticalLayout {
+                    spacing: 0px;
+                    
                     Text {
-                        text: root.status == "playing" ? "pause" : "play_arrow";
-                        font-family: Theme.icon-font-family;
-                        font-size: 16px;
-                        color: Theme.accent;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                    }
-                }
-            }
-            
-            TouchArea {
-                clicked => { root.next(); }
-                Rectangle {
-                    width: 20px;
-                    height: 20px;
-                    Text {
-                        text: "skip_next";
-                        font-family: Theme.icon-font-family;
-                        font-size: 16px;
+                        text: root.artist;
+                        font-family: Theme.font-family;
+                        font-size: 11px;
                         color: Theme.foreground;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
+                        max-width: 100px;
+                        overflow: elide;
+                    }
+                    
+                    Text {
+                        text: root.title;
+                        font-family: Theme.font-family;
+                        font-size: 11px;
+                        color: Theme.foreground;
+                        opacity: 0.7;
+                        max-width: 100px;
+                        overflow: elide;
                     }
                 }
             }

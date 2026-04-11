@@ -13,10 +13,11 @@ log = "0.4"
 env_logger = "0.11"
 thiserror = "2"
 winit = "0.30"
+image = "0.25"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 volumecontrol = "0.1"
-windows = { version = "0.58", features = ["Win32_UI_Input_KeyboardAndMouse", "Win32_Foundation"] }
+windows = { version = "0.58", features = ["Win32_UI_Input_KeyboardAndMouse", "Win32_Foundation", "Media_Control", "Storage_Streams", "Storage"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 mpris = "2.0"
