@@ -13,60 +13,69 @@ export component MusicIconWidget {
     
     Rectangle {
         vertical-stretch: 1;
-        opacity: root.has-player ? 1.0 : 0.5;
+        //opacity: root.has-player ? 1.0 : 0.5;
         
-        VerticalLayout {
+        HorizontalLayout {
+            spacing: 8px;
             alignment: center;
             
-            HorizontalLayout {
-                spacing: 6px;
+            // Icono centrado verticalmente
+            VerticalLayout {
                 alignment: center;
                 
-                Text {
-                    text: root.has-player ? "music_note" : "music_off";
-                    font-family: Theme.icon-font-family;
-                    font-size: 16px;
-                    color: Theme.foreground;
+                icon-rect := Rectangle {
+                    width: 20px;
+                    
+                    Text {
+                        text: root.has-player ? "music_note" : "music_off";
+                        font-family: Theme.icon-font-family;
+                        font-size: 16px;
+                        color: Theme.foreground;
+                    }
                 }
+            }
+            
+            // Album art container
+            VerticalLayout {
+                alignment: center;
                 
-                // Album art container
                 Rectangle {
+                    clip: true;
                     width: 24px;
                     height: 24px;
-                    border-radius: 4px;
-                    background: Theme.background;
-                    
-                    // Image or placeholder
-                    Image {
+                    border-radius: 6px;
+                    //background: red;                 
+                    Image {               
                         source: root.album-art;
                         width: 24px;
                         height: 24px;
-                        visible: root.album-art.width > 0;
+                        image-fit: cover;
                     }
                 }
+            }
+            
+            // Artist and Title
+            VerticalLayout {
+                alignment: end;
+                //spacing: 0px;
                 
-                // Artist and Title
-                VerticalLayout {
-                    spacing: 0px;
-                    
-                    Text {
-                        text: root.artist;
-                        font-family: Theme.font-family;
-                        font-size: 11px;
-                        color: Theme.foreground;
-                        max-width: 100px;
-                        overflow: elide;
-                    }
-                    
-                    Text {
-                        text: root.title;
-                        font-family: Theme.font-family;
-                        font-size: 11px;
-                        color: Theme.foreground;
-                        opacity: 0.7;
-                        max-width: 100px;
-                        overflow: elide;
-                    }
+                Text {
+                    text: root.artist;
+                    font-family: Theme.font-family;
+                    font-size: 9px;
+                    color: Theme.foreground;
+                    opacity: 0.7;
+                    max-width: 150px;
+                    overflow: elide;
+                }
+                
+                Text {
+                    text: root.title;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: Theme.foreground;
+                    max-width: 150px;
+                    overflow: elide;
                 }
             }
         }
