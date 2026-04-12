@@ -15,7 +15,9 @@ static POPUP_WEAK: Mutex<Option<Weak<MusicPopupWindow>>> = Mutex::new(None);
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "windows")]
     unsafe {
-        std::env::set_var("SLINT_BACKEND", "winit-software");
+        // std::env::set_var("SLINT_BACKEND", "winit-software");
+        std::env::set_var("SLINT_BACKEND", "winit-skia");
+        // std::env::set_var("SLINT_BACKEND", "winit-femtovg");
     }
 
     env_logger::init();
