@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-slint = "1.15.1"
+slint = { version = "1.15.1", features = ["renderer-winit-skia","renderer-winit-femtovg"] }
 sysinfo = "0.32"
 battery = "0.7.8"
 chrono = "0.4"
