@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[allow(dead_code)]
 pub struct MediaPlayerInfo {
     pub title: String,
     pub artist: String,
@@ -44,6 +45,7 @@ pub fn get_media_info() -> Option<MediaPlayerInfo> {
 }
 
 #[cfg(not(target_os = "linux"))]
+#[allow(dead_code)]
 pub fn get_media_info() -> Option<MediaPlayerInfo> {
     None
 }

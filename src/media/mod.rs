@@ -2,9 +2,7 @@ mod mpris;
 
 #[cfg(target_os = "windows")]
 mod windows;
-
-pub use mpris::MediaPlayerInfo;
-
+// pub use mpris::MediaPlayerInfo;
 #[cfg(target_os = "linux")]
 pub use mpris::{get_media_info, next, play_pause, previous};
 

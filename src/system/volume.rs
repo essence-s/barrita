@@ -33,6 +33,7 @@ pub fn get_volume_info() -> Option<VolumeInfo> {
     }
 }
 
+#[allow(dead_code)]
 pub fn increase_volume() -> Result<u8, String> {
     #[cfg(target_os = "windows")]
     {
@@ -51,6 +52,7 @@ pub fn increase_volume() -> Result<u8, String> {
     }
 }
 
+#[allow(dead_code)]
 pub fn decrease_volume() -> Result<u8, String> {
     #[cfg(target_os = "windows")]
     {
@@ -69,6 +71,7 @@ pub fn decrease_volume() -> Result<u8, String> {
     }
 }
 
+#[allow(dead_code)]
 pub fn set_volume(volume: u8) -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
@@ -85,6 +88,7 @@ pub fn set_volume(volume: u8) -> Result<(), String> {
     }
 }
 
+#[allow(dead_code)]
 pub fn toggle_mute() -> Result<bool, String> {
     #[cfg(target_os = "windows")]
     {

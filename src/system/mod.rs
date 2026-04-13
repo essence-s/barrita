@@ -8,7 +8,7 @@ pub use battery::get_battery_info;
 pub use network::get_network_info;
 pub use processes::get_top_process;
 pub use time::get_time_info;
-pub use volume::{decrease_volume, get_volume_info, increase_volume, set_volume, toggle_mute};
+pub use volume::get_volume_info;
 
 use crate::media::get_media_info;
 

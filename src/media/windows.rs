@@ -114,9 +114,9 @@ fn get_media_info_internal() -> Option<MediaPlayerInfo> {
         Err(_) => return None,
     };
 
-    let mut title_str = String::new();
-    let mut artist_str = String::new();
     let mut album_art: Vec<u8> = Vec::new();
+    let title_str: String;
+    let artist_str: String;
 
     let props = match session.TryGetMediaPropertiesAsync() {
         Ok(op) => match op.get() {
