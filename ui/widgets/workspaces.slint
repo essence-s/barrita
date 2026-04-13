@@ -6,7 +6,8 @@ export component WorkspacesWidget {
     
     Rectangle {
         vertical-stretch: 1;
-        background: Theme.background;
+        // background: Theme.background;
+        // background: blue;
         border-radius: 12px;
         
         VerticalLayout {
@@ -14,14 +15,35 @@ export component WorkspacesWidget {
             
             HorizontalLayout {
                 alignment: center;
-                spacing: 8px;
                 
-                for i in root.total-workspaces : Rectangle {
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 4px;
-                    background: i == root.active-workspace ? Theme.accent : Theme.foreground;
-                    opacity: i == root.active-workspace ? 1.0 : 0.3;
+
+                Rectangle {
+                    background: #00000037;
+                    horizontal-stretch: 1;
+                    border-radius: 15px;
+                    // padding: 5px;
+
+                    HorizontalLayout {
+                        alignment: center;
+                        spacing: 15px;
+                        padding: 2px;
+                        
+                        
+                        for i in root.total-workspaces : Rectangle {
+                            width: 22px;
+                            height: 22px;
+                            border-radius: 15px;
+                            background: i == root.active-workspace ? #ebebebe1 : #00000000;
+
+                            Rectangle {
+                                width: 5px;
+                                height: 5px;
+                                border-radius: 4px;
+                                background: i == root.active-workspace ? black : Theme.foreground;
+                                opacity: i == root.active-workspace ? 1.0 : 1.0;
+                            }
+                        }
+                    }
                 }
             }
         }
