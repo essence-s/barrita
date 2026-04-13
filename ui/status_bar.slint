@@ -56,55 +56,54 @@ export component StatusBarWindow inherits Window {
         HorizontalLayout {
             spacing: 12px;
             padding: 0px;
-            
-            VerticalLayout {
-                spacing: 0px;
-                vertical-stretch: 1;
-                alignment: center;
-                
-                music-touch-area := TouchArea {
-                    width: 180px;
-                    height: Theme.bar-height;
-                    
-                    MusicIconWidget {
-                        status: root.media-status;
-                        has-player: root.media-has-player;
-                        title: root.media-title;
-                        artist: root.media-artist;
-                        album-art: root.media-album-art;
-                    }
-                    
-                    clicked => { root.popup_toggle(); }
+                               
+            MusicIconWidget {
+                horizontal-stretch: 1;
+                status: root.media-status;
+                has-player: root.media-has-player;
+                title: root.media-title;
+                artist: root.media-artist;
+                album-art: root.media-album-art;
+
+                clicked => {
+                    root.popup_toggle();
                 }
             }
-            
+
             WorkspacesWidget {
                 active-workspace: root.active-workspace;
                 horizontal-stretch: 1;
             }
             
-            ScreenshotWidget { }
-            ColorizeWidget { }
-            
-            ClockWidget {
-                time: root.time;
-                date: root.date;
-            }
-            
-            BatteryWidget {
-                percentage: root.battery-percentage;
-                is-charging: root.battery-charging;
-                icon: root.battery-icon;
-            }
-            
-            NetworkWidget {
-                status: root.network-status;
-                connected: root.network-connected;
-                icon: root.network-icon;
-            }
-            
-            BluetoothWidget {
-                connected: root.bluetooth-connected;
+            HorizontalLayout {
+                horizontal-stretch: 1;
+                spacing: 12px;
+                alignment: end;   
+                
+                ScreenshotWidget { }
+                ColorizeWidget { }
+                
+                ClockWidget {
+                    time: root.time;
+                    date: root.date;
+                }
+                
+                BatteryWidget {
+                    percentage: root.battery-percentage;
+                    is-charging: root.battery-charging;
+                    icon: root.battery-icon;
+                }
+                
+                NetworkWidget {
+                    status: root.network-status;
+                    connected: root.network-connected;
+                    icon: root.network-icon;
+                }
+                
+                BluetoothWidget {
+                    connected: root.bluetooth-connected;
+                }
+
             }
         }
     }
