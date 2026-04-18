@@ -98,7 +98,7 @@ fn get_media_info_internal() -> Option<MediaPlayerInfo> {
     let timeout_thumbnail = Duration::from_millis(30);
 
     let manager = match GlobalSystemMediaTransportControlsSessionManager::RequestAsync() {
-        Ok(op) => match op.get() {
+        Ok(op) => match op.join() {
             Ok(m) => m,
             Err(_) => return None,
         },
@@ -118,13 +118,14 @@ fn get_media_info_internal() -> Option<MediaPlayerInfo> {
     let title_str: String;
     let artist_str: String;
 
-    let props = match session.TryGetMediaPropertiesAsync() {
-        Ok(op) => match op.get() {
-            Ok(p) => p,
+    let props: windows::Media::Control::GlobalSystemMediaTransportControlsSessionMediaProperties =
+        match session.TryGetMediaPropertiesAsync() {
+            Ok(op) => match op.join() {
+                Ok(p) => p,
+                Err(_) => return None,
+            },
             Err(_) => return None,
-        },
-        Err(_) => return None,
-    };
+        };
 
     if start.elapsed() > timeout_total {
         return None;
@@ -138,25 +139,27 @@ fn get_media_info_internal() -> Option<MediaPlayerInfo> {
             if start.elapsed() < timeout_thumbnail {
                 if let Ok(async_op) = thumbnail.OpenReadAsync() {
                     if start.elapsed() < timeout_thumbnail {
-                        if let Ok(read_stream) = async_op.get() {
-                            if let Ok(size) = read_stream.Size() {
-                                let size_u32 = size as u32;
-                                if size_u32 > 100 && size_u32 < 2_000_000 {
-                                    if let Ok(reader) = DataReader::CreateDataReader(&read_stream) {
-                                        if let Ok(load_op) = reader.LoadAsync(size_u32) {
-                                            if load_op.get().is_ok() {
-                                                let mut buffer = vec![0u8; size_u32 as usize];
-                                                let _ = reader.ReadBytes(&mut buffer);
+                        if let Ok(read_stream) = async_op.join() {
+                            let size: u64 = match read_stream.Size() {
+                                Ok(s) => s,
+                                Err(_) => return None,
+                            };
+                            let size_u32 = size as u32;
+                            if size_u32 > 100 && size_u32 < 2_000_000 {
+                                if let Ok(reader) = DataReader::CreateDataReader(&read_stream) {
+                                    if let Ok(load_op) = reader.LoadAsync(size_u32) {
+                                        if load_op.join().is_ok() {
+                                            let mut buffer = vec![0u8; size_u32 as usize];
+                                            let _ = reader.ReadBytes(&mut buffer);
 
-                                                if is_valid_image_format(&buffer) {
-                                                    log::info!(
-                                                        "Thumbnail valid: {} bytes",
-                                                        buffer.len()
-                                                    );
-                                                    album_art = buffer;
-                                                } else {
-                                                    log::warn!("Thumbnail invalid format");
-                                                }
+                                            if is_valid_image_format(&buffer) {
+                                                log::info!(
+                                                    "Thumbnail valid: {} bytes",
+                                                    buffer.len()
+                                                );
+                                                album_art = buffer;
+                                            } else {
+                                                log::warn!("Thumbnail invalid format");
                                             }
                                         }
                                     }
