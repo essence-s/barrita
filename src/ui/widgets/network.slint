@@ -3,45 +3,19 @@ import { Theme } from "../styles/theme.slint";
 export component NetworkWidget {
     in-out property <string> status: "WiFi";
     in-out property <bool> connected: true;
-    in-out property <string> icon: "wifi";
-    
+    // in-out property <string> icon: "Network Wifi";
+
     Rectangle {
         vertical-stretch: 1;
-        min-width: 80px;
-        max-width: 80px;
-        
+
         VerticalLayout {
             alignment: center;
-            
-            HorizontalLayout {
-                spacing: 4px;
-                padding: 0px;
-                alignment: center;
-                
-                Text {
-                    text: root.icon;
-                    font-family: Theme.icon-font-family;
-                    font-size: 16px;
-                    color: root.connected ? Theme.foreground : Theme.error;
-                }
-                
-                Text {
-                    text: root.status;
-                    font-family: Theme.font-family;
-                    font-size: Theme.font-size;
-                    color: root.connected ? Theme.foreground : Theme.error;
-                    visible: root.connected;
-                    max-width: 60px;
-                    overflow: elide;
-                }
-                
-                Text {
-                    text: "signal_wifi_off";
-                    font-family: Theme.icon-font-family;
-                    font-size: 16px;
-                    color: Theme.error;
-                    visible: !root.connected;
-                }
+
+            Text {
+                text: root.connected ? "Network_Wifi" : "Globe_2_Cancel";
+                font-family: Theme.icon-font-family;
+                font-size: 16px;
+                color: root.connected ? Theme.foreground : Theme.error;
             }
         }
     }
