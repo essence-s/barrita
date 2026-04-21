@@ -3,7 +3,7 @@ import { Theme } from "../styles/theme.slint";
 export component BatteryWidget {
     in-out property <string> percentage: "100%";
     in-out property <bool> is-charging: false;
-    in-out property <string> icon: "battery_6_bar";
+    in-out property <string> icon: "Battery_Android_Frame_Full";
     
     Rectangle {
         vertical-stretch: 1;
@@ -17,18 +17,18 @@ export component BatteryWidget {
                 alignment: center;
                 
                 Text {
-                    text: root.icon;
+                    text: "Battery_Android_Frame_Full";
                     font-family: Theme.icon-font-family;
-                    font-size: 16px;
+                    font-size: 27px;
                     color: Theme.foreground;
                 }
                 
-                Text {
-                    text: root.percentage;
-                    font-family: Theme.font-family;
-                    font-size: Theme.font-size;
-                    color: root.is-charging ? Theme.warning : Theme.foreground;
-                }
+                // Text {
+                //     text: root.percentage;
+                //     font-family: Theme.font-family;
+                //     font-size: Theme.font-size;
+                //     color: root.is-charging ? Theme.warning : Theme.foreground;
+                // }
             }
         }
     }
