@@ -18,28 +18,28 @@ export component WorkspacesWidget {
                 
 
                 Rectangle {
-                    background: #00000037;
+                    background: #414b459e;
                     horizontal-stretch: 1;
                     border-radius: 15px;
                     // padding: 5px;
 
                     HorizontalLayout {
                         alignment: center;
-                        spacing: 15px;
+                        spacing: 3px;
                         padding: 2px;
                         
                         
                         for i in root.total-workspaces : Rectangle {
-                            width: 22px;
-                            height: 22px;
+                            width: 19px;
+                            height: 18px;
                             border-radius: 15px;
-                            background: i == root.active-workspace ? #ebebebe1 : #00000000;
+                            background: i == root.active-workspace ? #c7dfbedf : #00000000;
 
                             Rectangle {
-                                width: 5px;
-                                height: 5px;
+                                width: 4px;
+                                height: 4px;
                                 border-radius: 4px;
-                                background: i == root.active-workspace ? black : Theme.foreground;
+                                background: i == root.active-workspace ? #121312 : Theme.foreground;
                                 opacity: i == root.active-workspace ? 1.0 : 1.0;
                             }
                         }
