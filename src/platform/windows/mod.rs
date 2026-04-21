@@ -1,7 +1,6 @@
 pub mod appbar;
 pub mod config;
 pub mod position_monitor;
-pub mod init;
 
 pub use appbar::{get_window_position, install_appbar_window_proc};
 pub use config::{AppBarEdge, StatusBarConfig};

@@ -1,6 +1,6 @@
 slint::include_modules!();
 
-use slint::{ComponentHandle, Timer, TimerMode};
+use slint::{ComponentHandle, PhysicalPosition, PhysicalSize, Timer, TimerMode, Weak};
 use std::time::Duration;
 
 mod core;
@@ -9,19 +9,23 @@ mod app;
 mod popup;
 mod status_updater;
 
-use platform::windows::{init_statusbar, AppBarEdge, StatusBarConfig};
+use platform::windows::{appbar, init_statusbar, AppBarEdge, StatusBarConfig};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    platform::windows::init::configure_backend();
+    #[cfg(target_os = "windows")]
+    unsafe {
+        std::env::set_var("SLINT_BACKEND", "winit-skia");
+    }
 
     env_logger::init();
     log::info!("Starting Barrita Status Bar");
 
     let app = StatusBarWindow::new()?;
-    platform::windows::init::setup_window(&app);
+    app.window().set_size(PhysicalSize::new(1920, 32));
+    app.window().set_position(PhysicalPosition::new(0, 0));
 
-    let app_weak = platform::windows::init::get_window_weak(&app);
+    let app_weak = app.as_weak();
 
     app.on_popup_toggle(move || {
         popup::toggle_popup(&app_weak);
@@ -68,7 +72,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     };
                     init_statusbar(&config, hwnd);
 
-                    let rect = platform::windows::appbar::get_window_position(hwnd);
+                    let rect = appbar::get_window_position(hwnd);
                     println!("[main] Window rect: left={}, top={}", rect.left, rect.top);
                 }
                 _ => {
