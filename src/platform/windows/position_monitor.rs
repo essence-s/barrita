@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use super::appbar::{force_window_position, get_window_position, get_work_area, AppBar};
+use super::app_bar::{force_window_position, get_window_position, get_work_area, AppBar};
 use super::config::AppBarEdge;
 
 pub fn start_position_monitor(hwnd: isize, config_height: i32) {
@@ -56,7 +56,7 @@ pub fn start_position_monitor(hwnd: isize, config_height: i32) {
                     bar.unregister();
                     std::thread::sleep(std::time::Duration::from_millis(20));
 
-                    super::appbar::kill_systray_timer();
+                    super::app_bar::kill_systray_timer();
 
                     let registered = bar.register(hwnd, AppBarEdge::Top, config_height);
                     if registered {

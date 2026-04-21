@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::platform::windows::config::AppBarEdge;
+use super::config::AppBarEdge;
 use windows::Win32::Foundation::{LPARAM, RECT};
 use windows::Win32::UI::Shell::APPBARDATA;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;
@@ -8,6 +8,7 @@ use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;
 pub const GWL_EXSTYLE: i32 = -20;
 pub const WS_EX_NOACTIVATE: u32 = 0x08000000;
 pub const WS_EX_TOPMOST: u32 = 0x00000008;
+pub const WS_EX_TOOLWINDOW: u32 = 0x00000080;
 
 pub const SWP_NOSENDCHANGING: u32 = 0x0400;
 pub const SWP_NOACTIVATE: u32 = 0x0010;
@@ -35,6 +36,7 @@ pub const ABE_RIGHT: u32 = 2;
 pub const ABE_BOTTOM: u32 = 3;
 
 pub const WM_USER: u32 = 0x0400;
+pub const WM_STYLECHANGED: u32 = 0x007D;
 pub const GWL_WNDPROC: i32 = -4;
 
 pub const SW_HIDE: i32 = 0;
@@ -42,6 +44,70 @@ pub const SW_SHOW: i32 = 5;
 
 pub const HWND_TOPMOST: isize = -1;
 pub const HWND_NOTOPMOST: isize = -2;
+
+pub fn hide_from_taskbar(hwnd: isize) {
+    use windows::Win32::System::Com::{CoCreateInstance, CoInitializeEx, CLSCTX_ALL, COINIT_APARTMENTTHREADED};
+    use windows::Win32::UI::Shell::{ITaskbarList3, TaskbarList};
+
+    unsafe {
+        let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
+
+        let taskbar: Result<ITaskbarList3, _> = CoCreateInstance(&TaskbarList, None, CLSCTX_ALL);
+
+        if let Ok(taskbar) = taskbar {
+            let hwnd_raw = windows::Win32::Foundation::HWND(hwnd as *mut std::ffi::c_void);
+            let result = taskbar.DeleteTab(hwnd_raw);
+            println!("[app_bar] ITaskbarList3::DeleteTab hwnd={} result: {:?}", hwnd, result);
+        } else {
+            println!("[app_bar] Failed to create ITaskbarList3");
+        }
+    }
+}
+
+static STYLE_RESTORE_HOOK: std::sync::OnceLock<Option<isize>> = std::sync::OnceLock::new();
+
+pub fn install_style_subclass(hwnd: isize) {
+    use windows::Win32::UI::WindowsAndMessaging::{GetWindowLongPtrW, SetWindowLongPtrW, WINDOW_LONG_PTR_INDEX};
+
+    STYLE_RESTORE_HOOK.get_or_init(|| {
+        unsafe {
+            let hwnd_raw = windows::Win32::Foundation::HWND(hwnd as *mut std::ffi::c_void);
+
+            let style = GetWindowLongPtrW(
+                hwnd_raw,
+                WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
+            );
+            let new_style = style as u32 | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
+            let _ = SetWindowLongPtrW(
+                hwnd_raw,
+                WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
+                new_style as isize,
+            );
+            println!("[app_bar] install_style_subclass: style {:#x} -> {:#x}", style, new_style);
+
+            Some(hwnd)
+        }
+    });
+}
+
+pub fn restore_toolwindow_style(hwnd: isize) {
+    use windows::Win32::UI::WindowsAndMessaging::{GetWindowLongPtrW, SetWindowLongPtrW, WINDOW_LONG_PTR_INDEX};
+
+    unsafe {
+        let hwnd_raw = windows::Win32::Foundation::HWND(hwnd as *mut std::ffi::c_void);
+        let style = GetWindowLongPtrW(
+            hwnd_raw,
+            WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
+        );
+        let new_style = style as u32 | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
+        let _ = SetWindowLongPtrW(
+            hwnd_raw,
+            WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
+            new_style as isize,
+        );
+        println!("[app_bar] restore_toolwindow_style: {:#x} -> {:#x}", style, new_style);
+    }
+}
 
 pub fn get_systray_hwnd() -> Option<isize> {
     use windows::Win32::UI::WindowsAndMessaging::FindWindowW;
@@ -123,6 +189,27 @@ pub fn restore_systray() {
                 None,
             );
         }
+    }
+}
+
+pub fn apply_toolwindow_style(hwnd: isize) {
+    use windows::Win32::UI::WindowsAndMessaging::{GetWindowLongPtrW, SetWindowLongPtrW};
+
+    unsafe {
+        let current_ex_style = GetWindowLongPtrW(
+            windows::Win32::Foundation::HWND(hwnd as *mut std::ffi::c_void),
+            windows::Win32::UI::WindowsAndMessaging::WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
+        );
+        let updated_ex_style = current_ex_style as u32 | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
+        println!(
+            "[app_bar] apply_toolwindow_style: hwnd={}, old_style={:#x}, new_style={:#x}",
+            hwnd, current_ex_style, updated_ex_style
+        );
+        let _ = SetWindowLongPtrW(
+            windows::Win32::Foundation::HWND(hwnd as *mut std::ffi::c_void),
+            windows::Win32::UI::WindowsAndMessaging::WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
+            updated_ex_style as isize,
+        );
     }
 }
 
@@ -403,12 +490,14 @@ impl AppBar {
                 windows::Win32::Foundation::HWND(self.hwnd as *mut std::ffi::c_void),
                 windows::Win32::UI::WindowsAndMessaging::WINDOW_LONG_PTR_INDEX(GWL_EXSTYLE),
             );
-            let mut updated_ex_style = current_ex_style as u32 | WS_EX_NOACTIVATE;
+            let mut updated_ex_style = current_ex_style as u32 | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
 
             if always_on_top {
                 updated_ex_style |= WS_EX_TOPMOST;
                 println!("[app_bar] Setting WS_EX_TOPMOST");
             }
+
+            println!("[app_bar] WS_EX_TOOLWINDOW applied to hide from taskbar and Alt+Tab");
 
             println!(
                 "[app_bar] Setting window style: current={:#x}, new={:#x}",
