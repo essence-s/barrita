@@ -9,7 +9,7 @@ mod app;
 mod popup;
 mod status_updater;
 
-use platform::windows::{app_bar, init_statusbar, AppBarEdge, StatusBarConfig};
+use platform::windows::{get_window_position, init_statusbar, AppBarEdge, StatusBarConfig};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -72,7 +72,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     };
                     init_statusbar(&config, hwnd);
 
-                    let rect = app_bar::get_window_position(hwnd);
+                    let rect = get_window_position(hwnd);
                     println!("[main] Window rect: left={}, top={}", rect.left, rect.top);
                 }
                 _ => {
