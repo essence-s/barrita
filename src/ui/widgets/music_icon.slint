@@ -15,8 +15,6 @@ export component MusicIconWidget {
     
     Rectangle {
         vertical-stretch: 1;
-        // background: red;
-        //opacity: root.has-player ? 1.0 : 0.5;
 
         HorizontalLayout {
             horizontal-stretch: 0;
@@ -25,7 +23,7 @@ export component MusicIconWidget {
         
             TouchArea {         
                 HorizontalLayout {
-                    spacing: 8px;
+                    spacing: 4px;
 
                     // Icono centrado verticalmente
                     VerticalLayout {
@@ -51,8 +49,8 @@ export component MusicIconWidget {
                             clip: true;
                             width: 24px;
                             height: 24px;
-                            border-radius: 6px;
-                            //background: red;                 
+                            border-radius: 5px;
+                            // background: black;        
                             Image {               
                                 source: root.album-art;
                                 width: 24px;
@@ -64,10 +62,12 @@ export component MusicIconWidget {
                     
                     // Artist and Title
                     VerticalLayout {
-                        alignment: end;
-                        //spacing: 0px;
+                        alignment: center;
+                        padding-top: 1px;
+                        spacing: -3px;
                         
                         Text {
+                            vertical-alignment: bottom;
                             text: root.artist;
                             font-family: Theme.font-family;
                             font-size: 9px;
@@ -78,6 +78,7 @@ export component MusicIconWidget {
                         }
                         
                         Text {
+                            vertical-alignment: bottom;
                             text: root.title;
                             font-family: Theme.font-family;
                             font-size: 11px;
