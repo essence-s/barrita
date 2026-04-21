@@ -1,4 +1,4 @@
-use crate::system::ProcessInfo;
+use crate::core::data::ProcessInfo;
 use sysinfo::{ProcessesToUpdate, System};
 
 pub fn get_top_process() -> ProcessInfo {

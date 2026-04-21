@@ -1,13 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-#[allow(dead_code)]
-pub struct MediaPlayerInfo {
-    pub title: String,
-    pub artist: String,
-    pub status: String, // "playing", "paused", "stopped"
-    pub has_player: bool,
-}
+use crate::core::data::MediaPlayerInfo;
 
 #[cfg(target_os = "linux")]
 pub fn get_media_info() -> Option<MediaPlayerInfo> {
@@ -41,6 +32,10 @@ pub fn get_media_info() -> Option<MediaPlayerInfo> {
         artist,
         status: status.to_string(),
         has_player: true,
+        album_art: Vec::new(),
+        progress: 0.0,
+        progress_time: "0:00".to_string(),
+        total_time: "0:00".to_string(),
     })
 }
 

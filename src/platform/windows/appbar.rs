@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use super::config::AppBarEdge;
+use crate::platform::windows::config::AppBarEdge;
 use windows::Win32::Foundation::{LPARAM, RECT};
 use windows::Win32::UI::Shell::APPBARDATA;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;

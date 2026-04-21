@@ -3,44 +3,41 @@ slint::include_modules!();
 use slint::{ComponentHandle, Timer, TimerMode};
 use std::time::Duration;
 
-use statusbar::{init_statusbar, AppBarEdge, StatusBarConfig};
-mod statusbar;
-use raw_window_handle::HasWindowHandle;
-
-mod init;
+mod core;
+mod platform;
+mod app;
 mod popup;
 mod status_updater;
-mod media;
-mod system;
+
+use platform::windows::{init_statusbar, AppBarEdge, StatusBarConfig};
+use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    init::configure_backend();
+    platform::windows::init::configure_backend();
 
     env_logger::init();
     log::info!("Starting Barrita Status Bar");
 
     let app = StatusBarWindow::new()?;
-    init::setup_window(&app);
+    platform::windows::init::setup_window(&app);
 
-    let app_weak = init::get_window_weak(&app);
+    let app_weak = platform::windows::init::get_window_weak(&app);
 
     app.on_popup_toggle(move || {
         popup::toggle_popup(&app_weak);
     });
 
     app.on_media_play_pause(move || {
-        let _ = media::play_pause();
+        let _ = app::media::play_pause();
     });
 
     app.on_media_next(move || {
-        let _ = media::next();
+        let _ = app::media::next();
     });
 
     app.on_media_previous(move || {
-        let _ = media::previous();
+        let _ = app::media::previous();
     });
-
-    // app.show()?;
 
     let app_weak = app.as_weak();
     let timer = Timer::default();
@@ -50,7 +47,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    // slint::run_event_loop()?;
     let app_weak = app.as_weak();
     slint::invoke_from_event_loop(move || {
         let app = app_weak.unwrap();
@@ -72,7 +68,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     };
                     init_statusbar(&config, hwnd);
 
-                    let rect = statusbar::get_window_position(hwnd);
+                    let rect = platform::windows::appbar::get_window_position(hwnd);
                     println!("[main] Window rect: left={}, top={}", rect.left, rect.top);
                 }
                 _ => {

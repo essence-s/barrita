@@ -4,7 +4,7 @@ use slint::{Image as SlintImage, SharedPixelBuffer, Rgba8Pixel};
 
 use std::sync::Mutex;
 
-use crate::system::StatusBarData;
+use crate::core::data::StatusBarData;
 
 static THUMBNAIL_COUNTER: Mutex<u32> = Mutex::new(0);
 static LAST_ALBUM_BYTES: Mutex<Vec<u8>> = Mutex::new(Vec::new());

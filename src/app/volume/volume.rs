@@ -1,4 +1,4 @@
-use crate::system::VolumeInfo;
+use crate::core::data::VolumeInfo;
 
 pub fn get_volume_info() -> Option<VolumeInfo> {
     #[cfg(target_os = "windows")]

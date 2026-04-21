@@ -1,4 +1,4 @@
-use crate::system::TimeInfo;
+use crate::core::data::TimeInfo;
 use chrono::Local;
 
 pub fn get_time_info() -> TimeInfo {

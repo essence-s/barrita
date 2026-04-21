@@ -1,8 +1,9 @@
-pub mod app_bar;
+pub mod appbar;
 pub mod config;
 pub mod position_monitor;
+pub mod init;
 
-pub use app_bar::get_window_position;
+pub use appbar::{get_window_position, install_appbar_window_proc};
 pub use config::{AppBarEdge, StatusBarConfig};
 
 pub fn init_statusbar(config: &StatusBarConfig, hwnd: isize) {
@@ -11,9 +12,9 @@ pub fn init_statusbar(config: &StatusBarConfig, hwnd: isize) {
         config.height, config.edge
     );
 
-    app_bar::install_appbar_window_proc(hwnd);
+    install_appbar_window_proc(hwnd);
 
-    app_bar::force_window_position(hwnd, 0, 0, 1366, config.height);
+    appbar::force_window_position(hwnd, 0, 0, 1366, config.height);
 
     position_monitor::start_position_monitor(hwnd, config.height);
 }

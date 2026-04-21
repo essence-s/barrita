@@ -1,4 +1,4 @@
-use crate::system::BatteryInfo;
+use crate::core::data::BatteryInfo;
 use battery::Manager;
 
 pub fn get_battery_info() -> Option<BatteryInfo> {

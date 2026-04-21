@@ -1,18 +1,10 @@
-pub mod battery;
-pub mod network;
-pub mod processes;
-pub mod time;
-pub mod volume;
-
-pub use battery::get_battery_info;
-pub use network::get_network_info;
-pub use processes::get_top_process;
-pub use time::get_time_info;
-pub use volume::get_volume_info;
-
-use crate::media::get_media_info;
-
 use serde::{Deserialize, Serialize};
+use crate::app::media::get_media_info;
+use crate::app::battery::get_battery_info;
+use crate::app::network::get_network_info;
+use crate::app::volume::get_volume_info;
+use crate::app::time::get_time_info;
+use crate::app::processes::get_top_process;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct BatteryInfo {
@@ -45,6 +37,18 @@ pub struct TimeInfo {
 pub struct ProcessInfo {
     pub top_process: String,
     pub cpu_usage: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct MediaPlayerInfo {
+    pub title: String,
+    pub artist: String,
+    pub status: String,
+    pub has_player: bool,
+    pub album_art: Vec<u8>,
+    pub progress: f32,
+    pub progress_time: String,
+    pub total_time: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

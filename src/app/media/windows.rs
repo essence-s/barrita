@@ -51,7 +51,6 @@ pub fn get_media_info() -> Option<MediaPlayerInfo> {
     let cooldown = Duration::from_secs(10);
     let now = Instant::now();
 
-    // Check cooldown
     let should_attempt = {
         if let Ok(last_attempt) = LAST_ATTEMPT_TIME.lock() {
             last_attempt.elapsed() > cooldown
@@ -60,18 +59,15 @@ pub fn get_media_info() -> Option<MediaPlayerInfo> {
         }
     };
 
-    // Return cached if within cooldown
     if !should_attempt {
         return Some(get_cached_or_default());
     }
 
-    // Try to get fresh data in a thread with timeout
     let result = std::thread::spawn(|| get_media_info_internal())
         .join()
         .ok()
         .flatten();
 
-    // Update cache and timestamp
     if let Some(ref info) = result {
         if let Ok(mut cache) = MEDIA_CACHE.lock() {
             *cache = Some(info.clone());
