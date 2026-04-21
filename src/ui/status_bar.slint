@@ -55,7 +55,7 @@ export component StatusBarWindow inherits Window {
         
         HorizontalLayout {
             spacing: 0px;
-            padding: 0px;
+            padding-left: 10px;
                                
             MusicIconWidget {
                 horizontal-stretch: 1;
@@ -82,6 +82,7 @@ export component StatusBarWindow inherits Window {
                 max-width: parent.width / 3;
                 spacing: 12px;
                 alignment: end;   
+                padding-right: 10px;
                 
                 ScreenshotWidget { }
                 ColorizeWidget { }
