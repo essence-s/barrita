@@ -54,11 +54,12 @@ export component StatusBarWindow inherits Window {
         // opacity: 0.95;
         
         HorizontalLayout {
-            spacing: 12px;
+            spacing: 0px;
             padding: 0px;
                                
             MusicIconWidget {
                 horizontal-stretch: 1;
+                max-width: parent.width / 3;
                 status: root.media-status;
                 has-player: root.media-has-player;
                 title: root.media-title;
@@ -71,12 +72,14 @@ export component StatusBarWindow inherits Window {
             }
 
             WorkspacesWidget {
-                active-workspace: root.active-workspace;
                 horizontal-stretch: 1;
+                max-width: parent.width / 3;
+                active-workspace: root.active-workspace;
             }
             
             HorizontalLayout {
                 horizontal-stretch: 1;
+                max-width: parent.width / 3;
                 spacing: 12px;
                 alignment: end;   
                 
