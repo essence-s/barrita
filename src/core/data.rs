@@ -40,18 +40,6 @@ pub struct ProcessInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct MediaPlayerInfo {
-    pub title: String,
-    pub artist: String,
-    pub status: String,
-    pub has_player: bool,
-    pub album_art: Vec<u8>,
-    pub progress: f32,
-    pub progress_time: String,
-    pub total_time: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct StatusBarData {
     pub time: String,
     pub date: String,
