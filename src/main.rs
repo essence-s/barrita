@@ -15,7 +15,14 @@ use raw_window_handle::HasWindowHandle;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "windows")]
     unsafe {
-        std::env::set_var("SLINT_BACKEND", "winit-skia");
+        // std::env::set_var("SLINT_BACKEND", "winit-skia");
+        std::env::set_var("SLINT_BACKEND", "winit-femtovg");
+        // std::env::set_var("SLINT_BACKEND", "winit-software");
+        // std::env::set_var("SLINT_BACKEND", "winit-femtovg-wgpu");
+        // std::env::set_var("SLINT_BACKEND", "winit-skia-software");
+        // std::env::set_var("SLINT_BACKEND", "winit-skia-opengl");
+
+        // std::env::set_var("SLINT_SCALE_FACTOR", "1.5");
     }
 
     env_logger::init();
@@ -67,7 +74,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     window.show().unwrap();
 
                     let config = StatusBarConfig {
-                        height: 34,
+                        height: 38,
                         edge: AppBarEdge::Top,
                     };
                     init_statusbar(&config, hwnd);

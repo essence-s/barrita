@@ -4,7 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-slint = { version = "1.15.1", features = ["renderer-winit-skia","raw-window-handle-06"] }
+slint = { version = "1.16", features = [
+  "backend-winit",
+  "renderer-femtovg",
+  "renderer-skia",
+  "raw-window-handle-06"
+] }
 sysinfo = "0.32"
 battery = "0.7.8"
 chrono = "0.4"
@@ -24,5 +29,5 @@ windows = { version = "0.62", features = ["Win32_UI_Input_KeyboardAndMouse", "Wi
 mpris = "2.0"
 zbus = "4"
 
-[build-dependencies]
-slint-build = "1.15.1"
+  [build-dependencies]
+slint-build = "1.16"
