@@ -20,7 +20,7 @@ export component WorkspacesWidget {
                 Rectangle {
                     background: #414b459e;
                     horizontal-stretch: 1;
-                    border-radius: 15px;
+                    border-radius: 12px;
                     // padding: 5px;
 
                     HorizontalLayout {
@@ -30,15 +30,15 @@ export component WorkspacesWidget {
                         
                         
                         for i in root.total-workspaces : Rectangle {
-                            width: 19px;
-                            height: 18px;
-                            border-radius: 15px;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 10px;
                             background: i == root.active-workspace ? #c7dfbedf : #00000000;
 
                             Rectangle {
                                 width: 4px;
                                 height: 4px;
-                                border-radius: 4px;
+                                border-radius: 2px;
                                 background: i == root.active-workspace ? #121312 : Theme.foreground;
                                 opacity: i == root.active-workspace ? 1.0 : 1.0;
                             }
