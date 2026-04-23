@@ -8,50 +8,81 @@ export component WorkspacesWidget {
     private property <length> button-size: 18px;
     private property <length> button-spacing: 3px;
     private property <length> margin: 2px;
-    private property <length> gap: 2px;
 
     Rectangle {
         vertical-stretch: 1;
         
         HorizontalLayout {
             alignment: center;
-            spacing: root.button-spacing;
-            padding: root.margin;
-            
-            for i in root.total-workspaces : Rectangle {
-                width: root.button-size;
-                height: root.button-size;
-                
+
+            VerticalLayout {
+                alignment: center;
+
                 Rectangle {
-                    x: 0;
-                    y: 0;
-                    width: root.button-size;
-                    height: root.button-size;
-                    border-radius: 4px;
-                    background: root.workspace-occupied[i - 1] ? #3a3a3a : #00000000;
-                    opacity: root.workspace-occupied[i - 1] ? 1.0 : 0.0;
+                    background: #252725d1;
+                    border-radius: 12px;
+                    
+                    HorizontalLayout {
+                        alignment: center;
+                        spacing: 4px;
+                        padding: 4px;
+                        
+                        for i in root.total-workspaces : Rectangle {
+                            width: root.button-size;
+                            height: root.button-size;
+                            
+                            private property <bool> occupied: 
+                                i < root.workspace-occupied.length && 
+                                root.workspace-occupied[i];
+                            
+                            private property <bool> active: 
+                                i == root.active-workspace - 1;
+                            
+                            Rectangle {
+                                x: 0;
+                                y: 0;
+                                width: root.button-size;
+                                height: root.button-size;
+                                border-radius: root.button-size / 2;
+                                background: active ? Theme.accent : #00000000;
+                                opacity: active ? 0.2 : 0.0;
+                            }
+                            
+                            Rectangle {
+                                x: 0;
+                                y: 0;
+                                width: root.button-size;
+                                height: root.button-size;
+                                border-radius: root.button-size / 2;
+                                background: occupied ? #fdfdfda2 : #00000000;
+                                opacity: occupied ? 0.3 : 0.0;
+                            }
+                            
+                            Rectangle {
+                                x: 3px;
+                                y: 3px;
+                                width: root.button-size - 6px;
+                                height: root.button-size - 6px;
+                                border-radius: root.button-size / 2 - 3px;
+                                background: active ? Theme.accent : #00000000;
+                            }
+                            
+                            Text {
+                                text: i + 1;
+                                font-size: 8px;
+                                font-weight: active ? 700 : 400;
+                                color: active ? 
+                                    Theme.accent : 
+                                    occupied ? 
+                                        #ebf1eb : 
+                                        #868686;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
                 }
-                
-                Rectangle {
-                    x: 0;
-                    y: 0;
-                    width: root.button-size;
-                    height: root.button-size;
-                    border-radius: root.button-size / 2;
-                    background: (i - 1) == (root.active-workspace - 1) ? Theme.accent : #00000000;
-                }
-                
-                Text {
-                    text: i;
-                    font-size: 8px;
-                    font-weight: (i - 1) == (root.active-workspace - 1) ? 700 : 400;
-                    color: root.workspace-occupied[i - 1] ? 
-                        #e0e0e0 : 
-                        #707070;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
-                }
-            }
+        }
         }
     }
 }
