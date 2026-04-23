@@ -28,6 +28,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     log::info!("Starting Barrita Status Bar");
 
+    #[cfg(target_os = "windows")]
+    app::workspaces::start_komorebi_listener();
+
     let app = StatusBarWindow::new()?;
     app.window().set_size(PhysicalSize::new(1920, 32));
     app.window().set_position(PhysicalPosition::new(0, 0));
