@@ -3,47 +3,53 @@ import { Theme } from "../styles/theme.slint";
 export component WorkspacesWidget {
     in-out property <int> active-workspace: 1;
     in-out property <int> total-workspaces: 8;
-    
+    in-out property <[bool]> workspace-occupied: [];
+
+    private property <length> button-size: 18px;
+    private property <length> button-spacing: 3px;
+    private property <length> margin: 2px;
+    private property <length> gap: 2px;
+
     Rectangle {
         vertical-stretch: 1;
-        // background: Theme.background;
-        // background: blue;
-        border-radius: 12px;
         
-        VerticalLayout {
+        HorizontalLayout {
             alignment: center;
+            spacing: root.button-spacing;
+            padding: root.margin;
             
-            HorizontalLayout {
-                alignment: center;
+            for i in root.total-workspaces : Rectangle {
+                width: root.button-size;
+                height: root.button-size;
                 
-
                 Rectangle {
-                    background: #414b459e;
-                    horizontal-stretch: 1;
-                    border-radius: 12px;
-                    // padding: 5px;
-
-                    HorizontalLayout {
-                        alignment: center;
-                        spacing: 3px;
-                        padding: 2px;
-                        
-                        
-                        for i in root.total-workspaces : Rectangle {
-                            width: 20px;
-                            height: 20px;
-                            border-radius: 10px;
-                            background: i == root.active-workspace ? #c7dfbedf : #00000000;
-
-                            Rectangle {
-                                width: 4px;
-                                height: 4px;
-                                border-radius: 2px;
-                                background: i == root.active-workspace ? #121312 : Theme.foreground;
-                                opacity: i == root.active-workspace ? 1.0 : 1.0;
-                            }
-                        }
-                    }
+                    x: 0;
+                    y: 0;
+                    width: root.button-size;
+                    height: root.button-size;
+                    border-radius: 4px;
+                    background: root.workspace-occupied[i - 1] ? #3a3a3a : #00000000;
+                    opacity: root.workspace-occupied[i - 1] ? 1.0 : 0.0;
+                }
+                
+                Rectangle {
+                    x: 0;
+                    y: 0;
+                    width: root.button-size;
+                    height: root.button-size;
+                    border-radius: root.button-size / 2;
+                    background: (i - 1) == (root.active-workspace - 1) ? Theme.accent : #00000000;
+                }
+                
+                Text {
+                    text: i;
+                    font-size: 8px;
+                    font-weight: (i - 1) == (root.active-workspace - 1) ? 700 : 400;
+                    color: root.workspace-occupied[i - 1] ? 
+                        #e0e0e0 : 
+                        #707070;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
                 }
             }
         }

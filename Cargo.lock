@@ -562,6 +562,7 @@ dependencies = [
  "mpris",
  "raw-window-handle",
  "serde",
+ "serde_json",
  "slint",
  "slint-build",
  "sysinfo",

@@ -28,7 +28,6 @@ pub fn update(window: &StatusBarWindow) {
     window.set_media_progress(data.media_progress);
     window.set_media_progress_time(data.media_progress_time.into());
     window.set_media_total_time(data.media_total_time.into());
-    window.set_active_workspace(1);
 
     update_thumbnail(window, &data.media_album_art);
 }

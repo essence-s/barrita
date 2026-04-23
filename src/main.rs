@@ -15,28 +15,17 @@ use raw_window_handle::HasWindowHandle;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "windows")]
     unsafe {
-        // std::env::set_var("SLINT_BACKEND", "winit-skia");
         std::env::set_var("SLINT_BACKEND", "winit-femtovg");
-        // std::env::set_var("SLINT_BACKEND", "winit-software");
-        // std::env::set_var("SLINT_BACKEND", "winit-femtovg-wgpu");
-        // std::env::set_var("SLINT_BACKEND", "winit-skia-software");
-        // std::env::set_var("SLINT_BACKEND", "winit-skia-opengl");
-
-        // std::env::set_var("SLINT_SCALE_FACTOR", "1.5");
     }
 
     env_logger::init();
     log::info!("Starting Barrita Status Bar");
-
-    #[cfg(target_os = "windows")]
-    app::workspaces::start_komorebi_listener();
 
     let app = StatusBarWindow::new()?;
     app.window().set_size(PhysicalSize::new(1920, 32));
     app.window().set_position(PhysicalPosition::new(0, 0));
 
     let app_weak = app.as_weak();
-
     app.on_popup_toggle(move || {
         popup::toggle_popup(&app_weak);
     });
@@ -61,9 +50,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    let app_weak = app.as_weak();
+    let init_app_weak = app.as_weak();
     slint::invoke_from_event_loop(move || {
-        let app = app_weak.unwrap();
+        let app = init_app_weak.upgrade().unwrap();
         let window = app.window();
         let handle = window.window_handle();
 
@@ -95,6 +84,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     })
     .unwrap();
+
+    #[cfg(target_os = "windows")]
+    {
+        let komorebi_app_weak = app.as_weak();
+        app::workspaces::start_komorebi_listener(komorebi_app_weak);
+    }
 
     let _ = app.run();
     
