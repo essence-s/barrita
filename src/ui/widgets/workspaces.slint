@@ -3,6 +3,8 @@ import { Theme } from "../styles/theme.slint";
 export component WorkspacesWidget {
     in-out property <int> active-workspace: 1;
     in-out property <int> total-workspaces: 8;
+    in-out property <bool> use-japanese: true;
+    in-out property <[string]> japanese-numbers: ["一","二","三","四","五","六","七","八","九","十"];
     in-out property <[bool]> workspace-occupied: [];
 
     private property <length> button-size: 24px;
@@ -68,7 +70,7 @@ export component WorkspacesWidget {
                             }
 
                             Text {
-                                text: i + 1;
+                                text: root.use-japanese && i < root.japanese-numbers.length ? root.japanese-numbers[i] : i + 1;
                                 font-size: 13px;
                                 // font-weight: 600;
                                 font-family: Theme.font-family;
