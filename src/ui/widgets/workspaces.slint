@@ -5,9 +5,11 @@ export component WorkspacesWidget {
     in-out property <int> total-workspaces: 8;
     in-out property <[bool]> workspace-occupied: [];
 
-    private property <length> button-size: 18px;
+    private property <length> button-size: 24px;
     private property <length> button-spacing: 3px;
     private property <length> margin: 2px;
+
+    private property <color> accent: #B4CCC1;
 
     Rectangle {
         vertical-stretch: 1;
@@ -19,70 +21,70 @@ export component WorkspacesWidget {
                 alignment: center;
 
                 Rectangle {
-                    background: #252725d1;
-                    border-radius: 12px;
+                    background: #1e1f1b;
+                    border-radius: 15px;
                     
                     HorizontalLayout {
                         alignment: center;
-                        spacing: 4px;
+                        // spacing: 4px;
                         padding: 4px;
                         
                         for i in root.total-workspaces : Rectangle {
                             width: root.button-size;
                             height: root.button-size;
-                            
-                            private property <bool> occupied: 
-                                i < root.workspace-occupied.length && 
-                                root.workspace-occupied[i];
-                            
-                            private property <bool> active: 
+
+                            private property <bool> occupied:
+                                i < root.workspace-occupied.length && root.workspace-occupied[i];
+
+                            private property <bool> isActive:
                                 i == root.active-workspace - 1;
-                            
+
+                            private property <bool> leftFilled:
+                                i > 0 && i - 1 < root.workspace-occupied.length && root.workspace-occupied[i - 1];
+
+                            private property <bool> rightFilled:
+                                i + 1 < root.workspace-occupied.length && root.workspace-occupied[i + 1];
+
+                            // Fondo (ocupados en bloque)
                             Rectangle {
-                                x: 0;
-                                y: 0;
-                                width: root.button-size;
-                                height: root.button-size;
-                                border-radius: root.button-size / 2;
-                                background: active ? Theme.accent : #00000000;
-                                opacity: active ? 0.2 : 0.0;
+                                border-top-left-radius: !leftFilled ? root.button-size/2 : 0px;
+                                border-bottom-left-radius: !leftFilled ? root.button-size/2 : 0px;
+                                border-top-right-radius: !rightFilled ? root.button-size/2 : 0px;
+                                border-bottom-right-radius: !rightFilled ? root.button-size/2 : 0px;
+                                background: occupied ? #303934 : #00000000;
+                                opacity: occupied ? 1 : 0.0;
                             }
-                            
-                            Rectangle {
-                                x: 0;
-                                y: 0;
-                                width: root.button-size;
-                                height: root.button-size;
-                                border-radius: root.button-size / 2;
-                                background: occupied ? #fdfdfda2 : #00000000;
-                                opacity: occupied ? 0.3 : 0.0;
+
+                            // circulo activo
+                            if (isActive) : Rectangle {
+                                width: root.button-size * 0.85;
+                                height: root.button-size * 0.85;
+
+                                border-radius: self.width / 2;
+                                background: root.accent;
+
+                                x: (root.button-size - self.width) / 2;
+                                y: (root.button-size - self.height) / 2;
                             }
-                            
-                            Rectangle {
-                                x: 3px;
-                                y: 3px;
-                                width: root.button-size - 6px;
-                                height: root.button-size - 6px;
-                                border-radius: root.button-size / 2 - 3px;
-                                background: active ? Theme.accent : #00000000;
-                            }
-                            
+
                             Text {
                                 text: i + 1;
-                                font-size: 8px;
-                                font-weight: active ? 700 : 400;
-                                color: active ? 
-                                    Theme.accent : 
-                                    occupied ? 
-                                        #ebf1eb : 
-                                        #868686;
+                                font-size: 13px;
+                                // font-weight: 600;
+                                font-family: Theme.font-family;
+                                color: isActive ?
+                                #303934 :   // oscuro para el activo
+                                occupied ?
+                                    #B4C0B9 :
+                                    #868686;
                                 horizontal-alignment: center;
                                 vertical-alignment: center;
                             }
+                        
                         }
                     }
                 }
-        }
+            }
         }
     }
 }
