@@ -9,6 +9,7 @@ mod app;
 mod popup;
 mod status_updater;
 
+use platform::tray::init_tray;
 use platform::windows::{get_window_position, init_statusbar, AppBarEdge, StatusBarConfig};
 use raw_window_handle::HasWindowHandle;
 
@@ -20,6 +21,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     env_logger::init();
     log::info!("Starting Barrita Status Bar");
+
+    let _tray = init_tray();
 
     let app = StatusBarWindow::new()?;
     app.window().set_size(PhysicalSize::new(1920, 32));
