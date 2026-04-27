@@ -42,6 +42,8 @@ export component StatusBarWindow inherits Window {
     
     in-out property <int> active-workspace: 1;
     in-out property <[bool]> workspace-occupied: [];
+    in-out property <int> workspace-total: 8;
+    in-out property <[string]> workspace-format: [];
     in-out property <bool> music-popup-visible: false;
     
     callback popup_toggle();
@@ -77,6 +79,8 @@ export component StatusBarWindow inherits Window {
                 max-width: parent.width / 3;
                 active-workspace: root.active-workspace;
                 workspace-occupied: root.workspace-occupied;
+                total-workspaces: root.workspace-total;
+                japanese-numbers: root.workspace-format;
             }
             
             HorizontalLayout {

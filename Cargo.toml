@@ -21,6 +21,8 @@ thiserror = "2"
 winit = "0.30"
 image = { version = "0.25", default-features = false, features = ["png"] }
 tray-icon = "0.22"
+toml = "0.8"
+dirs = "5"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 volumecontrol = "0.1"

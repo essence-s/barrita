@@ -2,7 +2,7 @@
 
 slint::include_modules!();
 
-use slint::{ComponentHandle, PhysicalPosition, PhysicalSize, Timer, TimerMode};
+use slint::{ComponentHandle, PhysicalPosition, PhysicalSize, Timer, TimerMode, VecModel, ModelRc, SharedString};
 use std::time::Duration;
 
 mod core;
@@ -10,6 +10,9 @@ mod platform;
 mod app;
 mod popup;
 mod status_updater;
+mod config;
+
+use config::load_or_create_config;
 
 use platform::tray::init_tray;
 use platform::windows::{get_window_position, init_statusbar, AppBarEdge, StatusBarConfig};
@@ -24,11 +27,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     log::info!("Starting Barrita Status Bar");
 
+    let cfg = load_or_create_config();
+
     let _tray = init_tray();
 
     let app = StatusBarWindow::new()?;
     app.window().set_size(PhysicalSize::new(1920, 32));
     app.window().set_position(PhysicalPosition::new(0, 0));
+
+    app.set_workspace_total(cfg.workspaces.total_workspaces);
+    if let Some(format) = cfg.workspaces.format {
+        let shared_format: Vec<SharedString> = format.into_iter().map(|s| s.into()).collect();
+        let model = VecModel::from(shared_format);
+        app.set_workspace_format(ModelRc::new(model));
+    }
 
     let app_weak = app.as_weak();
     app.on_popup_toggle(move || {
@@ -70,9 +82,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("[main] Showing window first...");
                     window.show().unwrap();
 
+                    let bar_edge = match cfg.display.edge.as_str() {
+                        "bottom" => AppBarEdge::Bottom,
+                        "left" => AppBarEdge::Left,
+                        "right" => AppBarEdge::Right,
+                        _ => AppBarEdge::Top,
+                    };
+
                     let config = StatusBarConfig {
-                        height: 38,
-                        edge: AppBarEdge::Top,
+                        height: cfg.display.height,
+                        edge: bar_edge,
                     };
                     init_statusbar(&config, hwnd);
 
