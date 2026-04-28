@@ -6,6 +6,7 @@ import { BluetoothWidget } from "widgets/bluetooth.slint";
 import { WorkspacesWidget } from "widgets/workspaces.slint";
 import { ScreenshotWidget } from "widgets/screenshot.slint";
 import { ColorizeWidget } from "widgets/colorize.slint";
+import { ArticleWidget } from "widgets/article.slint";
 import { MusicIconWidget } from "widgets/music_icon.slint";
 
 export component StatusBarWindow inherits Window {
@@ -92,6 +93,7 @@ export component StatusBarWindow inherits Window {
                 
                 ScreenshotWidget { }
                 ColorizeWidget { }
+                ArticleWidget { }
                 
                 ClockWidget {
                     time: root.time;

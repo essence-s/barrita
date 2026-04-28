@@ -1,0 +1,25 @@
+import { Theme } from "../styles/theme.slint";
+
+export component ArticleWidget {
+    callback clicked();
+    
+    Rectangle {
+        vertical-stretch: 1;
+        
+        VerticalLayout {
+            alignment: center;
+            
+            TouchArea {
+                clicked => { root.clicked(); }
+            }
+            
+            Image {
+                source: @image-url("../../assets/icons/article.svg");
+                width: 18px;
+                height: 18px;
+                image-fit: contain;
+                colorize: Theme.foreground-icon;
+            }
+        }
+    }
+}
