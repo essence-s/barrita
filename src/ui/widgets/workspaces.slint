@@ -7,7 +7,7 @@ export component WorkspacesWidget {
     in-out property <[string]> japanese-numbers: ["一","二","三","四","五","六","七","八","九","十"];
     in-out property <[bool]> workspace-occupied: [];
 
-    private property <length> button-size: 24px;
+    private property <length> button-size: 22px;
     private property <length> button-spacing: 3px;
     private property <length> margin: 2px;
 
@@ -24,7 +24,7 @@ export component WorkspacesWidget {
 
                 Rectangle {
                     background: #1e1f1b;
-                    border-radius: 15px;
+                    border-radius: 14px;
                     
                     HorizontalLayout {
                         alignment: center;
@@ -72,7 +72,7 @@ export component WorkspacesWidget {
                             Text {
                                 text: root.use-japanese && i < root.japanese-numbers.length ? root.japanese-numbers[i] : i + 1;
                                 font-size: 13px;
-                                // font-weight: 600;
+                                font-weight: 500;
                                 font-family: Theme.font-family;
                                 color: isActive ?
                                 #303934 :   // oscuro para el activo
