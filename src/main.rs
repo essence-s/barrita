@@ -15,7 +15,7 @@ mod config;
 use config::load_or_create_config;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, AppBarEdge, StatusBarConfig};
+use platform::windows::{get_window_position, init_statusbar, open_network_panel, AppBarEdge, StatusBarConfig};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -60,6 +60,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     app.on_media_previous(move || {
         let _ = app::media::previous();
+    });
+
+    app.on_network_clicked(move || {
+        open_network_panel();
     });
 
     let app_weak = app.as_weak();

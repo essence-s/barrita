@@ -3,6 +3,7 @@ import { Theme } from "../styles/theme.slint";
 export component NetworkWidget {
     in-out property <string> status: "WiFi";
     in-out property <bool> connected: true;
+    callback clicked();
     // in-out property <string> icon: "Network Wifi";
     
     Rectangle {
@@ -17,6 +18,12 @@ export component NetworkWidget {
                 height: 18px;
                 image-fit: contain;
                 colorize: root.connected ? Theme.foreground-icon : Theme.error;
+            }
+        }
+        
+        TouchArea {
+            clicked => {
+                root.clicked();
             }
         }
     }

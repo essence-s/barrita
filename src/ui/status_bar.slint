@@ -51,6 +51,7 @@ export component StatusBarWindow inherits Window {
     callback media_play_pause();
     callback media_next();
     callback media_previous();
+    callback network_clicked();
     
     Rectangle {
         min-height: Theme.bar-height;
@@ -110,6 +111,9 @@ export component StatusBarWindow inherits Window {
                     status: root.network-status;
                     connected: root.network-connected;
                     // icon: root.network-icon;
+                    clicked => {
+                        root.network_clicked();
+                    }
                 }
                 
                 BluetoothWidget {

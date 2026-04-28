@@ -23,3 +23,10 @@ pub fn init_statusbar(config: &StatusBarConfig, hwnd: isize) {
 
     position_monitor::start_position_monitor(hwnd, config.height);
 }
+
+pub fn open_network_panel() {
+    std::process::Command::new("explorer.exe")
+        .arg("ms-availablenetworks:")
+        .spawn()
+        .expect("Failed to open network panel");
+}
