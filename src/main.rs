@@ -22,6 +22,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "windows")]
     unsafe {
         std::env::set_var("SLINT_BACKEND", "winit-femtovg");
+        // std::env::set_var("SLINT_BACKEND", "winit-femtovg-wgpu");
+        // std::env::set_var("SLINT_BACKEND", "winit-skia");
+        // std::env::set_var("SLINT_BACKEND", "winit-skia-opengl");
     }
 
     env_logger::init();
