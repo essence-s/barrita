@@ -9,11 +9,12 @@ export component BluetoothWidget {
         VerticalLayout {
             alignment: center;
             
-            Text {
-                text: "bluetooth";
-                font-family: Theme.icon-font-family;
-                font-size: 18px;
-                color: root.connected ? Theme.success : Theme.foreground-icon;
+            Image {
+                source: @image-url("../../assets/icons/bluetooth.svg");
+                width: 18px;
+                height: 18px;
+                image-fit: contain;
+                colorize: root.connected ? Theme.success : Theme.foreground-icon;
             }
         }
     }

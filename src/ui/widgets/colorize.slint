@@ -13,11 +13,12 @@ export component ColorizeWidget {
                 clicked => { root.clicked(); }
             }
             
-            Text {
-                text: "colorize";
-                font-family: Theme.icon-font-family;
-                font-size: 16px;
-                color: Theme.foreground-icon;
+            Image {
+                source: @image-url("../../assets/icons/colorize.svg");
+                width: 16px;
+                height: 16px;
+                image-fit: contain;
+                colorize: Theme.foreground-icon;
             }
         }
     }

@@ -16,11 +16,12 @@ export component BatteryWidget {
                 padding: 0px;
                 alignment: center;
                 
-                Text {
-                    text: "Battery_Android_Frame_Full";
-                    font-family: Theme.icon-font-family;
-                    font-size: 25px;
-                    color: Theme.foreground-icon;
+                Image {
+                    source: @image-url("../../assets/icons/battery_android_frame_full.svg");
+                    width: 26px;
+                    height: 26px;
+                    image-fit: contain;
+                    colorize: root.is-charging ? Theme.warning : Theme.foreground-icon;
                 }
                 
                 // Text {

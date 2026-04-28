@@ -4,18 +4,19 @@ export component NetworkWidget {
     in-out property <string> status: "WiFi";
     in-out property <bool> connected: true;
     // in-out property <string> icon: "Network Wifi";
-
+    
     Rectangle {
         vertical-stretch: 1;
 
         VerticalLayout {
             alignment: center;
-
-            Text {
-                text: root.connected ? "Network_Wifi" : "Globe_2_Cancel";
-                font-family: Theme.icon-font-family;
-                font-size: 18px;
-                color: root.connected ? Theme.foreground-icon : Theme.error;
+            
+            Image {
+                source: root.connected ? @image-url("../../assets/icons/network_wifi.svg") : @image-url("../../assets/icons/globe_2_cancel.svg");
+                width: 18px;
+                height: 18px;
+                image-fit: contain;
+                colorize: root.connected ? Theme.foreground-icon : Theme.error;
             }
         }
     }
