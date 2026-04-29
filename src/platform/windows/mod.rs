@@ -30,3 +30,10 @@ pub fn open_network_panel() {
         .spawn()
         .expect("Failed to open network panel");
 }
+
+pub fn open_screen_clip() {
+    std::process::Command::new("explorer.exe")
+        .arg("ms-screenclip:")
+        .spawn()
+        .expect("Failed to open screen clip tool");
+}
