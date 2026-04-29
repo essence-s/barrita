@@ -15,7 +15,7 @@ mod config;
 use config::load_or_create_config;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, AppBarEdge, StatusBarConfig};
+use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, AppBarEdge, StatusBarConfig};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -72,6 +72,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     app.on_screenshot_clicked(move || {
         open_screen_clip();
+    });
+
+    app.on_article_clicked(move || {
+        open_text_extractor();
     });
 
     let app_weak = app.as_weak();
