@@ -7,25 +7,41 @@ export component ScreenshotWidget {
         vertical-stretch: 1;
         
         VerticalLayout {
-            alignment: center;     
+            alignment: center;
             
-            // Image {
-            //     source: @image-url("../../assets/icons/screenshot_region.svg");
-            //     width: 16px;
-            //     height: 16px;
-            //     image-fit: contain;
-            //     colorize: Theme.foreground-icon;
-            // }
+            hover_rect := Rectangle {
+                // width: 30px;
+                height: 30px;
+                background: touch_area.has-hover ? #e7e8eb2f : transparent;
+                border-width: 1px;
+                border-color: touch_area.has-hover ? #ffffff0e : transparent;
+                border-radius: 4px;
+                
+                VerticalLayout {
+                    alignment: center;
+                    padding-left: 6px;
+                    padding-right: 6px;
 
-            Text {
-                text: "screenshot_region";
-                font-family: Theme.icon-font-family;
-                font-size: 17px;
-                color: Theme.foreground-icon;
+                    // Image {
+                    //     source: @image-url("../../assets/icons/screenshot_region.svg");
+                    //     width: 16px;
+                    //     height: 16px;
+                    //     image-fit: contain;
+                    //     colorize: Theme.foreground-icon;
+                    // }
+                    
+                    Text {
+                        text: "screenshot_region";
+                        font-family: Theme.icon-font-family;
+                        font-size: 17px;
+                        color: Theme.foreground-icon;
+                    }
+                    
+                }
             }
         }
-
-        TouchArea {
+        
+        touch_area := TouchArea {
             clicked => { root.clicked(); }
         }
     }

@@ -6,21 +6,34 @@ export component ArticleWidget {
     Rectangle {
         vertical-stretch: 1;
         
+        touch_area := TouchArea {
+            clicked => { root.clicked(); }
+        }
+        
         VerticalLayout {
-            padding-left: 6px;
-            padding-right: 6px;
             alignment: center;
             
-            TouchArea {
-                clicked => { root.clicked(); }
-            }
-            
-            Image {
-                source: @image-url("../../assets/icons/article.svg");
-                width: 18px;
-                height: 18px;
-                image-fit: contain;
-                colorize: Theme.foreground-icon;
+            hover_rect := Rectangle {
+                // width: 30px;
+                height: 30px;
+                background: touch_area.has-hover ? #e7e8eb2f : transparent;
+                border-width: 1px;
+                border-color: touch_area.has-hover ? #ffffff0e : transparent;
+                border-radius: 4px;
+                
+                VerticalLayout {
+                    alignment: center;
+                    padding-left: 6px;
+                    padding-right: 6px;
+                    
+                    Image {
+                        source: @image-url("../../assets/icons/article.svg");
+                        width: 18px;
+                        height: 18px;
+                        image-fit: contain;
+                        colorize: Theme.foreground-icon;
+                    }
+                }
             }
         }
     }
