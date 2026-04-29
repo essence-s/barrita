@@ -53,6 +53,7 @@ export component StatusBarWindow inherits Window {
     callback media_previous();
     callback network_clicked();
     callback colorize_clicked();
+    callback screenshot_clicked();
     
     Rectangle {
         min-height: Theme.bar-height;
@@ -93,7 +94,11 @@ export component StatusBarWindow inherits Window {
                 alignment: end;   
                 padding-right: 10px;
                 
-                ScreenshotWidget { }
+                ScreenshotWidget {
+                    clicked => {
+                        root.screenshot_clicked();
+                    }
+                }
                 ColorizeWidget {
                     clicked => {
                         root.colorize_clicked();

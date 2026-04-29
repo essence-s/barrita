@@ -70,6 +70,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         open_screen_clip();
     });
 
+    app.on_screenshot_clicked(move || {
+        open_screen_clip();
+    });
+
     let app_weak = app.as_weak();
     let timer = Timer::default();
     timer.start(TimerMode::Repeated, Duration::from_secs(5), move || {

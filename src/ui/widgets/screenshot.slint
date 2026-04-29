@@ -7,11 +7,7 @@ export component ScreenshotWidget {
         vertical-stretch: 1;
         
         VerticalLayout {
-            alignment: center;
-            
-            TouchArea {
-                clicked => { root.clicked(); }
-            }
+            alignment: center;     
             
             // Image {
             //     source: @image-url("../../assets/icons/screenshot_region.svg");
@@ -27,6 +23,10 @@ export component ScreenshotWidget {
                 font-size: 17px;
                 color: Theme.foreground-icon;
             }
+        }
+
+        TouchArea {
+            clicked => { root.clicked(); }
         }
     }
 }
