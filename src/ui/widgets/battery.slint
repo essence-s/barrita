@@ -29,13 +29,26 @@ export component BatteryWidget {
                     padding-left: 6px;
                     padding-right: 6px;
                     
-                    Image {
-                        source: @image-url("../../assets/icons/battery_android_frame_full.svg");
-                        width: 26px;
-                        height: 26px;
-                        image-fit: contain;
-                        colorize: root.is-charging ? Theme.warning : Theme.foreground-icon;
+                 
+                    Rectangle { 
+                        
+                        Rectangle {
+                            x: 3px; y: 10px;
+                            width:15px;
+                            height: 6px;
+                            background: root.is-charging ? Theme.warning : Theme.foreground-icon;
+                            clip: true;
+                        }
+                        
+                        Image {
+                            source: @image-url("../../assets/icons/battery_android_0.svg");
+                            width: 26px; 
+                            height: 26px;
+                            image-fit: contain;
+                            colorize: root.is-charging ? Theme.warning : Theme.foreground-icon;
+                        }
                     }
+                   
                 }
             }
         }
