@@ -15,7 +15,7 @@ mod config;
 use config::load_or_create_config;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, AppBarEdge, StatusBarConfig};
+use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, AppBarEdge, StatusBarConfig, BatteryMonitor};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -46,8 +46,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let app_weak = app.as_weak();
+    let app_weak_popup = app_weak.clone();
     app.on_popup_toggle(move || {
-        popup::toggle_popup(&app_weak);
+        popup::toggle_popup(&app_weak_popup);
     });
 
     app.on_media_play_pause(move || {
@@ -77,6 +78,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     app.on_article_clicked(move || {
         open_text_extractor();
     });
+
+    let monitor = BatteryMonitor::new(move |status| {
+        let status = status.clone();
+        let app_weak_clone = app_weak.clone();
+        slint::invoke_from_event_loop(move || {
+            if let Some(window) = app_weak_clone.upgrade() {
+                window.set_battery_percentage(format!("{}%", status.percentage).into());
+                window.set_battery_charging(status.is_charging);
+                window.set_battery_level(status.percentage as i32);
+                window.set_battery_low(status.is_low);
+            }
+        }).ok();
+    })?;
 
     let app_weak = app.as_weak();
     let timer = Timer::default();

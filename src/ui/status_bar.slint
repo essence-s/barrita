@@ -23,7 +23,9 @@ export component StatusBarWindow inherits Window {
     in-out property <string> date: "Mon 04/09";
     
     in-out property <string> battery-percentage: "100%";
+    in-out property <int> battery-level: 100;
     in-out property <bool> battery-charging: false;
+    in-out property <bool> battery-low: false;
     in-out property <string> battery-icon: "battery_6_bar";
     
     in-out property <string> network-status: "WiFi";
@@ -116,7 +118,9 @@ export component StatusBarWindow inherits Window {
                 
                 BatteryWidget {
                     percentage: root.battery-percentage;
+                    percentage-value: root.battery-level;
                     is-charging: root.battery-charging;
+                    is-low: root.battery-low;
                     icon: root.battery-icon;
                 }
                 

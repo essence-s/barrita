@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use crate::app::media::get_media_info;
-use crate::app::battery::get_battery_info;
 use crate::app::network::get_network_info;
 use crate::app::volume::get_volume_info;
 use crate::app::time::get_time_info;
@@ -10,7 +9,7 @@ use crate::app::processes::get_top_process;
 pub struct BatteryInfo {
     pub percentage: u8,
     pub is_charging: bool,
-    pub icon: String,
+    pub is_low: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -72,19 +71,6 @@ impl StatusBarData {
         let info = get_time_info();
         self.time = info.time;
         self.date = info.date;
-
-        if let Some(info) = get_battery_info() {
-            self.battery_percentage = format!("{}%", info.percentage);
-            self.battery_charging = info.is_charging;
-            self.battery_icon = if info.is_charging {
-                "⚡".to_string()
-            } else {
-                info.icon
-            };
-        } else {
-            self.battery_percentage = "N/A".to_string();
-            self.battery_icon = "🔋".to_string();
-        }
 
         let net_info = get_network_info();
         self.network_status = net_info.status;

@@ -1,7 +1,6 @@
 use crate::StatusBarWindow;
 use image::load_from_memory;
 use slint::{Image as SlintImage, SharedPixelBuffer, Rgba8Pixel};
-
 use std::sync::Mutex;
 
 use crate::core::data::StatusBarData;
@@ -15,9 +14,6 @@ pub fn update(window: &StatusBarWindow) {
 
     window.set_time(data.time.into());
     window.set_date(data.date.into());
-    window.set_battery_percentage(data.battery_percentage.into());
-    window.set_battery_charging(data.battery_charging);
-    window.set_battery_icon(data.battery_icon.into());
     window.set_network_status(data.network_status.into());
     window.set_network_connected(data.network_connected);
     window.set_network_icon(data.network_icon.into());
