@@ -7,6 +7,9 @@ export component MusicIconWidget {
     in-out property <string> artist: "";
     in-out property <image> album-art;
     
+    in-out property <color> artist_color: #85948d;
+    in-out property <int> album_border_radius: 4;
+    
     callback play-pause();
     callback next();
     callback previous();
@@ -50,7 +53,7 @@ export component MusicIconWidget {
                             clip: true;
                             width: 24px;
                             height: 24px;
-                            border-radius: 4px;
+                            border-radius: root.album_border_radius * 1px;
                             // background: black;       
                             Image {               
                                 source: root.album-art;
@@ -73,7 +76,7 @@ export component MusicIconWidget {
                             text: root.artist;
                             font-family: Theme.font-family;
                             font-size: 9.5px;
-                            color: #85948d;
+                            color: root.artist_color;
                             max-width: 150px;
                             overflow: elide;
                         }

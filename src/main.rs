@@ -12,7 +12,7 @@ mod popup;
 mod status_updater;
 mod config;
 
-use config::load_or_create_config;
+use config::{get_workspaces_style, get_music_icon_style, workspaces_style_to_slint, music_icon_style_to_slint, load_or_create_config};
 
 use platform::tray::init_tray;
 use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, AppBarEdge, StatusBarConfig, BatteryMonitor};
@@ -39,11 +39,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     app.window().set_position(PhysicalPosition::new(0, 0));
 
     app.set_workspace_total(cfg.workspaces.total_workspaces);
-    if let Some(format) = cfg.workspaces.format {
+    if let Some(ref format) = cfg.workspaces.format {
         let shared_format: Vec<SharedString> = format.into_iter().map(|s| s.into()).collect();
         let model = VecModel::from(shared_format);
         app.set_workspace_format(ModelRc::new(model));
     }
+
+    let workspaces_style = get_workspaces_style(&cfg);
+    let (bg, active, occupied, text_active, text_occupied, text_free, border) = workspaces_style_to_slint(&workspaces_style);
+    app.set_workspaces_bg_color(bg);
+    app.set_workspaces_active_color(active);
+    app.set_workspaces_occupied_bg(occupied);
+    app.set_workspaces_text_active(text_active);
+    app.set_workspaces_text_occupied(text_occupied);
+    app.set_workspaces_text_free(text_free);
+    app.set_workspaces_border_radius(border);
+
+    let music_icon_style = get_music_icon_style(&cfg);
+    let (artist_color, album_border) = music_icon_style_to_slint(&music_icon_style);
+    app.set_music_artist_color(artist_color);
+    app.set_music_album_border_radius(album_border);
 
     let app_weak = app.as_weak();
     let app_weak_popup = app_weak.clone();

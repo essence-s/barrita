@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use slint::Color;
 use std::fs;
 use std::path::PathBuf;
 
@@ -6,6 +7,7 @@ use std::path::PathBuf;
 pub struct Config {
     pub display: DisplayConfig,
     pub theme: ThemeConfig,
+    pub widget: WidgetStylesConfig,
     pub widgets: WidgetsConfig,
     pub workspaces: WorkspacesConfig,
 }
@@ -22,6 +24,52 @@ pub struct ThemeConfig {
     pub background: String,
     pub foreground: String,
     pub accent: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct WidgetStylesConfig {
+    pub workspaces: Option<WorkspacesStyle>,
+    pub music_icon: Option<MusicIconStyle>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WorkspacesStyle {
+    pub bg_color: Option<String>,
+    pub active_color: Option<String>,
+    pub occupied_bg: Option<String>,
+    pub text_active: Option<String>,
+    pub text_occupied: Option<String>,
+    pub text_free: Option<String>,
+    pub border_radius: Option<i32>,
+}
+
+impl Default for WorkspacesStyle {
+    fn default() -> Self {
+        Self {
+            bg_color: Some("#1e1f1bf6".to_string()),
+            active_color: Some("#B4CCC1".to_string()),
+            occupied_bg: Some("#303934".to_string()),
+            text_active: Some("#303934".to_string()),
+            text_occupied: Some("#B4C0B9".to_string()),
+            text_free: Some("#868686".to_string()),
+            border_radius: Some(14),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MusicIconStyle {
+    pub artist_color: Option<String>,
+    pub album_border_radius: Option<i32>,
+}
+
+impl Default for MusicIconStyle {
+    fn default() -> Self {
+        Self {
+            artist_color: Some("#85948d".to_string()),
+            album_border_radius: Some(4),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,6 +137,7 @@ impl Default for Config {
         Self {
             display: DisplayConfig::default(),
             theme: ThemeConfig::default(),
+            widget: WidgetStylesConfig::default(),
             widgets: WidgetsConfig::default(),
             workspaces: WorkspacesConfig::default(),
         }
@@ -99,6 +148,22 @@ pub fn get_config_dir() -> PathBuf {
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
         .join("barrita")
+}
+
+pub fn get_workspaces_style(config: &Config) -> WorkspacesStyle {
+    config
+        .widget
+        .workspaces
+        .clone()
+        .unwrap_or_default()
+}
+
+pub fn get_music_icon_style(config: &Config) -> MusicIconStyle {
+    config
+        .widget
+        .music_icon
+        .clone()
+        .unwrap_or_default()
 }
 
 pub fn get_config_path() -> PathBuf {
@@ -157,4 +222,39 @@ pub fn save_config(config: &Config) {
             println!("[config] Error serializing config: {}", e);
         }
     }
+}
+
+fn parse_hex_color(hex: &str) -> Color {
+    let hex = hex.trim_start_matches('#');
+    if hex.len() == 8 {
+        let r = u8::from_str_radix(&hex[0..2], 16).unwrap_or(0);
+        let g = u8::from_str_radix(&hex[2..4], 16).unwrap_or(0);
+        let b = u8::from_str_radix(&hex[4..6], 16).unwrap_or(0);
+        let a = u8::from_str_radix(&hex[6..8], 16).unwrap_or(255);
+        Color::from_argb_u8(a, r, g, b)
+    } else if hex.len() == 6 {
+        let r = u8::from_str_radix(&hex[0..2], 16).unwrap_or(0);
+        let g = u8::from_str_radix(&hex[2..4], 16).unwrap_or(0);
+        let b = u8::from_str_radix(&hex[4..6], 16).unwrap_or(0);
+        Color::from_argb_u8(255, r, g, b)
+    } else {
+        Color::from_rgb_u8(0, 0, 0)
+    }
+}
+
+pub fn workspaces_style_to_slint(workspaces_style: &WorkspacesStyle) -> (Color, Color, Color, Color, Color, Color, i32) {
+    let bg = parse_hex_color(&workspaces_style.bg_color.as_deref().unwrap_or("#1e1f1bf6"));
+    let active = parse_hex_color(&workspaces_style.active_color.as_deref().unwrap_or("#B4CCC1"));
+    let occupied = parse_hex_color(&workspaces_style.occupied_bg.as_deref().unwrap_or("#303934"));
+    let text_active = parse_hex_color(&workspaces_style.text_active.as_deref().unwrap_or("#303934"));
+    let text_occupied = parse_hex_color(&workspaces_style.text_occupied.as_deref().unwrap_or("#B4C0B9"));
+    let text_free = parse_hex_color(&workspaces_style.text_free.as_deref().unwrap_or("#868686"));
+    let border = workspaces_style.border_radius.unwrap_or(14);
+    (bg, active, occupied, text_active, text_occupied, text_free, border)
+}
+
+pub fn music_icon_style_to_slint(music_style: &MusicIconStyle) -> (Color, i32) {
+    let artist = parse_hex_color(&music_style.artist_color.as_deref().unwrap_or("#85948d"));
+    let border = music_style.album_border_radius.unwrap_or(4);
+    (artist, border)
 }

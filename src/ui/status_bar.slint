@@ -49,6 +49,17 @@ export component StatusBarWindow inherits Window {
     in-out property <[string]> workspace-format: [];
     in-out property <bool> music-popup-visible: false;
     
+    in-out property <color> workspaces_bg_color: #1e1f1bf6;
+    in-out property <color> workspaces_active_color: #B4CCC1;
+    in-out property <color> workspaces_occupied_bg: #303934;
+    in-out property <color> workspaces_text_active: #303934;
+    in-out property <color> workspaces_text_occupied: #B4C0B9;
+    in-out property <color> workspaces_text_free: #868686;
+    in-out property <int> workspaces_border_radius: 14;
+    
+    in-out property <color> music_artist_color: #85948d;
+    in-out property <int> music_album_border_radius: 4;
+    
     callback popup_toggle();
     callback media_play_pause();
     callback media_next();
@@ -75,6 +86,8 @@ export component StatusBarWindow inherits Window {
                 title: root.media-title;
                 artist: root.media-artist;
                 album-art: root.media-album-art;
+                artist_color: root.music_artist_color;
+                album_border_radius: root.music_album_border_radius;
 
                 clicked => {
                     root.popup_toggle();
@@ -88,6 +101,13 @@ export component StatusBarWindow inherits Window {
                 workspace-occupied: root.workspace-occupied;
                 total-workspaces: root.workspace-total;
                 japanese-numbers: root.workspace-format;
+                bg_color: root.workspaces_bg_color;
+                active_color: root.workspaces_active_color;
+                occupied_bg: root.workspaces_occupied_bg;
+                text_active: root.workspaces_text_active;
+                text_occupied: root.workspaces_text_occupied;
+                text_free: root.workspaces_text_free;
+                border_radius: root.workspaces_border_radius;
             }
             
             HorizontalLayout {
