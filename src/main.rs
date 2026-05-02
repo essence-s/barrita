@@ -79,7 +79,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         open_text_extractor();
     });
 
-    let monitor = BatteryMonitor::new(move |status| {
+    let _monitor = BatteryMonitor::new(move |status| {
         let status = status.clone();
         let app_weak_clone = app_weak.clone();
         slint::invoke_from_event_loop(move || {

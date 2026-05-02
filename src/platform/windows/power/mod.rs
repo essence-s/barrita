@@ -44,13 +44,13 @@ pub struct BatteryMonitor {
 }
 
 #[repr(C)]
-struct POWERBROADCAST_SETTING {
-    PowerSetting: GUID,
-    DataLength: u32,
-    Data: u32,
+struct PowerBroadcastSetting {
+    power_setting: GUID,
+    data_length: u32,
+    data: u32,
 }
 
-static g_tx: std::sync::OnceLock<Box<mpsc::Sender<PowerEvent>>> = std::sync::OnceLock::new();
+static G_TX: std::sync::OnceLock<Box<mpsc::Sender<PowerEvent>>> = std::sync::OnceLock::new();
 
 impl BatteryMonitor {
     pub fn new<F>(callback: F) -> Result<Self, Box<dyn std::error::Error>>
@@ -58,7 +58,7 @@ impl BatteryMonitor {
         F: 'static + Send + Fn(BatteryStatusInfo) + Clone,
     {
         let (tx, rx) = mpsc::channel::<PowerEvent>();
-        let _ = g_tx.set(Box::new(tx));
+        let _ = G_TX.set(Box::new(tx));
         
         let callback_clone = callback.clone();
         
@@ -71,26 +71,26 @@ impl BatteryMonitor {
                 return 0;
             }
             
-            let ps = &*(setting as *const POWERBROADCAST_SETTING);
+            let ps = unsafe { &*(setting as *const PowerBroadcastSetting) };
             
             println!("[Power] Event: GUID={:?}, DataLength={}, Data={}", 
-                ps.PowerSetting, ps.DataLength, ps.Data);
+                ps.power_setting, ps.data_length, ps.data);
             
-            if ps.PowerSetting == GUID_ACDC_POWER_SOURCE {
-                let power_source = match ps.Data {
+            if ps.power_setting == GUID_ACDC_POWER_SOURCE {
+                let power_source = match ps.data {
                     0 => PowerSource::Ac,
                     1 => PowerSource::Dc,
                     2 => PowerSource::Hot,
                     _ => PowerSource::Dc,
                 };
                 println!("[Power] PowerSource: {:?}", power_source);
-                if let Some(tx) = g_tx.get() {
+                if let Some(tx) = G_TX.get() {
                     let _ = tx.send(PowerEvent::PowerSource(power_source));
                 }
-            } else if ps.PowerSetting == GUID_BATTERY_PERCENTAGE_REMAINING {
-                let percentage = (ps.Data & 0xFF) as u8;
+            } else if ps.power_setting == GUID_BATTERY_PERCENTAGE_REMAINING {
+                let percentage = (ps.data & 0xFF) as u8;
                 println!("[Power] BatteryPercentage: {}%", percentage);
-                if let Some(tx) = g_tx.get() {
+                if let Some(tx) = G_TX.get() {
                     let _ = tx.send(PowerEvent::BatteryPercentage(percentage));
                 }
             }

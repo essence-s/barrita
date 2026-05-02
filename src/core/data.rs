@@ -6,13 +6,6 @@ use crate::app::time::get_time_info;
 use crate::app::processes::get_top_process;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct BatteryInfo {
-    pub percentage: u8,
-    pub is_charging: bool,
-    pub is_low: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NetworkInfo {
     pub status: String,
     pub connected: bool,
