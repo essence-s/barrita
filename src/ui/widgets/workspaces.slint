@@ -7,14 +7,6 @@ export component WorkspacesWidget {
     in-out property <[string]> japanese-numbers: ["一","二","三","四","五","六","七","八","九","十"];
     in-out property <[bool]> workspace-occupied: [];
 
-    in-out property <color> bg_color: #1e1f1bf6;
-    in-out property <color> active_color: #B4CCC1;
-    in-out property <color> occupied_bg: #303934;
-    in-out property <color> text_active: #303934;
-    in-out property <color> text_occupied: #B4C0B9;
-    in-out property <color> text_free: #868686;
-    in-out property <int> border_radius: 14;
-
     private property <length> button-size: 22px;
     private property <length> button-spacing: 3px;
     private property <length> margin: 2px;
@@ -29,8 +21,8 @@ export component WorkspacesWidget {
                 alignment: center;
 
                 Rectangle {
-                    background: root.bg_color;
-                    border-radius: root.border-radius * 1px;
+                    background: Theme.workspaces_bg_color;
+                    border-radius: Theme.workspaces_border_radius * 1px;
                     
                     HorizontalLayout {
                         alignment: center;
@@ -57,7 +49,7 @@ export component WorkspacesWidget {
                                 border-bottom-left-radius: !leftFilled ? root.button-size/2 : 0px;
                                 border-top-right-radius: !rightFilled ? root.button-size/2 : 0px;
                                 border-bottom-right-radius: !rightFilled ? root.button-size/2 : 0px;
-                                background: occupied ? root.occupied_bg : #00000000;
+                                background: occupied ? Theme.workspaces_occupied_bg : #00000000;
                                 opacity: occupied ? 1 : 0.0;
                             }
 
@@ -66,7 +58,7 @@ export component WorkspacesWidget {
                                 height: root.button-size * 0.85;
 
                                 border-radius: self.width / 2;
-                                background: root.active_color;
+                                background: Theme.workspaces_active_color;
 
                                 x: (root.button-size - self.width) / 2;
                                 y: (root.button-size - self.height) / 2;
@@ -78,10 +70,10 @@ export component WorkspacesWidget {
                                 font-weight: 500;
                                 font-family: Theme.font-family;
                                 color: isActive ?
-                                    root.text_active :
+                                    Theme.workspaces_text_active :
                                     occupied ?
-                                        root.text_occupied :
-                                        root.text_free;
+                                        Theme.workspaces_text_occupied :
+                                        Theme.workspaces_text_free;
                                 horizontal-alignment: center;
                                 vertical-alignment: center;
                             }

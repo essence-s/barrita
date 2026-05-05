@@ -1,6 +1,6 @@
 use slint::{ComponentHandle, PhysicalPosition, PhysicalSize, VecModel, ModelRc, SharedString};
-use crate::config::{Config, get_workspaces_style, get_music_icon_style, workspaces_style_to_slint, music_icon_style_to_slint};
-use crate::StatusBarWindow;
+use crate::config::{Config, get_workspaces_style, get_music_icon_style, parse_hex_color};
+use crate::{StatusBarWindow, Theme};
 
 pub fn init_window(app: &StatusBarWindow, width: u32, height: u32) {
     app.window().set_size(PhysicalSize::new(width, height));
@@ -17,21 +17,38 @@ pub fn init_workspaces(app: &StatusBarWindow, config: &Config) {
 }
 
 pub fn init_styles(app: &StatusBarWindow, config: &Config) {
-    let workspaces_style = get_workspaces_style(config);
-    let (bg, active, occupied, text_active, text_occupied, text_free, border) = workspaces_style_to_slint(&workspaces_style);
-
-    app.set_workspaces_bg_color(bg);
-    app.set_workspaces_active_color(active);
-    app.set_workspaces_occupied_bg(occupied);
-    app.set_workspaces_text_active(text_active);
-    app.set_workspaces_text_occupied(text_occupied);
-    app.set_workspaces_text_free(text_free);
-    app.set_workspaces_border_radius(border);
-
-    let music_icon_style = get_music_icon_style(config);
-    let (artist_color, album_border) = music_icon_style_to_slint(&music_icon_style);
-    app.set_music_artist_color(artist_color);
-    app.set_music_album_border_radius(album_border);
+    let theme = app.global::<Theme>();
+    
+    let ws = get_workspaces_style(config);
+    if let Some(color) = ws.bg_color {
+        theme.set_workspaces_bg_color(parse_hex_color(&color));
+    }
+    if let Some(color) = ws.active_color {
+        theme.set_workspaces_active_color(parse_hex_color(&color));
+    }
+    if let Some(color) = ws.occupied_bg {
+        theme.set_workspaces_occupied_bg(parse_hex_color(&color));
+    }
+    if let Some(color) = ws.text_active {
+        theme.set_workspaces_text_active(parse_hex_color(&color));
+    }
+    if let Some(color) = ws.text_occupied {
+        theme.set_workspaces_text_occupied(parse_hex_color(&color));
+    }
+    if let Some(color) = ws.text_free {
+        theme.set_workspaces_text_free(parse_hex_color(&color));
+    }
+    if let Some(radius) = ws.border_radius {
+        theme.set_workspaces_border_radius(radius as i32);
+    }
+    
+    let ms = get_music_icon_style(config);
+    if let Some(color) = ms.artist_color {
+        theme.set_music_artist_color(parse_hex_color(&color));
+    }
+    if let Some(radius) = ms.album_border_radius {
+        theme.set_music_album_border_radius(radius as i32);
+    }
 }
 
 pub fn init_app(app: &StatusBarWindow, config: &Config, display_width: u32, display_height: u32) {

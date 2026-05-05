@@ -224,7 +224,7 @@ pub fn save_config(config: &Config) {
     }
 }
 
-fn parse_hex_color(hex: &str) -> Color {
+pub fn parse_hex_color(hex: &str) -> Color {
     let hex = hex.trim_start_matches('#');
     if hex.len() == 8 {
         let r = u8::from_str_radix(&hex[0..2], 16).unwrap_or(0);
@@ -240,21 +240,4 @@ fn parse_hex_color(hex: &str) -> Color {
     } else {
         Color::from_rgb_u8(0, 0, 0)
     }
-}
-
-pub fn workspaces_style_to_slint(workspaces_style: &WorkspacesStyle) -> (Color, Color, Color, Color, Color, Color, i32) {
-    let bg = parse_hex_color(&workspaces_style.bg_color.as_deref().unwrap_or("#1e1f1bf6"));
-    let active = parse_hex_color(&workspaces_style.active_color.as_deref().unwrap_or("#B4CCC1"));
-    let occupied = parse_hex_color(&workspaces_style.occupied_bg.as_deref().unwrap_or("#303934"));
-    let text_active = parse_hex_color(&workspaces_style.text_active.as_deref().unwrap_or("#303934"));
-    let text_occupied = parse_hex_color(&workspaces_style.text_occupied.as_deref().unwrap_or("#B4C0B9"));
-    let text_free = parse_hex_color(&workspaces_style.text_free.as_deref().unwrap_or("#868686"));
-    let border = workspaces_style.border_radius.unwrap_or(14);
-    (bg, active, occupied, text_active, text_occupied, text_free, border)
-}
-
-pub fn music_icon_style_to_slint(music_style: &MusicIconStyle) -> (Color, i32) {
-    let artist = parse_hex_color(&music_style.artist_color.as_deref().unwrap_or("#85948d"));
-    let border = music_style.album_border_radius.unwrap_or(4);
-    (artist, border)
 }
