@@ -57,6 +57,7 @@ export component StatusBarWindow inherits Window {
     callback colorize_clicked();
     callback screenshot_clicked();
     callback article_clicked();
+    callback bluetooth_clicked();
     
     Rectangle {
         min-height: Theme.bar-height;
@@ -135,6 +136,9 @@ export component StatusBarWindow inherits Window {
                 
                 BluetoothWidget {
                     connected: root.bluetooth-connected;
+                    clicked => {
+                        root.bluetooth_clicked();
+                    }
                 }
 
             }

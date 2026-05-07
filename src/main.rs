@@ -17,7 +17,7 @@ use config::load_or_create_config;
 use app_init::init_app;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, AppBarEdge, StatusBarConfig, BatteryMonitor};
+use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, open_action_center, AppBarEdge, StatusBarConfig, BatteryMonitor};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -71,6 +71,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     app.on_article_clicked(move || {
         open_text_extractor();
+    });
+
+    app.on_bluetooth_clicked(move || {
+        open_action_center();
     });
 
     let _monitor = BatteryMonitor::new(move |status| {
