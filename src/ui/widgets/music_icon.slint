@@ -6,11 +6,14 @@ export component MusicIconWidget {
     in-out property <string> title: "Sin música";
     in-out property <string> artist: "";
     in-out property <image> album-art;
+    in-out property <int> frame-count: 0;
+    in-out property <image> frame-0;
+    in-out property <image> frame-1;
+    in-out property <int> current-frame-index: 0;
     
     callback play-pause();
     callback next();
     callback previous();
-
     callback clicked;
     
     Rectangle {
@@ -27,17 +30,17 @@ export component MusicIconWidget {
                     // Icono centrado verticalmente
                     VerticalLayout {
                         alignment: center;
-                        padding-right: 4px;
+                        padding-right: 0px;
                         
                         icon-rect := Rectangle {
-                            width: 20px;
+                            width: 43px;
                             
                         Image {
-                            source: root.has-player ? @image-url("../../assets/icons/motion_play.svg") : @image-url("../../assets/icons/music_off.svg");
-                            width: 20px;
-                            height: 20px;
+                            source: root.has-player ? (
+                                root.current-frame-index == 0 ? root.frame-0 : root.frame-1
+                            ) : @image-url("../../assets/icons/music_off.svg");
+                            height: 22px;
                             image-fit: contain;
-                            colorize: Theme.foreground-icon;
                         }
                         }
                     }
@@ -48,10 +51,10 @@ export component MusicIconWidget {
                         
                         Rectangle {
                             clip: true;
-                            width: 24px;
-                            height: 24px;
+                            width: 22px;
+                            height: 22px;
                             border-radius: Theme.music_album_border_radius * 1px;
-                            // background: black;       
+                            background: #a7a7a778;     
                             Image {               
                                 source: root.album-art;
                                 width: 24px;

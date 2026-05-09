@@ -42,6 +42,10 @@ export component StatusBarWindow inherits Window {
     in-out property <float> media-progress: 0.0;
     in-out property <string> media-progress-time: "0:00";
     in-out property <string> media-total-time: "0:00";
+    in-out property <int> media-gif-frame-count: 0;
+    in-out property <image> frame_0;
+    in-out property <image> frame_1;
+    in-out property <int> media-gif-current-frame-index: 0;
     
     in-out property <int> active-workspace: 1;
     in-out property <[bool]> workspace-occupied: [];
@@ -76,6 +80,10 @@ export component StatusBarWindow inherits Window {
                 title: root.media-title;
                 artist: root.media-artist;
                 album-art: root.media-album-art;
+                frame-count: root.media-gif-frame-count;
+                frame-0: root.frame_0;
+                frame-1: root.frame_1;
+                current-frame-index: root.media-gif-current-frame-index;
 
                 clicked => {
                     root.popup_toggle();

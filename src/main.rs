@@ -12,6 +12,10 @@ mod popup;
 mod status_updater;
 mod config;
 mod app_init;
+mod gif_loader;
+mod gif_animator;
+
+const GIF_INTERVAL_MS: u64 = 400;
 
 use config::load_or_create_config;
 use app_init::init_app;
@@ -38,6 +42,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = StatusBarWindow::new()?;
     init_app(&app, &cfg, 1920, 32);
+
+    let animator = gif_animator::GifAnimator::new();
+    animator.init(&app);
+    let _gif_timer = animator.start_animation(app.as_weak(), GIF_INTERVAL_MS);
 
     let app_weak = app.as_weak();
     let app_weak_popup = app_weak.clone();

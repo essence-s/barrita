@@ -19,7 +19,7 @@ log = "0.4"
 env_logger = "0.11"
 thiserror = "2"
 winit = "0.30"
-image = { version = "0.25", default-features = false, features = ["png"] }
+image = { version = "0.25", default-features = false, features = ["gif", "png"] }
 tray-icon = "0.22"
 toml = "0.8"
 dirs = "5"
