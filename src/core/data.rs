@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use crate::app::media::get_media_info;
 use crate::app::network::get_network_info;
 use crate::app::volume::get_volume_info;
 use crate::app::time::get_time_info;
@@ -69,26 +68,6 @@ impl StatusBarData {
         } else {
             self.volume = 0;
             self.volume_icon = "🔊".to_string();
-        }
-
-        if let Some(info) = get_media_info() {
-            self.media_title = info.title;
-            self.media_artist = info.artist;
-            self.media_status = info.status;
-            self.media_has_player = info.has_player;
-            self.media_album_art = info.album_art;
-            self.media_progress = info.progress;
-            self.media_progress_time = info.progress_time;
-            self.media_total_time = info.total_time;
-        } else {
-            self.media_title = "Sin música".to_string();
-            self.media_artist = String::new();
-            self.media_status = "stopped".to_string();
-            self.media_has_player = false;
-            self.media_album_art = Vec::new();
-            self.media_progress = 0.0;
-            self.media_progress_time = "0:00".to_string();
-            self.media_total_time = "0:00".to_string();
         }
     }
 }

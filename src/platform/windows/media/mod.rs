@@ -1,64 +1,49 @@
-use std::sync::{Arc, Mutex, mpsc};
+use std::collections::HashMap;
 use std::thread;
-use std::time::Duration;
-use windows::{
-    Media::Control::{
-        GlobalSystemMediaTransportControlsSessionManager,
-        GlobalSystemMediaTransportControlsSessionPlaybackStatus,
-        GlobalSystemMediaTransportControlsSession,
-    },
+use std::sync::{Arc, Mutex};
+
+use windows::Media::Control::{
+    GlobalSystemMediaTransportControlsSessionManager,
 };
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum MediaEvent {
-    SessionCreated,
-    SessionRemoved,
-    CurrentSessionChanged,
-    SessionsChanged,
-    PlaybackInfoChanged,
-    TimelinePropertiesChanged,
-    MediaPropertiesChanged,
-}
-
-#[derive(Debug, Clone)]
-pub struct MediaInfo {
-    pub title: String,
-    pub artist: String,
-    pub status: String,
-    pub has_player: bool,
-    pub position_secs: u64,
-    pub duration_secs: u64,
+    SessionCreated(()),
+    SessionRemoved(()),
+    CurrentSessionChanged(Option<String>),
+    PlaybackInfoChanged(()),
+    MediaPropertiesChanged(()),
+    TimelinePropertiesChanged(()),
 }
 
 pub struct MediaListener {
-    _receiver: Arc<Mutex<Option<mpsc::Receiver<MediaEvent>>>>,
+    _running: Arc<Mutex<bool>>,
 }
 
 impl MediaListener {
     pub fn new<F>(callback: F) -> Result<Self, Box<dyn std::error::Error>>
     where
-        F: 'static + Send + Fn(MediaEvent) + Clone,
+        F: 'static + Fn(MediaEvent) + Send + Clone,
     {
-        let (_tx, rx) = mpsc::channel::<MediaEvent>();
-        let callback_clone = callback.clone();
+        let running = Arc::new(Mutex::new(true));
+        let running_clone = running.clone();
 
         thread::spawn(move || {
-            run_media_listener_loop(callback_clone);
+            run_event_loop(callback, running_clone);
         });
 
         Ok(MediaListener {
-            _receiver: Arc::new(Mutex::new(Some(rx))),
+            _running: running,
         })
     }
 }
 
-fn run_media_listener_loop<F>(callback: F)
+fn run_event_loop<F>(callback: F, running: Arc<Mutex<bool>>)
 where
-    F: 'static + Send + Fn(MediaEvent) + Clone,
+    F: 'static + Fn(MediaEvent) + Send + Clone,
 {
-    println!("[Media] Starting media listener thread...");
-
-    let manager: GlobalSystemMediaTransportControlsSessionManager = match GlobalSystemMediaTransportControlsSessionManager::RequestAsync() {
+    let manager = match GlobalSystemMediaTransportControlsSessionManager::RequestAsync() {
         Ok(op) => match op.join() {
             Ok(m) => {
                 println!("[Media] Manager initialized");
@@ -75,61 +60,75 @@ where
         }
     };
 
-    let mut last_session_available = false;
+    let mut last_session_id: Option<String> = None;
+    let mut known_sessions: HashMap<String, bool> = HashMap::new();
 
-    loop {
-        thread::sleep(Duration::from_millis(500));
-
-        let session_result: Result<GlobalSystemMediaTransportControlsSession, windows::core::Error> = manager.GetCurrentSession();
-
-        match session_result {
-            Ok(session) => {
-                if !last_session_available {
-                    println!("[Media] Session created");
-                    last_session_available = true;
-                    callback(MediaEvent::SessionCreated);
-                }
-
-                let playback_info_result = session.GetPlaybackInfo();
-                if let Ok(info) = playback_info_result {
-                    let status = info.PlaybackStatus().unwrap_or(GlobalSystemMediaTransportControlsSessionPlaybackStatus::Stopped);
-                    let status_str = match status {
-                        GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing => "playing",
-                        GlobalSystemMediaTransportControlsSessionPlaybackStatus::Paused => "paused",
-                        _ => "stopped",
-                    };
-                    println!("[Media] Playback status: {}", status_str);
-                    callback(MediaEvent::PlaybackInfoChanged);
-                }
-
-                let timeline_result = session.GetTimelineProperties();
-                if timeline_result.is_ok() {
-                    println!("[Media] Timeline updated");
-                    callback(MediaEvent::TimelinePropertiesChanged);
-                }
-
-                let props_async_result = session.TryGetMediaPropertiesAsync();
-                if let Ok(op) = props_async_result {
-                    if op.join().is_ok() {
-                        println!("[Media] Media properties updated");
-                        callback(MediaEvent::MediaPropertiesChanged);
-                    }
-                }
-            }
-            Err(_) => {
-                if last_session_available {
-                    println!("[Media] Session removed");
-                    last_session_available = false;
-                    callback(MediaEvent::SessionRemoved);
-                }
-            }
+    if let Ok(sessions) = manager.GetSessions() {
+        for session in sessions {
+            let id = session.SourceAppUserModelId().unwrap_or_default().to_string();
+            known_sessions.insert(id.clone(), true);
+            println!("[Media] Session created: {}", id);
+            callback(MediaEvent::SessionCreated(()));
         }
     }
+
+    if let Ok(session) = manager.GetCurrentSession() {
+        let id = session.SourceAppUserModelId().unwrap_or_default().to_string();
+        last_session_id = Some(id.clone());
+        callback(MediaEvent::CurrentSessionChanged(Some(id)));
+    }
+
+    while *running.lock().unwrap() {
+        let new_sessions = manager.GetSessions();
+        
+        if let Ok(sessions) = new_sessions {
+            let mut current_ids: Vec<String> = Vec::new();
+            
+            for session in sessions {
+                let id = session.SourceAppUserModelId().unwrap_or_default().to_string();
+                current_ids.push(id.clone());
+                
+                if !known_sessions.contains_key(&id) {
+                    println!("[Media] Session created: {}", id);
+                    known_sessions.insert(id.clone(), true);
+                    callback(MediaEvent::SessionCreated(()));
+                }
+            }
+
+            let ids_to_remove: Vec<String> = known_sessions.keys()
+                .filter(|id| !current_ids.contains(id))
+                .cloned()
+                .collect();
+            
+            for id in ids_to_remove {
+                println!("[Media] Session removed: {}", id);
+                known_sessions.remove(&id);
+                callback(MediaEvent::SessionRemoved(()));
+            }
+        }
+
+        if let Ok(session) = manager.GetCurrentSession() {
+            let current_id = session.SourceAppUserModelId().unwrap_or_default().to_string();
+            if last_session_id.as_ref() != Some(&current_id) {
+                println!("[Media] Current session changed: {}", current_id);
+                last_session_id = Some(current_id.clone());
+                callback(MediaEvent::CurrentSessionChanged(Some(current_id)));
+            }
+        } else if last_session_id.is_some() {
+            println!("[Media] Current session: None");
+            last_session_id = None;
+            callback(MediaEvent::CurrentSessionChanged(None));
+        }
+
+        thread::sleep(std::time::Duration::from_millis(500));
+    }
+
+    println!("[Media] Event loop ended");
 }
 
 pub fn start_media_listener<F>(callback: F) -> Result<MediaListener, Box<dyn std::error::Error>>
 where
-    F: 'static + Send + Fn(MediaEvent) + Clone,
+    F: 'static + Fn(MediaEvent) + Send + Clone,
 {
     MediaListener::new(callback)
 }

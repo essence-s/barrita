@@ -7,7 +7,7 @@ pub mod media;
 pub use app_bar::get_window_position;
 pub use config::{AppBarEdge, StatusBarConfig};
 pub use power::BatteryMonitor;
-pub use media::{MediaEvent, MediaListener, start_media_listener};
+pub use media::{start_media_listener};
 
 pub fn init_statusbar(config: &StatusBarConfig, hwnd: isize) {
     println!(

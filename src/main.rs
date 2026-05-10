@@ -53,18 +53,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         popup::toggle_popup(&app_weak_popup);
     });
 
-    app.on_media_play_pause(move || {
-        let _ = app::media::play_pause();
-    });
-
-    app.on_media_next(move || {
-        let _ = app::media::next();
-    });
-
-    app.on_media_previous(move || {
-        let _ = app::media::previous();
-    });
-
     app.on_network_clicked(move || {
         open_network_panel();
     });
