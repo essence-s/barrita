@@ -21,7 +21,7 @@ use config::load_or_create_config;
 use app_init::init_app;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, open_action_center, AppBarEdge, StatusBarConfig, BatteryMonitor};
+use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, open_action_center, AppBarEdge, StatusBarConfig, BatteryMonitor, start_media_listener};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -96,6 +96,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 window.set_battery_low(status.is_low);
             }
         }).ok();
+    })?;
+
+    let _media_listener = start_media_listener(move |event| {
+        println!("[main] Media event: {:?}", event);
     })?;
 
     let app_weak = app.as_weak();

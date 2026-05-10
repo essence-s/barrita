@@ -30,6 +30,7 @@ raw-window-handle = "0.6"
 uds_windows = "1.2"
 which = "0.2"
 windows = { version = "0.62", features = ["Win32_UI_Input_KeyboardAndMouse", "Win32_Foundation", "Media_Control", "Storage_Streams", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Storage", "Devices_Power", "Win32_System_Power"] }
+tokio = { version = "1", features = ["rt", "time", "sync"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 mpris = "2.0"
