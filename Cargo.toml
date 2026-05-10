@@ -10,7 +10,7 @@ slint = { version = "1.16", features = [
   "renderer-skia",
   "raw-window-handle-06"
 ] }
-sysinfo = "0.32"
+sysinfo = "0.38"
 battery = "0.7.8"
 chrono = "0.4"
 serde = { version = "1", features = ["derive"] }

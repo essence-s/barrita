@@ -3,7 +3,6 @@ use crate::app::media::get_media_info;
 use crate::app::network::get_network_info;
 use crate::app::volume::get_volume_info;
 use crate::app::time::get_time_info;
-use crate::app::processes::get_top_process;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NetworkInfo {
@@ -26,12 +25,6 @@ pub struct TimeInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ProcessInfo {
-    pub top_process: String,
-    pub cpu_usage: u32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct StatusBarData {
     pub time: String,
     pub date: String,
@@ -44,7 +37,6 @@ pub struct StatusBarData {
     pub volume: i32,
     pub volume_muted: bool,
     pub volume_icon: String,
-    pub top_process: String,
     pub media_title: String,
     pub media_artist: String,
     pub media_status: String,
@@ -78,9 +70,6 @@ impl StatusBarData {
             self.volume = 0;
             self.volume_icon = "🔊".to_string();
         }
-
-        let proc_info = get_top_process();
-        self.top_process = proc_info.top_process;
 
         if let Some(info) = get_media_info() {
             self.media_title = info.title;
