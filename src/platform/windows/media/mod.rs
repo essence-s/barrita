@@ -1,5 +1,4 @@
 #![allow(unused_imports)]
-use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -42,81 +41,54 @@ pub enum MediaEvent {
     MediaInfoChanged(MediaInfo),
 }
 
-#[allow(dead_code)]
+#[derive(Debug, Clone)]
+pub enum MediaUpdate {
+    PlaybackStatus(String),
+    MediaInfo { title: String, artist: String, status: String, has_player: bool },
+}
+
+#[derive(Debug, Clone)]
+struct MediaState {
+    status: String,
+    title: String,
+    artist: String,
+    has_player: bool,
+}
+
+impl Default for MediaState {
+    fn default() -> Self {
+        MediaState {
+            status: "stopped".to_string(),
+            title: "Sin música".to_string(),
+            artist: String::new(),
+            has_player: false,
+        }
+    }
+}
+
 struct SessionState {
     session: GlobalSystemMediaTransportControlsSession,
     playback_token: Option<i64>,
-    timeline_token: Option<i64>,
     media_token: Option<i64>,
 }
 
 pub struct MediaListener {
     _running: Arc<Mutex<bool>>,
-    _states: Arc<Mutex<HashMap<String, SessionState>>>,
 }
 
 impl MediaListener {
     pub fn new<F>(callback: F) -> Result<Self, Box<dyn std::error::Error>>
     where
-        F: 'static + Fn(MediaEvent) + Send + Clone + Sync,
+        F: 'static + Fn(MediaUpdate) + Send + Clone + Sync,
     {
         let running = Arc::new(Mutex::new(true));
-        let states: Arc<Mutex<HashMap<String, SessionState>>> = Arc::new(Mutex::new(HashMap::new()));
+        let current_state: Arc<Mutex<MediaState>> = Arc::new(Mutex::new(MediaState::default()));
 
         let manager = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?.join()?;
-        let manager_for_sessions = manager.clone();
-        let manager_for_current = manager.clone();
         let manager_for_initial = manager.clone();
 
         let callback_arc = Arc::new(callback);
-        let cb_all = callback_arc.clone();
-
-        let sessions_handler = TypedEventHandler::<
-            GlobalSystemMediaTransportControlsSessionManager,
-            windows::Media::Control::SessionsChangedEventArgs,
-        >::new(move |_sender, _args| {
-            if let Ok(sessions_list) = manager_for_sessions.GetSessions() {
-                let count = sessions_list.Size().unwrap_or(0);
-                println!("[Media] SessionsChanged event: {} sessions", count);
-                cb_all(MediaEvent::SessionsChanged);
-
-                for i in 0..count {
-                    if let Ok(session) = sessions_list.GetAt(i) {
-                        let app_id = session.SourceAppUserModelId()
-                            .map(|s| s.to_string())
-                            .unwrap_or_default();
-                        println!("[Media]   New session: {}", app_id);
-                        cb_all(MediaEvent::SessionCreated(app_id));
-                    }
-                }
-            }
-            Ok(())
-        });
-
-        let cb_current = callback_arc.clone();
-        let manager_for_current2 = manager_for_current.clone();
-        let current_handler = TypedEventHandler::<
-            GlobalSystemMediaTransportControlsSessionManager,
-            windows::Media::Control::CurrentSessionChangedEventArgs,
-        >::new(move |_sender, _args| {
-            match manager_for_current2.GetCurrentSession() {
-                Ok(session) => {
-                    let app_id = session.SourceAppUserModelId()
-                        .map(|s| s.to_string())
-                        .unwrap_or_default();
-                    println!("[Media] CurrentSessionChanged: {}", app_id);
-                    cb_current(MediaEvent::CurrentSessionChanged(app_id));
-                }
-                Err(_) => {
-                    println!("[Media] CurrentSessionChanged: None");
-                    cb_current(MediaEvent::CurrentSessionChanged(String::new()));
-                }
-            }
-            Ok(())
-        });
-
-        let _sessions_token = manager.SessionsChanged(&sessions_handler)?;
-        let _current_token = manager_for_current.CurrentSessionChanged(&current_handler)?;
+        let state_clone = current_state.clone();
 
         println!("[Media] TypedEventHandler registered, scanning initial sessions...");
 
@@ -124,7 +96,6 @@ impl MediaListener {
             let count = sessions_list.Size().unwrap_or(0);
             if count > 0 {
                 println!("[Media] Found {} initial sessions", count);
-                let mut states_map = states.lock().unwrap();
 
                 for i in 0..count {
                     if let Ok(session) = sessions_list.GetAt(i) {
@@ -133,37 +104,90 @@ impl MediaListener {
                             .unwrap_or_default();
                         println!("[Media] Registering handlers for: {}", app_id);
 
-                        let app_id_pb = app_id.clone();
-                        let app_id_med = app_id.clone();
-
                         let callback_pb = callback_arc.clone();
-                        let callback_med = callback_arc.clone();
+                        let state_pb = state_clone.clone();
+                        let manager_pb = manager_for_initial.clone();
 
                         let playback_token = session.PlaybackInfoChanged(&TypedEventHandler::<
                             GlobalSystemMediaTransportControlsSession,
                             windows::Media::Control::PlaybackInfoChangedEventArgs,
                         >::new(move |_sender, _args| {
-                            callback_pb(MediaEvent::PlaybackChanged(app_id_pb.clone()));
+                            match get_playback_status_internal(&manager_pb) {
+                                Ok(is_playing) => {
+                                    let new_status = if is_playing { "playing" } else { "paused" };
+                                    let mut state = state_pb.lock().unwrap();
+                                    if state.status != new_status {
+                                        println!("[Media] Playback changed: {} -> {}", state.status, new_status);
+                                        state.status = new_status.to_string();
+                                        callback_pb(MediaUpdate::PlaybackStatus(new_status.to_string()));
+                                    }
+                                }
+                                Err(e) => {
+                                    println!("[Media] Error getting playback status: {:?}", e);
+                                }
+                            }
                             Ok(())
                         })).ok();
 
-                        // Not using TimelineChanged - too noisy (fires constantly during playback)
-                        let timeline_token: Option<i64> = None;
+                        let callback_med = callback_arc.clone();
+                        let state_med = state_clone.clone();
+                        let manager_med = manager_for_initial.clone();
 
                         let media_token = session.MediaPropertiesChanged(&TypedEventHandler::<
                             GlobalSystemMediaTransportControlsSession,
                             windows::Media::Control::MediaPropertiesChangedEventArgs,
                         >::new(move |_sender, _args| {
-                            callback_med(MediaEvent::MediaPropertiesChanged(app_id_med.clone()));
+                            match get_media_properties_internal(&manager_med) {
+                                Ok((title, artist, is_playing)) => {
+                                    let has_player = title != "Sin música";
+                                    let status = if is_playing {
+                                        "playing"
+                                    } else if has_player {
+                                        "paused"
+                                    } else {
+                                        "stopped"
+                                    };
+
+                                    let mut changed = false;
+                                    {
+                                        let mut state = state_med.lock().unwrap();
+                                        if state.title != title {
+                                            state.title = title.clone();
+                                            changed = true;
+                                        }
+                                        if state.artist != artist {
+                                            state.artist = artist.clone();
+                                            changed = true;
+                                        }
+                                        if state.status != status {
+                                            state.status = status.to_string();
+                                            changed = true;
+                                        }
+                                        if state.has_player != has_player {
+                                            state.has_player = has_player;
+                                            changed = true;
+                                        }
+                                    }
+
+                                    if changed {
+                                        println!("[Media] Media props changed: {} - {} (status: {})", title, artist, status);
+                                        callback_med(MediaUpdate::MediaInfo {
+                                            title,
+                                            artist,
+                                            status: status.to_string(),
+                                            has_player,
+                                        });
+                                    }
+                                }
+                                Err(e) => {
+                                    println!("[Media] Error getting media properties: {:?}", e);
+                                }
+                            }
                             Ok(())
                         })).ok();
 
-                        states_map.insert(app_id, SessionState {
-                            session,
-                            playback_token,
-                            timeline_token,
-                            media_token,
-                        });
+                        let _ = playback_token;
+                        let _ = media_token;
                     }
                 }
             } else {
@@ -180,9 +204,51 @@ impl MediaListener {
 
         Ok(MediaListener {
             _running: running,
-            _states: states,
         })
     }
+}
+
+fn get_playback_status_internal(manager: &GlobalSystemMediaTransportControlsSessionManager) -> Result<bool, Box<dyn std::error::Error>> {
+    let session = match manager.GetCurrentSession() {
+        Ok(s) => s,
+        Err(_) => return Ok(false),
+    };
+
+    let playback_info = session.GetPlaybackInfo()?;
+    let playback_status = playback_info.PlaybackStatus()?;
+    let is_playing = playback_status == GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing;
+
+    Ok(is_playing)
+}
+
+fn get_media_properties_internal(manager: &GlobalSystemMediaTransportControlsSessionManager) -> Result<(String, String, bool), Box<dyn std::error::Error>> {
+    let session = match manager.GetCurrentSession() {
+        Ok(s) => s,
+        Err(_) => return Ok(("Sin música".to_string(), String::new(), false)),
+    };
+
+    let playback_info = session.GetPlaybackInfo()?;
+    let playback_status = playback_info.PlaybackStatus()?;
+    let is_playing = playback_status == GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing;
+
+    let mut title = String::new();
+    let mut artist = String::new();
+
+    match session.TryGetMediaPropertiesAsync() {
+        Ok(async_op) => {
+            if let Ok(props) = async_op.join() {
+                title = props.Title().map(|s| s.to_string()).unwrap_or_default();
+                artist = props.Artist().map(|s| s.to_string()).unwrap_or_default();
+            }
+        }
+        Err(_) => {}
+    }
+
+    if title.is_empty() {
+        title = "Sin música".to_string();
+    }
+
+    Ok((title, artist, is_playing))
 }
 
 pub fn get_current_media_info() -> Result<MediaInfo, Box<dyn std::error::Error>> {
@@ -230,9 +296,14 @@ pub fn get_current_media_info() -> Result<MediaInfo, Box<dyn std::error::Error>>
     })
 }
 
+pub fn get_playback_status() -> Result<bool, Box<dyn std::error::Error>> {
+    let manager = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?.join()?;
+    get_playback_status_internal(&manager)
+}
+
 pub fn start_media_listener<F>(callback: F) -> Result<MediaListener, Box<dyn std::error::Error>>
 where
-    F: 'static + Fn(MediaEvent) + Send + Clone + Sync,
+    F: 'static + Fn(MediaUpdate) + Send + Clone + Sync,
 {
     MediaListener::new(callback)
 }
