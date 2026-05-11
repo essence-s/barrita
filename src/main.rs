@@ -21,7 +21,7 @@ use config::load_or_create_config;
 use app_init::init_app;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, open_action_center, AppBarEdge, StatusBarConfig, BatteryMonitor, start_media_listener};
+use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, open_action_center, AppBarEdge, StatusBarConfig, BatteryMonitor, start_media_listener, get_current_media_info, MediaEvent};
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -86,8 +86,37 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }).ok();
     })?;
 
+    // Media listener - updates UI on playback/timeline changes
+    let app_weak_for_listener = app.as_weak();
     let _media_listener = start_media_listener(move |event| {
-        println!("[main] Media event: {:?}", event);
+        match &event {
+            MediaEvent::PlaybackChanged(_) | MediaEvent::MediaPropertiesChanged(_) => {
+                let app_weak = app_weak_for_listener.clone();
+                slint::invoke_from_event_loop(move || {
+                    if let Some(window) = app_weak.upgrade() {
+                        match get_current_media_info() {
+                            Ok(info) => {
+                                let status = if info.is_playing {
+                                    "playing"
+                                } else if info.title != "Sin música" {
+                                    "paused"
+                                } else {
+                                    "stopped"
+                                };
+                                window.set_media_status(status.into());
+                                window.set_media_has_player(info.title != "Sin música");
+                                window.set_media_title(info.title.into());
+                                window.set_media_artist(info.artist.into());
+                            }
+                            Err(e) => {
+                                println!("[main] Media info error: {:?}", e);
+                            }
+                        }
+                    }
+                }).ok();
+            }
+            _ => {} // Ignore other events (TimelineChanged, SessionsChanged, etc.)
+        }
     })?;
 
     let app_weak = app.as_weak();
