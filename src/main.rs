@@ -14,10 +14,12 @@ mod config;
 mod app_init;
 mod gif_loader;
 mod gif_animator;
+mod ui;
 
 const GIF_INTERVAL_MS: u64 = 400;
 
 use config::load_or_create_config;
+use ui::image::bytes_to_slint_image;
 use app_init::init_app;
 
 use platform::tray::init_tray;
@@ -97,12 +99,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("[main] >>> PlaybackStatus update: {}", status);
                         window.set_media_status(status.into());
                     }
-                    MediaUpdate::MediaInfo { title, artist, status, has_player } => {
+                    MediaUpdate::MediaInfo { title, artist, status, has_player, thumbnail } => {
                         println!("[main] >>> MediaInfo update: {} - {} ({})", title, artist, status);
                         window.set_media_title(title.into());
                         window.set_media_artist(artist.into());
                         window.set_media_status(status.into());
                         window.set_media_has_player(has_player);
+
+                        if let Some(bytes) = thumbnail {
+                            if let Some(img) = bytes_to_slint_image(&bytes) {
+                                println!("[main] >>> Thumbnail updated");
+                                window.set_media_album_art(img);
+                            }
+                        }
                     }
                 }
             }
