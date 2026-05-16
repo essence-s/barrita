@@ -2,6 +2,7 @@
 
 slint::include_modules!();
 
+use log::info;
 use slint::{ComponentHandle, Timer, TimerMode};
 use std::time::Duration;
 
@@ -35,7 +36,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // std::env::set_var("SLINT_BACKEND", "winit-skia-opengl");
     }
 
-    env_logger::init();
+    env_logger::Builder::from_default_env()
+        .filter_level(log::LevelFilter::Info)
+        .init();
     log::info!("Starting Barrita Status Bar");
 
     let cfg = load_or_create_config();
@@ -172,7 +175,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         let app_weak = app.as_weak();
         app::workspaces::start_komorebi_listener(move |info| {
-            println!("[main] Workspace changed: active={}, occupied={:?}", 
+            info!("[main] Workspace changed: active={}, occupied={:?}", 
                 info.active_workspace, info.workspace_occupied);
             let app_weak_clone = app_weak.clone();
             if let Err(e) = slint::invoke_from_event_loop(move || {
@@ -183,7 +186,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     window.set_workspace_occupied(slint::ModelRc::new(model));
                 }
             }) {
-                eprintln!("[komorebi] Failed to update UI: {}", e);
+                log::error!("[komorebi] Failed to update UI: {}", e);
             }
         });
     }

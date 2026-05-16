@@ -1,3 +1,4 @@
+use log::{info, error};
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
@@ -81,7 +82,7 @@ where
 {
     thread::spawn(move || {
         if let Err(e) = run_listener(callback) {
-            eprintln!("[komorebi] ERROR: {}", e);
+            error!("[komorebi] ERROR: {}", e);
         }
     });
 }
@@ -93,18 +94,18 @@ where
     let socket_path = get_socket_path();
     let socket_name = SOCKET_NAME;
 
-    println!("[komorebi] Creating socket at: {}", socket_path.display());
+    info!("[komorebi] Creating socket at: {}", socket_path.display());
 
     let _ = std::fs::remove_file(&socket_path);
 
     let listener = UnixListener::bind(&socket_path)?;
     listener.set_nonblocking(true)?;
 
-    println!("[komorebi] Socket created, starting komorebic subscribe-socket...");
+    info!("[komorebi] Socket created, starting komorebic subscribe-socket...");
 
     let komorebic_path = which_komorebic();
     if komorebic_path.is_none() {
-        eprintln!("[komorebi] ERROR: komorebic.exe not found in PATH");
+        error!("[komorebi] ERROR: komorebic.exe not found in PATH");
         return Err("komorebic.exe not found".into());
     }
 
@@ -113,20 +114,20 @@ where
         .args(["subscribe-socket", socket_name])
         .spawn()?;
 
-    println!("[komorebi] spawned komorebic subscribe-socket");
+    info!("[komorebi] spawned komorebic subscribe-socket");
 
     loop {
         match listener.accept() {
             Ok((stream, _addr)) => {
                 if let Err(e) = read_events(stream, &callback) {
-                    eprintln!("[komorebi] Read error: {}", e);
+                    error!("[komorebi] Read error: {}", e);
                 }
             }
             Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                 thread::sleep(Duration::from_millis(100));
             }
             Err(e) => {
-                eprintln!("[komorebi] Accept error: {}", e);
+                error!("[komorebi] Accept error: {}", e);
                 return Err(Box::new(e));
             }
         }
