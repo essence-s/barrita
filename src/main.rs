@@ -170,8 +170,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     #[cfg(target_os = "windows")]
     {
-        let komorebi_app_weak = app.as_weak();
-        app::workspaces::start_komorebi_listener(komorebi_app_weak);
+        let app_weak = app.as_weak();
+        app::workspaces::start_komorebi_listener(move |info| {
+            println!("[main] Workspace changed: active={}, occupied={:?}", 
+                info.active_workspace, info.workspace_occupied);
+            let app_weak_clone = app_weak.clone();
+            if let Err(e) = slint::invoke_from_event_loop(move || {
+                if let Some(window) = app_weak_clone.upgrade() {
+                    let occupied: Vec<bool> = info.workspace_occupied.clone();
+                    let model = slint::VecModel::from(occupied);
+                    window.set_active_workspace(info.active_workspace);
+                    window.set_workspace_occupied(slint::ModelRc::new(model));
+                }
+            }) {
+                eprintln!("[komorebi] Failed to update UI: {}", e);
+            }
+        });
     }
 
     let _ = app.run();

@@ -1,23 +1,23 @@
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
 use serde::Deserialize;
-use slint::Weak;
 use uds_windows::{UnixListener, UnixStream};
 use which::which;
-use crate::StatusBarWindow;
 
 const SOCKET_NAME: &str = "barritaEvents";
 
-#[derive(Debug, Clone)]
+static LAST_WORKSPACE_STATE: Mutex<Option<WorkspaceInfo>> = Mutex::new(None);
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct WorkspaceInfo {
     pub active_workspace: i32,
     pub workspace_occupied: Vec<bool>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct KomorebiEvent {
     event: EventInfo,
@@ -25,13 +25,10 @@ struct KomorebiEvent {
     state: Option<State>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct EventInfo {
     #[serde(rename = "type")]
     event_type: String,
-    #[serde(default)]
-    content: serde_json::Value,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -60,11 +57,8 @@ struct Workspaces {
     focused: i32,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize, Default)]
 struct Workspace {
-    #[serde(default)]
-    name: Option<String>,
     #[serde(default)]
     containers: Containers,
 }
@@ -75,29 +69,27 @@ struct Containers {
     elements: Vec<Container>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize, Default)]
 struct Container {
     #[serde(default)]
-    windows: Windows,
+    _windows: (),
 }
 
-#[allow(dead_code)]
-#[derive(Debug, Deserialize, Default)]
-struct Windows {
-    #[serde(default)]
-    elements: Vec<serde_json::Value>,
-}
-
-pub fn start_komorebi_listener(app_weak: Weak<StatusBarWindow>) {
+pub fn start_komorebi_listener<F>(callback: F)
+where
+    F: Fn(WorkspaceInfo) + Send + 'static,
+{
     thread::spawn(move || {
-        if let Err(e) = run_listener(app_weak) {
+        if let Err(e) = run_listener(callback) {
             eprintln!("[komorebi] ERROR: {}", e);
         }
     });
 }
 
-fn run_listener(app_weak: Weak<StatusBarWindow>) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+fn run_listener<F>(callback: F) -> Result<(), Box<dyn std::error::Error + Send + Sync>>
+where
+    F: Fn(WorkspaceInfo) + Send + 'static,
+{
     let socket_path = get_socket_path();
     let socket_name = SOCKET_NAME;
 
@@ -126,11 +118,9 @@ fn run_listener(app_weak: Weak<StatusBarWindow>) -> Result<(), Box<dyn std::erro
     loop {
         match listener.accept() {
             Ok((stream, _addr)) => {
-                println!("[komorebi] Client connected");
-                if let Err(e) = read_events(stream, &app_weak) {
+                if let Err(e) = read_events(stream, &callback) {
                     eprintln!("[komorebi] Read error: {}", e);
                 }
-                println!("[komorebi] Client disconnected");
             }
             Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                 thread::sleep(Duration::from_millis(100));
@@ -143,27 +133,37 @@ fn run_listener(app_weak: Weak<StatusBarWindow>) -> Result<(), Box<dyn std::erro
     }
 }
 
-fn read_events(
+fn read_events<F>(
     stream: UnixStream,
-    app_weak: &Weak<StatusBarWindow>,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    callback: &F,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>>
+where
+    F: Fn(WorkspaceInfo) + Send + 'static,
+{
     let reader = BufReader::new(stream);
     for line in reader.lines() {
         match line {
             Ok(event) => {
                 if let Some(info) = parse_workspace_event(&event) {
-                    println!("[komorebi] WORKSPACE: active={}, occupied={:?}", 
-                        info.active_workspace, 
-                        info.workspace_occupied
-                    );
-
-                    let weak = app_weak.clone();
-                    let info_clone = info.clone();
-                    slint::invoke_from_event_loop(move || {
-                        if let Some(app) = weak.upgrade() {
-                            update_workspace_widget(&app, &info_clone);
+                    let should_update = {
+                        let mut last_state = LAST_WORKSPACE_STATE.lock().unwrap();
+                        let changed = last_state.as_ref() != Some(&info);
+                        if changed {
+                            *last_state = Some(info.clone());
+                            true
+                        } else {
+                            false
                         }
-                    })?;
+                    };
+
+                    if should_update {
+                        // println!("[komorebi] WORKSPACE: active={}, occupied={:?}", 
+                        //     info.active_workspace, 
+                        //     info.workspace_occupied
+                        // );
+
+                        callback(info);
+                    }
                 }
             }
             Err(e) => {
@@ -174,15 +174,14 @@ fn read_events(
     Ok(())
 }
 
-fn update_workspace_widget(window: &StatusBarWindow, info: &WorkspaceInfo) {
-    let occupied: Vec<bool> = info.workspace_occupied.clone();
-    let model = slint::VecModel::from(occupied);
-    window.set_active_workspace(info.active_workspace);
-    window.set_workspace_occupied(slint::ModelRc::new(model));
-}
-
 fn parse_workspace_event(event: &str) -> Option<WorkspaceInfo> {
     let parsed: KomorebiEvent = serde_json::from_str(event).ok()?;
+
+    let event_type = parsed.event.event_type.clone();
+
+    if event_type != "FocusChange" && event_type != "WorkAreaChanged" {
+        return None;
+    }
 
     let state = parsed.state?;
 
@@ -207,20 +206,5 @@ fn get_socket_path() -> PathBuf {
 }
 
 fn which_komorebic() -> Option<PathBuf> {
-    let paths = ["komorebic.exe", "komorebi\\komorebic.exe"];
-
-    for path in &paths {
-        if let Ok(output) = Command::new("where").arg(path).output() {
-            if output.status.success() {
-                let first_line = String::from_utf8_lossy(&output.stdout)
-                    .lines()
-                    .next()?
-                    .trim()
-                    .to_string();
-                return Some(PathBuf::from(first_line));
-            }
-        }
-    }
-
     which("komorebic.exe").ok()
 }
