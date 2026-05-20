@@ -180,7 +180,7 @@ fn parse_workspace_event(event: &str) -> Option<WorkspaceInfo> {
 
     let event_type = parsed.event.event_type.clone();
 
-    if event_type != "FocusChange" && event_type != "WorkAreaChanged" {
+    if event_type != "FocusWorkspaceNumber" && event_type != "WorkAreaChanged" {
         return None;
     }
 
