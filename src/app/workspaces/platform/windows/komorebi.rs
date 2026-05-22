@@ -9,15 +9,11 @@ use serde::Deserialize;
 use uds_windows::{UnixListener, UnixStream};
 use which::which;
 
+use crate::app::workspaces::data::WorkspaceInfo;
+
 const SOCKET_NAME: &str = "barritaEvents";
 
 static LAST_WORKSPACE_STATE: Mutex<Option<WorkspaceInfo>> = Mutex::new(None);
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct WorkspaceInfo {
-    pub active_workspace: i32,
-    pub workspace_occupied: Vec<bool>,
-}
 
 #[derive(Debug, Deserialize)]
 struct KomorebiEvent {
@@ -76,7 +72,7 @@ struct Container {
     _windows: (),
 }
 
-pub fn start_komorebi_listener<F>(callback: F)
+pub fn start_listener<F>(callback: F)
 where
     F: Fn(WorkspaceInfo) + Send + 'static,
 {
@@ -158,11 +154,6 @@ where
                     };
 
                     if should_update {
-                        // println!("[komorebi] WORKSPACE: active={}, occupied={:?}", 
-                        //     info.active_workspace, 
-                        //     info.workspace_occupied
-                        // );
-
                         callback(info);
                     }
                 }

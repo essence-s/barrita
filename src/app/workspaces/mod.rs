@@ -1,11 +1,15 @@
-pub mod komorebi;
+pub mod data;
+pub mod platform;
 
-pub use komorebi::start_komorebi_listener;
+pub use data::WorkspaceInfo;
 
-#[cfg(not(target_os = "windows"))]
-pub fn start_komorebi_listener<F>(_callback: F)
+pub fn start_komorebi_listener<F>(callback: F)
 where
-    F: Fn(crate::app::workspaces::komorebi::WorkspaceInfo) + Send + 'static,
+    F: Fn(WorkspaceInfo) + Send + 'static,
 {
+    #[cfg(target_os = "windows")]
+    platform::windows::komorebi::start_listener(callback);
+
+    #[cfg(not(target_os = "windows"))]
     println!("[komorebi] not supported on this platform");
 }

@@ -1,4 +1,4 @@
-import { Theme } from "../styles/theme.slint";
+import { Theme } from "../../ui/styles/theme.slint";
 
 export component WorkspacesWidget {
     in-out property <int> active-workspace: 1;
@@ -74,8 +74,6 @@ export component WorkspacesWidget {
                                     occupied ?
                                         Theme.workspaces_text_occupied :
                                         Theme.workspaces_text_free;
-                                // horizontal-alignment: center;
-                                // vertical-alignment: center;
                             }
                         
                         }
