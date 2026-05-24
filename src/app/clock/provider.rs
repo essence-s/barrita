@@ -1,4 +1,4 @@
-use crate::core::data::TimeInfo;
+use crate::app::clock::TimeInfo;
 use chrono::{Local, Datelike};
 
 pub fn get_time_info() -> TimeInfo {

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::app::network::get_network_info;
 use crate::app::volume::get_volume_info;
-use crate::app::time::get_time_info;
+use crate::app::clock::get_time_info;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NetworkInfo {
@@ -15,12 +15,6 @@ pub struct VolumeInfo {
     pub volume: u8,
     pub muted: bool,
     pub icon: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct TimeInfo {
-    pub time: String,
-    pub date: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
