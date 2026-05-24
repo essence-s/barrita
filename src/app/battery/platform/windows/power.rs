@@ -15,27 +15,22 @@ use windows::{
     },
 };
 
+use crate::app::battery::BatteryStatusInfo;
+
 const GUID_ACDC_POWER_SOURCE: GUID = GUID::from_u128(0x5D3E9A59_E9D5_4B00_A6BD_FF34FF516548);
 const GUID_BATTERY_PERCENTAGE_REMAINING: GUID = GUID::from_u128(0xA7AD8041_B45A_4CAE_87A3_EECBB468A9E1);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum PowerSource {
+enum PowerSource {
     Ac = 0,
     Dc = 1,
     Hot = 2,
 }
 
 #[derive(Debug, Clone)]
-pub enum PowerEvent {
+enum PowerEvent {
     PowerSource(PowerSource),
     BatteryPercentage(u8),
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct BatteryStatusInfo {
-    pub percentage: u8,
-    pub is_charging: bool,
-    pub is_low: bool,
 }
 
 pub struct BatteryMonitor {

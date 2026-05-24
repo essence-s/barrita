@@ -1,12 +1,10 @@
 pub mod app_bar;
 pub mod config;
 pub mod position_monitor;
-pub mod power;
 pub mod media;
 
 pub use app_bar::get_window_position;
 pub use config::{AppBarEdge, StatusBarConfig};
-pub use power::BatteryMonitor;
 pub use media::{start_media_listener, MediaUpdate};
 
 pub fn init_statusbar(config: &StatusBarConfig, hwnd: isize) {
