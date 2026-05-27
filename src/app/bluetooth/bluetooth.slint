@@ -1,8 +1,7 @@
-import { Theme } from "../styles/theme.slint";
+import { Theme } from "../../ui/styles/theme.slint";
 
-export component NetworkWidget {
-    in-out property <string> status: "WiFi";
-    in-out property <bool> connected: true;
+export component BluetoothWidget {
+    in-out property <bool> connected: false;
     callback clicked();
     
     Rectangle {
@@ -16,7 +15,6 @@ export component NetworkWidget {
             alignment: center;
             
             hover_rect := Rectangle {
-                // width: 30px;
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
@@ -29,11 +27,11 @@ export component NetworkWidget {
                     padding-right: 6px;
                     
                     Image {
-                        source: root.connected ? @image-url("../../assets/icons/network_wifi.svg") : @image-url("../../assets/icons/globe_2_cancel.svg");
+                        source: @image-url("../../assets/icons/bluetooth.svg");
                         width: 18px;
                         height: 18px;
                         image-fit: contain;
-                        colorize: root.connected ? Theme.foreground-icon : Theme.error;
+                        colorize: root.connected ? Theme.success : Theme.foreground-icon;
                     }
                 }
             }

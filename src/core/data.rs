@@ -4,13 +4,6 @@ use crate::app::volume::get_volume_info;
 use crate::app::clock::get_time_info;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct NetworkInfo {
-    pub status: String,
-    pub connected: bool,
-    pub icon: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct VolumeInfo {
     pub volume: u8,
     pub muted: bool,

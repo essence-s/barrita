@@ -1,7 +1,6 @@
-import { Theme } from "../styles/theme.slint";
+import { Theme } from "../../ui/styles/theme.slint";
 
-export component BluetoothWidget {
-    in-out property <bool> connected: false;
+export component ColorizeWidget {
     callback clicked();
     
     Rectangle {
@@ -15,7 +14,6 @@ export component BluetoothWidget {
             alignment: center;
             
             hover_rect := Rectangle {
-                // width: 30px;
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
@@ -28,11 +26,11 @@ export component BluetoothWidget {
                     padding-right: 6px;
                     
                     Image {
-                        source: @image-url("../../assets/icons/bluetooth.svg");
-                        width: 18px;
-                        height: 18px;
+                        source: @image-url("../../assets/icons/colorize.svg");
+                        width: 16px;
+                        height: 16px;
                         image-fit: contain;
-                        colorize: root.connected ? Theme.success : Theme.foreground-icon;
+                        colorize: Theme.foreground-icon;
                     }
                 }
             }

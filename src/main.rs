@@ -24,8 +24,13 @@ use ui::image::bytes_to_slint_image;
 use app_init::init_app;
 
 use platform::tray::init_tray;
-use platform::windows::{get_window_position, init_statusbar, open_network_panel, open_screen_clip, open_text_extractor, open_action_center, AppBarEdge, StatusBarConfig, start_media_listener, MediaUpdate};
+use platform::windows::{get_window_position, init_statusbar, AppBarEdge, StatusBarConfig, start_media_listener, MediaUpdate};
+use app::network::open_network_panel;
 use app::battery::BatteryMonitor;
+use app::colorize::open_screen_clip as colorize_action;
+use app::screenshot::open_screen_clip as screenshot_action;
+use app::article::open_text_extractor;
+use app::bluetooth::open_action_center;
 use raw_window_handle::HasWindowHandle;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -64,11 +69,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     app.on_colorize_clicked(move || {
-        open_screen_clip();
+        colorize_action();
     });
 
     app.on_screenshot_clicked(move || {
-        open_screen_clip();
+        screenshot_action();
     });
 
     app.on_article_clicked(move || {

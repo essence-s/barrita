@@ -1,4 +1,4 @@
-use crate::core::data::NetworkInfo;
+use crate::app::network::NetworkInfo;
 use sysinfo::Networks;
 
 pub fn get_network_info() -> NetworkInfo {

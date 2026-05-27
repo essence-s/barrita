@@ -1,6 +1,8 @@
-import { Theme } from "../styles/theme.slint";
+import { Theme } from "../../ui/styles/theme.slint";
 
-export component ColorizeWidget {
+export component NetworkWidget {
+    in-out property <string> status: "WiFi";
+    in-out property <bool> connected: true;
     callback clicked();
     
     Rectangle {
@@ -14,7 +16,6 @@ export component ColorizeWidget {
             alignment: center;
             
             hover_rect := Rectangle {
-                // width: 30px;
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
@@ -27,11 +28,11 @@ export component ColorizeWidget {
                     padding-right: 6px;
                     
                     Image {
-                        source: @image-url("../../assets/icons/colorize.svg");
-                        width: 16px;
-                        height: 16px;
+                        source: root.connected ? @image-url("../../assets/icons/network_wifi.svg") : @image-url("../../assets/icons/globe_2_cancel.svg");
+                        width: 18px;
+                        height: 18px;
                         image-fit: contain;
-                        colorize: Theme.foreground-icon;
+                        colorize: root.connected ? Theme.foreground-icon : Theme.error;
                     }
                 }
             }

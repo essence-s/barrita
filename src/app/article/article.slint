@@ -1,4 +1,4 @@
-import { Theme } from "../styles/theme.slint";
+import { Theme } from "../../ui/styles/theme.slint";
 
 export component ArticleWidget {
     callback clicked();
@@ -14,7 +14,6 @@ export component ArticleWidget {
             alignment: center;
             
             hover_rect := Rectangle {
-                // width: 30px;
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
