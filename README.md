@@ -1,2 +1,3 @@
 # Barrita
-una status bar simple
+
+una status bar simple muestra informacion basica del sistema
