@@ -19,7 +19,7 @@ fn load_icon_from_png(bytes: &[u8]) -> Icon {
 }
 
 pub fn init_tray() -> Option<tray_icon::TrayIcon> {
-    let icon_bytes = include_bytes!("../assets/icon.png");
+    let icon_bytes = include_bytes!("./assets/icon.png");
     let icon = load_icon_from_png(icon_bytes);
 
     let quit_item = MenuItem::with_id("quit", "Salir", true, None::<Accelerator>);

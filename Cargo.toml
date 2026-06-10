@@ -10,8 +10,6 @@ slint = { version = "1.16.1", features = [
   "renderer-skia",
   "raw-window-handle-06"
 ] }
-sysinfo = "0.38"
-battery = "0.7.8"
 chrono = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -20,20 +18,12 @@ env_logger = "0.11"
 thiserror = "2"
 winit = "0.30"
 image = { version = "0.25", default-features = false, features = ["gif", "png", "jpeg"] }
-tray-icon = "0.22"
+# tray-icon = "0.22"  # TODO: activar cuando implementemos tray en Wayland
 toml = "0.8"
 dirs = "5"
-
-[target.'cfg(target_os = "windows")'.dependencies]
-volumecontrol = "0.1"
-raw-window-handle = "0.6"
-uds_windows = "1.2"
-which = "0.2"
-windows = { version = "0.62", features = ["Win32_UI_Input_KeyboardAndMouse", "Win32_Foundation", "Media_Control", "Storage_Streams", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Storage", "Devices_Power", "Win32_System_Power"] }
-
 [target.'cfg(target_os = "linux")'.dependencies]
 mpris = "2.0"
 zbus = "4"
 
-  [build-dependencies]
+[build-dependencies]
 slint-build = "1.16"

@@ -1,41 +1,43 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
-export component NetworkWidget {
-    in-out property <string> status: "WiFi";
+export global NetworkAdapter {
+    in-out property <string> current-status: "WiFi";
     in-out property <bool> connected: true;
-    callback clicked();
-    
+    callback network-clicked();
+}
+
+export component NetworkWidget {
     Rectangle {
         vertical-stretch: 1;
-        
-        touch_area := TouchArea {
-            clicked => { root.clicked(); }
-        }
-        
+
         VerticalLayout {
             alignment: center;
-            
+
             hover_rect := Rectangle {
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
                 border-color: touch_area.has-hover ? #ffffff0e : transparent;
                 border-radius: 4px;
-                
+
                 VerticalLayout {
                     alignment: center;
                     padding-left: 6px;
                     padding-right: 6px;
-                    
+
                     Image {
-                        source: root.connected ? @image-url("../../assets/icons/network_wifi.svg") : @image-url("../../assets/icons/globe_2_cancel.svg");
+                        source: NetworkAdapter.connected ? @image-url("../../assets/icons/network_wifi.svg") : @image-url("../../assets/icons/globe_2_cancel.svg");
                         width: 18px;
                         height: 18px;
                         image-fit: contain;
-                        colorize: root.connected ? Theme.foreground-icon : Theme.error;
+                        colorize: NetworkAdapter.connected ? Theme.foreground-icon : Theme.error;
                     }
                 }
             }
+        }
+
+        touch_area := TouchArea {
+            clicked => { NetworkAdapter.network-clicked(); }
         }
     }
 }

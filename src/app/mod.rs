@@ -1,5 +1,4 @@
 pub mod network;
-pub mod volume;
 pub mod workspaces;
 pub mod battery;
 pub mod clock;
@@ -7,3 +6,4 @@ pub mod colorize;
 pub mod screenshot;
 pub mod article;
 pub mod bluetooth;
+pub mod media;

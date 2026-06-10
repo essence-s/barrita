@@ -1,8 +1,10 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
+export global ScreenshotAdapter {
+    callback screenshot-clicked();
+}
+
 export component ScreenshotWidget {
-    callback clicked();
-    
     Rectangle {
         vertical-stretch: 1;
         
@@ -33,7 +35,7 @@ export component ScreenshotWidget {
         }
         
         touch_area := TouchArea {
-            clicked => { root.clicked(); }
+            clicked => { ScreenshotAdapter.screenshot-clicked(); }
         }
     }
 }

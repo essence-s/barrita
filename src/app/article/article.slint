@@ -1,30 +1,28 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
+export global ArticleAdapter {
+    callback article-clicked();
+}
+
 export component ArticleWidget {
-    callback clicked();
-    
     Rectangle {
         vertical-stretch: 1;
-        
-        touch_area := TouchArea {
-            clicked => { root.clicked(); }
-        }
-        
+
         VerticalLayout {
             alignment: center;
-            
+
             hover_rect := Rectangle {
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
                 border-color: touch_area.has-hover ? #ffffff0e : transparent;
                 border-radius: 4px;
-                
+
                 VerticalLayout {
                     alignment: center;
                     padding-left: 6px;
                     padding-right: 6px;
-                    
+
                     Image {
                         source: @image-url("../../assets/icons/article.svg");
                         width: 18px;
@@ -34,6 +32,10 @@ export component ArticleWidget {
                     }
                 }
             }
+        }
+
+        touch_area := TouchArea {
+            clicked => { ArticleAdapter.article-clicked(); }
         }
     }
 }

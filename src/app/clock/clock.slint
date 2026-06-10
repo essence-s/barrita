@@ -1,9 +1,11 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
+export global ClockAdapter {
+    in-out property <string> current-time: "12:00 PM";
+    in-out property <string> current-date: "Mon 04/09";
+}
+
 export component ClockWidget {
-    in-out property <string> time: "12:00 PM";
-    in-out property <string> date: "Mon 04/09";
-    
     Rectangle {
         vertical-stretch: 1;
         
@@ -17,14 +19,14 @@ export component ClockWidget {
                 alignment: center;
                 
                 Text {
-                    text: root.time;
+                    text: ClockAdapter.current-time;
                     font-family: Theme.font-family;
                     font-size: Theme.font-size;
                     color: Theme.foreground;
                 }
                 
                 Text {
-                    text: root.date;
+                    text: ClockAdapter.current-date;
                     font-family: Theme.font-family;
                     font-size: Theme.font-size;
                     color: Theme.foreground;

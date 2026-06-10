@@ -7,7 +7,7 @@ import { WorkspacesWidget } from "../app/workspaces/workspaces.slint";
 import { ScreenshotWidget } from "../app/screenshot/screenshot.slint";
 import { ColorizeWidget } from "../app/colorize/colorize.slint";
 import { ArticleWidget } from "../app/article/article.slint";
-import { MusicIconWidget } from "widgets/music_icon.slint";
+import { MediaWidget } from "../app/media/media.slint";
 
 export component StatusBarWindow inherits Window {
     title: "Barrita";
@@ -18,22 +18,7 @@ export component StatusBarWindow inherits Window {
     y: 0;
     width: 1366px;
     height: Theme.bar-height;
-    
-    in-out property <string> time: "12:00 PM";
-    in-out property <string> date: "Mon 04/09";
-    
-    in-out property <string> battery-percentage: "100%";
-    in-out property <int> battery-level: 100;
-    in-out property <bool> battery-charging: false;
-    in-out property <bool> battery-low: false;
-    in-out property <string> battery-icon: "battery_6_bar";
-    
-    in-out property <string> network-status: "WiFi";
-    in-out property <bool> network-connected: true;
-    in-out property <string> network-icon: "wifi";
-    
-    in-out property <bool> bluetooth-connected: false;
-    
+        
     in-out property <string> media-status: "stopped";
     in-out property <bool> media-has-player: false;
     in-out property <string> media-title: "Sin música";
@@ -47,32 +32,21 @@ export component StatusBarWindow inherits Window {
     in-out property <image> frame_1;
     in-out property <int> media-gif-current-frame-index: 0;
     
-    in-out property <int> active-workspace: 1;
-    in-out property <[bool]> workspace-occupied: [];
-    in-out property <int> workspace-total: 8;
-    in-out property <[string]> workspace-format: [];
     in-out property <bool> music-popup-visible: false;
     
     callback popup_toggle();
     callback media_play_pause();
     callback media_next();
     callback media_previous();
-    callback network_clicked();
-    callback colorize_clicked();
-    callback screenshot_clicked();
-    callback article_clicked();
-    callback bluetooth_clicked();
     
     Rectangle {
         min-height: Theme.bar-height;
-        // background: Theme.background;
-        // opacity: 0.95;
         
         HorizontalLayout {
             spacing: 0px;
             padding-left: 10px;
                                
-            MusicIconWidget {
+            MediaWidget {
                 horizontal-stretch: 1;
                 max-width: parent.width / 3;
                 status: root.media-status;
@@ -93,62 +67,25 @@ export component StatusBarWindow inherits Window {
             WorkspacesWidget {
                 horizontal-stretch: 1;
                 max-width: parent.width / 3;
-                active-workspace: root.active-workspace;
-                workspace-occupied: root.workspace-occupied;
-                total-workspaces: root.workspace-total;
-                japanese-numbers: root.workspace-format;
             }
             
             HorizontalLayout {
                 horizontal-stretch: 1;
                 max-width: parent.width / 3;
-                // spacing: 12px;
                 alignment: end;
                 padding-right: 10px;
                 
-                ScreenshotWidget {
-                    clicked => {
-                        root.screenshot_clicked();
-                    }
-                }
-                ColorizeWidget {
-                    clicked => {
-                        root.colorize_clicked();
-                    }
-                }
-                ArticleWidget {
-                    clicked => { root.article_clicked(); }
-                }
+                ScreenshotWidget { }
+                ColorizeWidget { }
+                ArticleWidget { }
                 
-                ClockWidget {
-                    time: root.time;
-                    date: root.date;
-                }
+                ClockWidget { }
                 
-                BatteryWidget {
-                    percentage: root.battery-percentage;
-                    percentage-value: root.battery-level;
-                    is-charging: root.battery-charging;
-                    is-low: root.battery-low;
-                    icon: root.battery-icon;
-                }
+                BatteryWidget { }
                 
-                NetworkWidget {
-                    status: root.network-status;
-                    connected: root.network-connected;
-                    // icon: root.network-icon;
-                    clicked => {
-                        root.network_clicked();
-                    }
-                }
+                NetworkWidget { }
                 
-                BluetoothWidget {
-                    connected: root.bluetooth-connected;
-                    clicked => {
-                        root.bluetooth_clicked();
-                    }
-                }
-
+                BluetoothWidget { }
             }
         }
     }

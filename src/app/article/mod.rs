@@ -1,4 +1,12 @@
-pub mod platform;
+use slint::ComponentHandle;
 
-#[cfg(target_os = "windows")]
-pub use platform::windows::open_text_extractor;
+pub struct ArticleController;
+
+impl ArticleController {
+    pub fn connect(window: &crate::StatusBarWindow) {
+        let adapter = window.global::<crate::ArticleAdapter>();
+        adapter.on_article_clicked(|| {
+            log::info!("[article] clicked");
+        });
+    }
+}

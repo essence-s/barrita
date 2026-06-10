@@ -1,19 +1,20 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
-export component WorkspacesWidget {
+export global WorkspacesAdapter {
     in-out property <int> active-workspace: 1;
-    in-out property <int> total-workspaces: 8;
-    in-out property <bool> use-japanese: true;
-    in-out property <[string]> japanese-numbers: ["一","二","三","四","五","六","七","八","九","十"];
     in-out property <[bool]> workspace-occupied: [];
+    in-out property <int> total-workspaces: 8;
+    in-out property <[string]> workspace-format: [];
+}
 
+export component WorkspacesWidget {
     private property <length> button-size: 18px;
     private property <length> button-spacing: 3px;
     private property <length> margin: 2px;
 
     Rectangle {
         vertical-stretch: 1;
-        
+
         HorizontalLayout {
             alignment: center;
 
@@ -23,26 +24,26 @@ export component WorkspacesWidget {
                 Rectangle {
                     background: Theme.workspaces_bg_color;
                     border-radius: Theme.workspaces_border_radius * 1px;
-                    
+
                     HorizontalLayout {
                         alignment: center;
                         padding: 4px;
-                        
-                        for i in root.total-workspaces : Rectangle {
+
+                        for i in WorkspacesAdapter.total-workspaces : Rectangle {
                             width: root.button-size;
                             height: root.button-size;
 
                             private property <bool> occupied:
-                                i < root.workspace-occupied.length && root.workspace-occupied[i];
+                                i < WorkspacesAdapter.workspace-occupied.length && WorkspacesAdapter.workspace-occupied[i];
 
                             private property <bool> isActive:
-                                i == root.active-workspace - 1;
+                                i == WorkspacesAdapter.active-workspace - 1;
 
                             private property <bool> leftFilled:
-                                i > 0 && i - 1 < root.workspace-occupied.length && root.workspace-occupied[i - 1];
+                                i > 0 && i - 1 < WorkspacesAdapter.workspace-occupied.length && WorkspacesAdapter.workspace-occupied[i - 1];
 
                             private property <bool> rightFilled:
-                                i + 1 < root.workspace-occupied.length && root.workspace-occupied[i + 1];
+                                i + 1 < WorkspacesAdapter.workspace-occupied.length && WorkspacesAdapter.workspace-occupied[i + 1];
 
                             Rectangle {
                                 border-top-left-radius: !leftFilled ? root.button-size/2 : 0px;
@@ -65,7 +66,7 @@ export component WorkspacesWidget {
                             }
 
                             Text {
-                                text: root.use-japanese && i < root.japanese-numbers.length ? root.japanese-numbers[i] : i + 1;
+                                text: i < WorkspacesAdapter.workspace-format.length ? WorkspacesAdapter.workspace-format[i] : i + 1;
                                 font-size: 12px;
                                 font-weight: 500;
                                 font-family: Theme.font-family;
@@ -75,7 +76,6 @@ export component WorkspacesWidget {
                                         Theme.workspaces_text_occupied :
                                         Theme.workspaces_text_free;
                             }
-                        
                         }
                     }
                 }

@@ -1,7 +1,9 @@
-pub mod data;
-pub mod platform;
+pub mod types;
 
-pub use data::BatteryStatusInfo;
+pub struct BatteryController;
 
-#[cfg(target_os = "windows")]
-pub use platform::windows::power::BatteryMonitor;
+impl BatteryController {
+    pub fn connect(_window: &crate::StatusBarWindow) {
+        log::info!("[battery] controller connected (placeholder)");
+    }
+}

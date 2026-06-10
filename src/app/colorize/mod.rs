@@ -1,4 +1,12 @@
-pub mod platform;
+use slint::ComponentHandle;
 
-#[cfg(target_os = "windows")]
-pub use platform::windows::open_screen_clip;
+pub struct ColorizeController;
+
+impl ColorizeController {
+    pub fn connect(window: &crate::StatusBarWindow) {
+        let adapter = window.global::<crate::ColorizeAdapter>();
+        adapter.on_colorize_clicked(|| {
+            log::info!("[colorize] clicked");
+        });
+    }
+}

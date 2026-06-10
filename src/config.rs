@@ -150,6 +150,7 @@ pub fn get_config_dir() -> PathBuf {
         .join("barrita")
 }
 
+#[allow(dead_code)]
 pub fn get_workspaces_style(config: &Config) -> WorkspacesStyle {
     config
         .widget
@@ -158,6 +159,7 @@ pub fn get_workspaces_style(config: &Config) -> WorkspacesStyle {
         .unwrap_or_default()
 }
 
+#[allow(dead_code)]
 pub fn get_music_icon_style(config: &Config) -> MusicIconStyle {
     config
         .widget
@@ -224,6 +226,7 @@ pub fn save_config(config: &Config) {
     }
 }
 
+#[allow(dead_code)]
 pub fn parse_hex_color(hex: &str) -> Color {
     let hex = hex.trim_start_matches('#');
     if hex.len() == 8 {

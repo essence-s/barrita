@@ -1,9 +1,14 @@
-pub mod data;
-pub mod provider;
-pub mod platform;
+use slint::ComponentHandle;
 
-pub use data::NetworkInfo;
-pub use provider::get_network_info;
+pub mod types;
 
-#[cfg(target_os = "windows")]
-pub use platform::windows::open_network_panel;
+pub struct NetworkController;
+
+impl NetworkController {
+    pub fn connect(window: &crate::StatusBarWindow) {
+        let adapter = window.global::<crate::NetworkAdapter>();
+        adapter.on_network_clicked(|| {
+            log::info!("[network] clicked");
+        });
+    }
+}

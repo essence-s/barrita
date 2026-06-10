@@ -1,5 +1,6 @@
 use slint::{Image as SlintImage, Rgba8Pixel, SharedPixelBuffer};
 
+#[allow(dead_code)]
 pub fn bytes_to_slint_image(bytes: &[u8]) -> Option<SlintImage> {
     if bytes.len() < 500 {
         return None;

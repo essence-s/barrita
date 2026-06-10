@@ -1,4 +1,12 @@
-pub mod platform;
+use slint::ComponentHandle;
 
-#[cfg(target_os = "windows")]
-pub use platform::windows::open_action_center;
+pub struct BluetoothController;
+
+impl BluetoothController {
+    pub fn connect(window: &crate::StatusBarWindow) {
+        let adapter = window.global::<crate::BluetoothAdapter>();
+        adapter.on_bluetooth_clicked(|| {
+            log::info!("[bluetooth] clicked");
+        });
+    }
+}

@@ -1,57 +1,54 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
+export global BatteryAdapter {
+    in-out property <string> current-percentage: "100%";
+    in-out property <int> level: 100;
+    in-out property <bool> charging: false;
+    in-out property <bool> low: false;
+}
+
 export component BatteryWidget {
-    in-out property <string> percentage: "100%";
-    in-out property <int> percentage-value: 100;
-    in-out property <bool> is-charging: false;
-    in-out property <bool> is-low: false;
-    in-out property <string> icon: "Battery_Android_Frame_Full";
-    callback clicked();
-    
     Rectangle {
         vertical-stretch: 1;
-        
-        touch_area := TouchArea {
-            clicked => { root.clicked(); }
-        }
-        
+
         VerticalLayout {
             alignment: center;
-            
+
             hover_rect := Rectangle {
                 height: 30px;
                 background: touch_area.has-hover ? #e7e8eb2f : transparent;
                 border-width: 1px;
                 border-color: touch_area.has-hover ? #ffffff0e : transparent;
                 border-radius: 4px;
-                
+
                 VerticalLayout {
                     alignment: center;
                     padding-left: 6px;
                     padding-right: 6px;
-                    
-                   
-                    Rectangle { 
-                        
+
+                    Rectangle {
                         Rectangle {
                             x: 3px; y: 10px;
-                            width: (root.percentage-value * 15px) / 100;
+                            width: (BatteryAdapter.level * 15px) / 100;
                             height: 6px;
-                            background: root.is-low ? #ff4444 : (root.is-charging ? #90EE90 : Theme.foreground-icon);
+                            background: BatteryAdapter.low ? #ff4444 : (BatteryAdapter.charging ? #90EE90 : Theme.foreground-icon);
                             clip: true;
                         }
-                        
+
                         Image {
                             source: @image-url("../../assets/icons/battery_android_0.svg");
-                            width: 26px; 
+                            width: 26px;
                             height: 26px;
                             image-fit: contain;
                             colorize: Theme.foreground-icon;
                         }
                     }
-                   
                 }
             }
+        }
+
+        touch_area := TouchArea {
+            // placeholder
         }
     }
 }
