@@ -18,7 +18,7 @@ export component StatusBarWindow inherits Window {
     y: 0;
     width: 1366px;
     height: Theme.bar-height;
-        
+
     in-out property <string> media-status: "stopped";
     in-out property <bool> media-has-player: false;
     in-out property <string> media-title: "Sin música";
@@ -31,61 +31,66 @@ export component StatusBarWindow inherits Window {
     in-out property <image> frame_0;
     in-out property <image> frame_1;
     in-out property <int> media-gif-current-frame-index: 0;
-    
+
     in-out property <bool> music-popup-visible: false;
-    
+
     callback popup_toggle();
     callback media_play_pause();
     callback media_next();
     callback media_previous();
-    
-    Rectangle {
-        min-height: Theme.bar-height;
-        
-        HorizontalLayout {
-            spacing: 0px;
-            padding-left: 10px;
-                               
-            MediaWidget {
-                horizontal-stretch: 1;
-                max-width: parent.width / 3;
-                status: root.media-status;
-                has-player: root.media-has-player;
-                title: root.media-title;
-                artist: root.media-artist;
-                album-art: root.media-album-art;
-                frame-count: root.media-gif-frame-count;
-                frame-0: root.frame_0;
-                frame-1: root.frame_1;
-                current-frame-index: root.media-gif-current-frame-index;
 
-                clicked => {
-                    root.popup_toggle();
-                }
-            }
+    touch_area := TouchArea {
+        opacity: touch_area.has-hover ? 1.0 : 0.999;
+        Rectangle {
+            min-height: Theme.bar-height;
 
-            WorkspacesWidget {
-                horizontal-stretch: 1;
-                max-width: parent.width / 3;
-            }
-            
             HorizontalLayout {
-                horizontal-stretch: 1;
-                max-width: parent.width / 3;
-                alignment: end;
-                padding-right: 10px;
-                
-                ScreenshotWidget { }
-                ColorizeWidget { }
-                ArticleWidget { }
-                
-                ClockWidget { }
-                
-                BatteryWidget { }
-                
-                NetworkWidget { }
-                
-                BluetoothWidget { }
+                spacing: 0px;
+                padding-left: 10px;
+
+                MediaWidget {
+                    horizontal-stretch: 1;
+                    max-width: parent.width / 3;
+                    status: root.media-status;
+                    has-player: root.media-has-player;
+                    title: root.media-title;
+                    artist: root.media-artist;
+                    album-art: root.media-album-art;
+                    frame-count: root.media-gif-frame-count;
+                    frame-0: root.frame_0;
+                    frame-1: root.frame_1;
+                    current-frame-index: root.media-gif-current-frame-index;
+
+                    clicked => {
+                        root.popup_toggle();
+                    }
+                }
+
+                WorkspacesWidget {
+                    horizontal-stretch: 1;
+                    max-width: parent.width / 3;
+                }
+
+                HorizontalLayout {
+                    horizontal-stretch: 1;
+                    max-width: parent.width / 3;
+                    alignment: end;
+                    padding-right: 10px;
+
+                    ScreenshotWidget { }
+
+                    ColorizeWidget { }
+
+                    ArticleWidget { }
+
+                    ClockWidget { }
+
+                    BatteryWidget { }
+
+                    NetworkWidget { }
+
+                    BluetoothWidget { }
+                }
             }
         }
     }

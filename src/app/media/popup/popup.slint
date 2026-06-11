@@ -14,80 +14,90 @@ export component MediaPopupWindow inherits Window {
     callback play-pause();
     callback next();
     callback previous();
-    
-    Rectangle {
-        VerticalLayout {
-            alignment: center;
-            padding: 16px;
 
-            Text {
-                text: "Hola";
-                font-size: 24px;
-                color: Theme.foreground;
-            }
+    touch_area := TouchArea {
+        opacity: touch_area.has-hover ? 1.0 : 0.999;
 
-            Rectangle {
-                height: 8px;
-            }
-
-            HorizontalLayout {
-                spacing: 4px;
+        Rectangle {
+            VerticalLayout {
                 alignment: center;
-                
-                TouchArea {
-                    clicked => { root.previous(); }
-                    Rectangle {
-                        width: 24px;
-                        height: 24px;
-                        Text {
-                            text: "skip_previous";
-                            font-family: Theme.icon-font-family;
-                            font-size: 18px;
-                            color: Theme.foreground-icon;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-                    }
-                }
-                
-                TouchArea {
-                    clicked => { root.play-pause(); }
-                    Rectangle {
-                        width: 24px;
-                        height: 24px;
-                        Text {
-                            text: root.has-player ? (root.status == "playing" ? "pause" : "play_arrow") : "play_arrow";
-                            font-family: Theme.icon-font-family;
-                            font-size: 18px;
-                            color: Theme.accent;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-                    }
-                }
-                
-                TouchArea {
-                    clicked => { root.next(); }
-                    Rectangle {
-                        width: 24px;
-                        height: 24px;
-                        Text {
-                            text: "skip_next";
-                            font-family: Theme.icon-font-family;
-                            font-size: 18px;
-                            color: Theme.foreground-icon;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-                    }
-                }
-            }
+                padding: 16px;
 
-            Text {
-                text: root.has-player ? root.song-title + " - " + root.artist : "Sin música";
-                font-family: Theme.font-family;
-                font-size: Theme.font-size;
-                color: Theme.foreground;
+                Text {
+                    text: "Hola";
+                    font-size: 24px;
+                    color: Theme.foreground;
+                }
+
+                Rectangle {
+                    height: 8px;
+                }
+
+                HorizontalLayout {
+                    spacing: 4px;
+                    alignment: center;
+
+                    TouchArea {
+                        clicked => {
+                            root.previous();
+                        }
+                        Rectangle {
+                            width: 24px;
+                            height: 24px;
+                            Text {
+                                text: "skip_previous";
+                                font-family: Theme.icon-font-family;
+                                font-size: 18px;
+                                color: Theme.foreground-icon;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+
+                    TouchArea {
+                        clicked => {
+                            root.play-pause();
+                        }
+                        Rectangle {
+                            width: 24px;
+                            height: 24px;
+                            Text {
+                                text: root.has-player ? (root.status == "playing" ? "pause" : "play_arrow") : "play_arrow";
+                                font-family: Theme.icon-font-family;
+                                font-size: 18px;
+                                color: Theme.accent;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+
+                    TouchArea {
+                        clicked => {
+                            root.next();
+                        }
+                        Rectangle {
+                            width: 24px;
+                            height: 24px;
+                            Text {
+                                text: "skip_next";
+                                font-family: Theme.icon-font-family;
+                                font-size: 18px;
+                                color: Theme.foreground-icon;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    text: root.has-player ? root.song-title + " - " + root.artist : "Sin música";
+                    font-family: Theme.font-family;
+                    font-size: Theme.font-size;
+                    color: Theme.foreground;
+                }
             }
         }
     }
