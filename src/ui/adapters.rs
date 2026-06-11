@@ -8,15 +8,16 @@ use crate::app::network::NetworkController;
 use crate::app::screenshot::ScreenshotController;
 use crate::app::workspaces::WorkspacesController;
 use crate::StatusBarWindow;
+use spell_framework::wayland_adapter::WinHandle;
 
-pub fn connect_all(window: &StatusBarWindow) {
+pub fn connect_all(window: &StatusBarWindow, popup_handler: WinHandle) {
     ArticleController::connect(window);
     BatteryController::connect(window);
     BluetoothController::connect(window);
     ClockController::connect(window);
     ColorizeController::connect(window);
     NetworkController::connect(window);
-    PopupController::connect(window);
+    PopupController::connect(window, popup_handler);
     ScreenshotController::connect(window);
     WorkspacesController::connect(window);
 }
