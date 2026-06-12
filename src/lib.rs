@@ -1,17 +1,47 @@
 slint::include_modules!();
+spell_framework::generate_widgets![StatusBarWindow, MediaPopupWindow];
 
 mod app;
 mod config;
-// mod tray;  // TODO: tray icon en Wayland (StatusNotifierItem)
 mod ui;
 
-pub fn run() {
+use spell_framework::{
+    cast_spell,
+    layer_properties::{LayerAnchor, LayerType, WindowConf},
+};
+
+pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let _cfg = config::load_or_create_config();
 
-    // TODO: tray icon en Wayland (StatusNotifierItem)
-    // let _tray = tray::init_tray().map(|t| Box::leak(Box::new(t)));
+    let bar_conf = WindowConf::builder()
+        .width(1366_u32)
+        .height(34_u32)
+        .anchor_1(LayerAnchor::TOP | LayerAnchor::LEFT | LayerAnchor::RIGHT)
+        .exclusive_zone(34)
+        .layer_type(LayerType::Top)
+        .build()
+        .unwrap();
 
-    let window = StatusBarWindow::new().unwrap();
-    ui::adapters::connect_all(&window);
-    window.run().unwrap();
+    let popup_conf = WindowConf::builder()
+        .width(300_u32)
+        .height(200_u32)
+        .anchor_1(LayerAnchor::TOP)
+        .margins(34, 0, 0, 0)
+        .exclusive_zone(-1)
+        .build()
+        .unwrap();
+
+    let bar = StatusBarWindowSpell::invoke_spell("barrita", bar_conf);
+    let popup = MediaPopupWindowSpell::invoke_spell("media-popup", popup_conf);
+    popup.hide();
+
+    let popup_handler = popup.get_handler();
+    ui::adapters::connect_all(&bar, popup_handler);
+
+    // spell's first render happens before the Slint component exists,
+    // so force a redraw now to ensure content appears on the first frame.
+    bar.window().request_redraw();
+    popup.window().request_redraw();
+
+    cast_spell!(windows: [bar, popup])
 }
