@@ -410,6 +410,7 @@ dependencies = [
  "hyprland",
  "image",
  "log",
+ "mpris",
  "serde",
  "serde_json",
  "slint",

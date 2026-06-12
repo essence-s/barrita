@@ -1,87 +1,83 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
-export component MediaWidget {
+export global MediaAdapter {
     in-out property <string> status: "stopped";
     in-out property <bool> has-player: false;
     in-out property <string> title: "Sin música";
     in-out property <string> artist: "";
-    in-out property <image> album-art;
-    in-out property <int> frame-count: 0;
-    in-out property <image> frame-0;
-    in-out property <image> frame-1;
-    in-out property <int> current-frame-index: 0;
-    
+
     callback play-pause();
     callback next();
     callback previous();
+}
+
+export component MediaWidget {
     callback clicked;
-    
+
     Rectangle {
         vertical-stretch: 1;
 
         HorizontalLayout {
             horizontal-stretch: 0;
             alignment: start;
-        
-            TouchArea {         
+
+            TouchArea {
                 HorizontalLayout {
                     spacing: 4px;
 
                     VerticalLayout {
                         alignment: center;
                         padding-right: 0px;
-                        
+
                         icon-rect := Rectangle {
                             width: 43px;
-                            
-                        Image {
-                            source: root.has-player ? (
-                                root.current-frame-index == 0 ? root.frame-0 : root.frame-1
-                            ) : @image-url("../../assets/icons/music_off.svg");
-                            height: 22px;
-                            image-fit: contain;
-                        }
-                        }
-                    }
-                    
-                    VerticalLayout {
-                        alignment: center;
-                        
-                        Rectangle {
-                            clip: true;
-                            width: 22px;
-                            height: 22px;
-                            border-radius: Theme.music_album_border_radius * 1px;
-                            background: #a7a7a778;     
-                            Image {               
-                                source: root.album-art;
-                                width: 22px;
+
+                            Image {
+                                source: MediaAdapter.has-player ? @image-url("../../assets/icons/motion_play.svg") : @image-url("../../assets/icons/music_off.svg");
                                 height: 22px;
-                                image-fit: cover;
+                                image-fit: contain;
                             }
                         }
                     }
-                    
+
+                    // VerticalLayout {
+                    //     alignment: center;
+
+                    //     Rectangle {
+                    //         clip: true;
+                    //         width: 22px;
+                    //         height: 22px;
+                    //         border-radius: Theme.music_album_border_radius * 1px;
+                    //         background: #a7a7a778;
+                    //         Image {               
+                    //             // source: root.album-art;
+                    //             width: 22px;
+                    //             height: 22px;
+                    //             image-fit: cover;
+                    //         }
+                    //     }
+                    // }
+
                     VerticalLayout {
                         alignment: center;
                         padding-top: 1px;
                         spacing: -2px;
-                        
+
                         Text {
                             font-weight: 600;
                             vertical-alignment: bottom;
-                            text: root.artist;
+                            text: MediaAdapter.artist;
                             font-family: Theme.font-family;
                             font-size: 9.5px;
                             color: Theme.music_artist_color;
                             max-width: 150px;
                             overflow: elide;
                         }
-                        
+
                         Text {
                             font-weight: 600;
                             vertical-alignment: bottom;
-                            text: root.title;
+                            text: MediaAdapter.title;
                             font-family: Theme.font-family;
                             font-size: 11px;
                             color: Theme.foreground;
@@ -90,7 +86,7 @@ export component MediaWidget {
                         }
                     }
                 }
-            
+
                 clicked => {
                     root.clicked();
                 }

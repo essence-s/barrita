@@ -19,21 +19,6 @@ export component StatusBarWindow inherits Window {
     width: 1366px;
     height: Theme.bar-height;
 
-    in-out property <string> media-status: "stopped";
-    in-out property <bool> media-has-player: false;
-    in-out property <string> media-title: "Sin música";
-    in-out property <string> media-artist: "";
-    in-out property <image> media-album-art;
-    in-out property <float> media-progress: 0.0;
-    in-out property <string> media-progress-time: "0:00";
-    in-out property <string> media-total-time: "0:00";
-    in-out property <int> media-gif-frame-count: 0;
-    in-out property <image> frame_0;
-    in-out property <image> frame_1;
-    in-out property <int> media-gif-current-frame-index: 0;
-
-    in-out property <bool> music-popup-visible: false;
-
     callback popup_toggle();
     callback media_play_pause();
     callback media_next();
@@ -51,15 +36,6 @@ export component StatusBarWindow inherits Window {
                 MediaWidget {
                     horizontal-stretch: 1;
                     max-width: parent.width / 3;
-                    status: root.media-status;
-                    has-player: root.media-has-player;
-                    title: root.media-title;
-                    artist: root.media-artist;
-                    album-art: root.media-album-art;
-                    frame-count: root.media-gif-frame-count;
-                    frame-0: root.frame_0;
-                    frame-1: root.frame_1;
-                    current-frame-index: root.media-gif-current-frame-index;
 
                     clicked => {
                         root.popup_toggle();
