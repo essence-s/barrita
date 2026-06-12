@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#[derive(Clone, PartialEq)]
 pub struct BatteryStatusInfo {
     pub percentage: String,
     pub level: i32,

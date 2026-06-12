@@ -21,6 +21,7 @@ image = { version = "0.25", default-features = false, features = ["gif", "png", 
 toml = "0.8"
 dirs = "5"
 hyprland = { version = "0.4.0-beta.3", default-features = false, features = ["listener"] }
+dbus = "0.9"
 
 [build-dependencies]
 slint-build = "1.16"
