@@ -5,37 +5,31 @@ export global ArticleAdapter {
 }
 
 export component ArticleWidget {
-    Rectangle {
-        vertical-stretch: 1;
 
-        VerticalLayout {
-            alignment: center;
+    VerticalLayout {
+        alignment: center;
 
-            hover_rect := Rectangle {
-                height: 30px;
-                background: touch_area.has-hover ? #e7e8eb2f : transparent;
-                border-width: 1px;
-                border-color: touch_area.has-hover ? #ffffff0e : transparent;
-                border-radius: 4px;
+        Rectangle {
+            width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            border-width: 2px;
+            border-color: touch_area.has-hover ? #ffffff42 : transparent;
+            background: touch_area.has-hover ? #262722ed : Theme.workspaces_bg_color;
 
-                VerticalLayout {
-                    alignment: center;
-                    padding-left: 6px;
-                    padding-right: 6px;
-
-                    Image {
-                        source: @image-url("../../assets/icons/article.svg");
-                        width: 18px;
-                        height: 18px;
-                        image-fit: contain;
-                        colorize: Theme.foreground-icon;
-                    }
-                }
+            Image {
+                source: @image-url("../../assets/icons/article.svg");
+                width: 18px;
+                height: 18px;
+                image-fit: contain;
+                colorize: Theme.foreground-icon;
             }
         }
+    }
 
-        touch_area := TouchArea {
-            clicked => { ArticleAdapter.article-clicked(); }
+    touch_area := TouchArea {
+        clicked => {
+            ArticleAdapter.article-clicked();
         }
     }
 }

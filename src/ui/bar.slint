@@ -8,6 +8,7 @@ import { ScreenshotWidget } from "../app/screenshot/screenshot.slint";
 import { ColorizeWidget } from "../app/colorize/colorize.slint";
 import { ArticleWidget } from "../app/article/article.slint";
 import { MediaWidget } from "../app/media/media.slint";
+import { LogoWidget } from "../app/logo/logo.slint";
 
 export component StatusBarWindow inherits Window {
     title: "Barrita";
@@ -32,6 +33,20 @@ export component StatusBarWindow inherits Window {
             HorizontalLayout {
                 spacing: 0px;
                 padding-left: 10px;
+                padding-right: 10px;
+
+                HorizontalLayout {
+                    horizontal-stretch: 1;
+                    max-width: parent.width / 3;
+                    alignment: start;
+                    spacing: 4px;
+
+                    LogoWidget { }
+
+                    WorkspacesWidget { }
+
+                    ColorizeWidget { }
+                }
 
                 MediaWidget {
                     horizontal-stretch: 1;
@@ -42,30 +57,41 @@ export component StatusBarWindow inherits Window {
                     }
                 }
 
-                WorkspacesWidget {
-                    horizontal-stretch: 1;
-                    max-width: parent.width / 3;
-                }
-
                 HorizontalLayout {
                     horizontal-stretch: 1;
                     max-width: parent.width / 3;
                     alignment: end;
-                    padding-right: 10px;
+                    spacing: 4px;
 
                     ScreenshotWidget { }
-
-                    ColorizeWidget { }
 
                     ArticleWidget { }
 
                     ClockWidget { }
 
-                    BatteryWidget { }
+                    VerticalLayout {
+                        alignment: center;
 
-                    NetworkWidget { }
+                        Rectangle {
+                            height: 28px;
+                            border-radius: 14px;
+                            background: Theme.workspaces_bg_color;
+                            horizontal-stretch: 1;
 
-                    BluetoothWidget { }
+                            HorizontalLayout {
+                                alignment: center;
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                spacing: 7px;
+
+                                BatteryWidget { }
+
+                                NetworkWidget { }
+
+                                BluetoothWidget { }
+                            }
+                        }
+                    }
                 }
             }
         }

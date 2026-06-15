@@ -1,11 +1,10 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
-export global ScreenshotAdapter {
-    callback screenshot-clicked();
+export global LogoAdapter {
+    callback logo-clicked();
 }
 
-export component ScreenshotWidget {
-
+export component LogoWidget {
     VerticalLayout {
         alignment: center;
 
@@ -17,18 +16,17 @@ export component ScreenshotWidget {
             border-color: touch_area.has-hover ? #ffffff42 : transparent;
             background: touch_area.has-hover ? #262722ed : Theme.workspaces_bg_color;
 
-            Text {
-                text: "screenshot_region";
-                font-family: Theme.icon-font-family;
-                font-size: 16px;
-                color: Theme.foreground-icon;
+            Image {
+                source: @image-url("../../assets/icon.png");
+                width: 16px;
+                height: 16px;
             }
         }
     }
 
     touch_area := TouchArea {
         clicked => {
-            ScreenshotAdapter.screenshot-clicked();
+            LogoAdapter.logo-clicked();
         }
     }
 }

@@ -14,135 +14,127 @@ export global MediaAdapter {
 export component MediaWidget {
     callback clicked;
 
-    Rectangle {
-        vertical-stretch: 1;
-        height: 32px;
+    HorizontalLayout {
+        horizontal-stretch: 0;
+        alignment: center;
+        height: 28px;
 
-        HorizontalLayout {
-            horizontal-stretch: 0;
-            alignment: center;
+        TouchArea {
+            Rectangle {
+                background: Theme.workspaces_bg_color;
+                border-radius: 20px;
 
-            TouchArea {
-                Rectangle {
-                    background: #5c5c5de0;
-                    border-radius: 50px;
+                HorizontalLayout {
+                    alignment: center;
 
-                    HorizontalLayout {
+                    VerticalLayout {
                         alignment: center;
-                        // spacing: 4px;
-                       
-                        VerticalLayout {
-                            alignment: center;
-                            padding-left: 4px;
-                            padding-right: 4px;
-                            Rectangle {
-                                width: 24px;
-                                height: 24px;
-                                border-radius: 12px;
-                                background: Theme.workspaces_bg_color;
-                                vertical-stretch: 0;
-                            }
+                        padding-left: 5px;
+                        padding-right: 4px;
+
+                        Rectangle {
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 12px;
+                            background: #ffffff1d;
+                            vertical-stretch: 0;
                         }
+                    }
 
-                        VerticalLayout {
-                            alignment: center;
-                            padding: 2px;
-                            Rectangle {
-                                background: Theme.workspaces_bg_color;
-                                border-radius: 6px;
-                                HorizontalLayout {
-                                    padding-left: 5px;
-                                    // padding-right: 5px;
-                                    spacing: 4px;
-                                    padding: 3px;
+                    VerticalLayout {
+                        alignment: center;
+                        padding: 2px;
+
+                        Rectangle {
+                            background: #6161616f;
+                            border-radius: 6px;
+                            drop-shadow-color: #00000079;
+                            drop-shadow-offset-y: 1px;
+                            drop-shadow-offset-x: 1px;
+                            drop-shadow-blur: 3px;
+
+                            HorizontalLayout {
+                                spacing: 5px;
+                                padding: 3px;
+
+                                VerticalLayout {
+                                    alignment: center;
+                                    padding: -1px;
+                                    padding-left: -0px;
+
+                                    Image {
+                                        source: MediaAdapter.has-player ? @image-url("../../assets/icons/motion_play.svg") : @image-url("../../assets/icons/music_off.svg");
+                                        image-fit: contain;
+                                    }
+                                }
+
+                                Text {
+                                    font-weight: 600;
+                                    vertical-alignment: center;
+                                    text: MediaAdapter.artist;
+                                    font-family: Theme.font-family;
+                                    font-size: 10px;
+                                    color: Theme.music_artist_color;
+                                    max-width: 70px;
+                                    overflow: elide;
+                                }
+
+                                Text {
+                                    vertical-alignment: center;
+                                    text: MediaAdapter.title;
+                                    font-family: Theme.font-family;
+                                    font-size: 10px;
+                                    color: Theme.foreground;
+                                    max-width: 100px;
+                                    overflow: elide;
+                                }
+
+                                Rectangle {
+                                    background: #464745;
+                                    border-radius: 4px;
+                                    drop-shadow-color: #00000079;
+                                    drop-shadow-offset-y: 1px;
+                                    drop-shadow-offset-x: 1px;
+                                    drop-shadow-blur: 3px;
 
                                     VerticalLayout {
-                                        alignment: center;
-                                        padding-right: 0px;
+                                        TouchArea {
+                                            clicked => {
+                                                MediaAdapter.play-pause();
+                                            }
+                                            opacity: MediaAdapter.has-player ? 1 : 0.3;
 
-                                        Image {
-                                            source: MediaAdapter.has-player ? @image-url("../../assets/icons/motion_play.svg") : @image-url("../../assets/icons/music_off.svg");
-                                            // height: 22px;
-                                            image-fit: contain;
-                                        }
-                                    }
-
-                                    VerticalLayout {
-                                        alignment: center;
-                                        // padding-top: 1px;
-                                        spacing: -3px;
-
-                                        Text {
-                                            // height: 5px;
-                                            font-weight: 600;
-                                            // vertical-alignment: bottom;
-                                            text: MediaAdapter.artist;
-                                            font-family: Theme.font-family;
-                                            font-size: 9px;
-                                            color: Theme.music_artist_color;
-                                            max-width: 150px;
-                                            overflow: elide;
-                                        }
-
-                                        Text {
-
-                                            font-weight: 600;
-                                            vertical-alignment: bottom;
-                                            text: MediaAdapter.title;
-                                            font-family: Theme.font-family;
-                                            font-size: 10.5px;
-                                            color: Theme.foreground;
-                                            max-width: 150px;
-                                            overflow: elide;
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        background: #2c2d29;
-                                        border-radius: 5px;
-                                            // width: 26px;
-                                            // height: 26px;
-
-                                            VerticalLayout {
-                                            // padding: 2px;
-
-                                            TouchArea {
-                                                clicked => {
-                                                    MediaAdapter.play-pause();
-                                                }
-                                                opacity: MediaAdapter.has-player ? 1 : 0.3;
-
-                                                Image {
-                                                    source: MediaAdapter.status == "playing" ? @image-url("../../assets/icons/pause.svg") : @image-url("../../assets/icons/play_arrow.svg");
-                                                    width: 16px;
-                                                    height: 16px;
-                                                    image-fit: contain;
-                                                }
+                                            Image {
+                                                source: MediaAdapter.status == "playing" ? @image-url("../../assets/icons/pause.svg") : @image-url("../../assets/icons/play_arrow.svg");
+                                                width: 16px;
+                                                height: 16px;
+                                                image-fit: contain;
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                    }
 
-                        VerticalLayout {
-                            alignment: center;
-                            padding-left: 4px;
-                            padding-right: 4px;
-                            Rectangle {
-                                width: 24px;
-                                height: 24px;
-                                border-radius: 12px;
-                                background: Theme.workspaces_bg_color;
-                                vertical-stretch: 0;
-                            }
+                    VerticalLayout {
+                        alignment: center;
+                        padding-left: 4px;
+                        padding-right: 5px;
+
+                        Rectangle {
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 12px;
+                            background: #ffffff1d;
+                            vertical-stretch: 0;
                         }
                     }
                 }
+            }
 
-                clicked => {
-                    root.clicked();
-                }
+            clicked => {
+                root.clicked();
             }
         }
     }

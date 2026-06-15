@@ -6,30 +6,43 @@ export global ClockAdapter {
 }
 
 export component ClockWidget {
-    Rectangle {
-        vertical-stretch: 1;
-        
-        VerticalLayout {
-            padding-left: 6px;
-            padding-right: 6px;
-            alignment: center;
-            
+
+    VerticalLayout {
+        alignment: center;
+
+        Rectangle {
+            height: 28px;
+            border-radius: 14px;
+            background: Theme.workspaces_bg_color;
+
             HorizontalLayout {
                 spacing: 4px;
                 alignment: center;
-                
+                padding-left: 10px;
+                padding-right: 10px;
+
                 Text {
                     text: ClockAdapter.current-time;
                     font-family: Theme.font-family;
                     font-size: Theme.font-size;
                     color: Theme.foreground;
+                    vertical-alignment: center;
                 }
-                
+
+                Text {
+                    text: "|";
+                    font-family: Theme.font-family;
+                    font-size: Theme.font-size;
+                    color: #ffffff26;
+                    vertical-alignment: center;
+                }
+
                 Text {
                     text: ClockAdapter.current-date;
                     font-family: Theme.font-family;
                     font-size: Theme.font-size;
                     color: Theme.foreground;
+                    vertical-alignment: center;
                 }
             }
         }
