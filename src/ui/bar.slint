@@ -76,19 +76,32 @@ export component StatusBarWindow inherits Window {
                             height: 28px;
                             border-radius: 14px;
                             background: Theme.workspaces_bg_color;
-                            horizontal-stretch: 1;
 
-                            HorizontalLayout {
+                            VerticalLayout {
                                 alignment: center;
-                                padding-left: 10px;
-                                padding-right: 10px;
-                                spacing: 7px;
+                                padding: 3px;
+                                Rectangle {
+                                    height: 22px;
+                                    border-radius: 11px;
+                                    background: #9a9a9a1d;
+                                    drop-shadow-color: #00000080;
+                                    drop-shadow-offset-y: 1px;
+                                    drop-shadow-offset-x: 1px;
+                                    drop-shadow-blur: 3px;
 
-                                BatteryWidget { }
+                                    HorizontalLayout {
+                                        alignment: center;
+                                        padding-left: 10px;
+                                        padding-right: 10px;
+                                        spacing: 8px;
 
-                                NetworkWidget { }
+                                        BatteryWidget { }
 
-                                BluetoothWidget { }
+                                        NetworkWidget { }
+
+                                        BluetoothWidget { }
+                                    }
+                                }
                             }
                         }
                     }

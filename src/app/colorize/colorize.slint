@@ -13,15 +13,24 @@ export component ColorizeWidget {
             height: 28px;
             border-radius: 14px;
             border-width: 2px;
-            border-color: touch_area.has-hover ? #ffffff42 : transparent;
             background: touch_area.has-hover ? #262722ed : Theme.workspaces_bg_color;
+            Rectangle {
+                width: 22px;
+                height: 22px;
+                border-radius: 11px;
+                background: #9a9a9a1d;
+                drop-shadow-color: #00000080;
+                drop-shadow-offset-y: 1px;
+                drop-shadow-offset-x: 1px;
+                drop-shadow-blur: 3px;
 
-            Image {
-                source: @image-url("../../assets/icons/colorize.svg");
-                width: 16px;
-                height: 16px;
-                image-fit: contain;
-                colorize: Theme.foreground-icon;
+                Image {
+                    source: @image-url("../../assets/icons/colorize.svg");
+                    width: 16px;
+                    height: 16px;
+                    image-fit: contain;
+                    colorize: Theme.foreground-icon;
+                }
             }
         }
     }

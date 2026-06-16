@@ -15,9 +15,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     let bar_conf = WindowConf::builder()
         .width(1366_u32)
-        .height(38_u32)
+        .height(36_u32)
         .anchor_1(LayerAnchor::TOP | LayerAnchor::LEFT | LayerAnchor::RIGHT)
-        .exclusive_zone(38)
+        .exclusive_zone(36)
         .layer_type(LayerType::Top)
         .build()
         .unwrap();
