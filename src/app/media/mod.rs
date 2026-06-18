@@ -1,6 +1,7 @@
 pub mod popup;
 
-use mpris::{Event, PlaybackStatus, PlayerFinder};
+use dbus::ffidisp::{BusType, Connection, ConnectionItem};
+use mpris::{PlaybackStatus, PlayerFinder};
 use slint::ComponentHandle;
 use std::thread;
 use std::time::Duration;
@@ -77,59 +78,56 @@ impl MediaController {
 
         thread::spawn(move || {
             loop {
-                let finder = match PlayerFinder::new() {
-                    Ok(f) => f,
+                let conn = match Connection::get_private(BusType::Session) {
+                    Ok(c) => c,
                     Err(e) => {
-                        log::warn!("[media] D-Bus connection failed: {e}");
+                        log::error!("[media] D-Bus connection failed: {e}");
                         thread::sleep(Duration::from_secs(5));
                         continue;
                     }
                 };
 
-                let player = match finder.find_active() {
-                    Ok(p) => p,
-                    Err(_) => {
-                        clear_ui(&weak);
-                        thread::sleep(Duration::from_secs(2));
-                        continue;
-                    }
-                };
+                let _ = conn.add_match(
+                    "interface='org.freedesktop.DBus',\
+                     member='NameOwnerChanged',\
+                     arg0namespace='org.mpris.MediaPlayer2'",
+                );
 
-                log::info!("[media] found active player");
+                let _ = conn.add_match(
+                    "interface='org.freedesktop.DBus.Properties',\
+                     member='PropertiesChanged',\
+                     path='/org/mpris/MediaPlayer2'",
+                );
 
-                update_text(&weak, player.get_metadata().ok().as_ref());
-                update_status(&weak, player.get_playback_status().ok());
-
-                let events = match player.events() {
-                    Ok(e) => e,
+                let finder = match PlayerFinder::new() {
+                    Ok(f) => f,
                     Err(e) => {
-                        log::error!("[media] failed to create event listener: {e}");
+                        log::warn!("[media] D-Bus finder failed: {e}");
                         continue;
                     }
                 };
 
-                for result in events {
-                    match result {
-                        Ok(Event::PlayerShutDown) => {
-                            log::info!("[media] player shutting down");
-                            break;
-                        }
-                        Ok(Event::TrackChanged(ref meta)) => {
-                            update_text(&weak, Some(meta));
+                for item in conn.iter(1000) {
+                    if let ConnectionItem::Signal(msg) = &item {
+                        log::debug!(
+                            "[media] signal: {}.{}",
+                            msg.interface().as_deref().unwrap_or("?"),
+                            msg.member().as_deref().unwrap_or("?")
+                        );
+                    }
+
+                    match finder.find_active() {
+                        Ok(player) => {
+                            update_text(&weak, player.get_metadata().ok().as_ref());
                             update_status(&weak, player.get_playback_status().ok());
                         }
-                        Ok(Event::Playing) => update_status(&weak, Some(PlaybackStatus::Playing)),
-                        Ok(Event::Paused) => update_status(&weak, Some(PlaybackStatus::Paused)),
-                        Ok(Event::Stopped) => update_status(&weak, None),
-                        Ok(_) => {}
-                        Err(e) => {
-                            log::error!("[media] event error: {e}");
-                            break;
+                        Err(_) => {
+                            clear_ui(&weak);
                         }
                     }
                 }
 
-                clear_ui(&weak);
+                log::info!("[media] D-Bus connection lost, reconnecting...");
             }
         });
     }
