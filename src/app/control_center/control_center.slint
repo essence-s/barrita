@@ -1,0 +1,21 @@
+import { Theme } from "../../ui/styles/theme.slint";
+import { Sidebar } from "sidebar.slint";
+import { MusicPlayer } from "music_player.slint";
+import { CenterPanel } from "center_panel.slint";
+import { Notifications } from "notifications.slint";
+
+export component ControlCenter inherits Window {
+    no-frame: true;
+    width: 800px;
+    height: 450px;
+    background: transparent;
+
+    in-out property <string> song-title: "title";
+    in-out property <string> artist: "artist";
+    in-out property <string> status: "playing";
+    in-out property <bool> has-player: true;
+
+    callback play-pause();
+    callback next();
+    callback previous();
+}
