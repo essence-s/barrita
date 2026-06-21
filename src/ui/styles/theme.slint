@@ -1,23 +1,86 @@
 import "../fonts/MaterialSymbolsRounded-Regular.ttf";
 
 export global Theme {
+
+    // Primary family
+    in-out property <color> primary: #9e9e9e;
+    in-out property <color> on-primary: #141414;
+    in-out property <color> primary-container: #2d2d2d;
+    in-out property <color> on-primary-container: #e0e0e0;
+
+    // Secondary family
+    in-out property <color> secondary: #8a8a8a;
+    in-out property <color> on-secondary: #141414;
+    in-out property <color> secondary-container: #262626;
+    in-out property <color> on-secondary-container: #d4d4d4;
+
+    // Tertiary family
+    in-out property <color> tertiary: #757575;
+    in-out property <color> on-tertiary: #141414;
+    in-out property <color> tertiary-container: #212121;
+    in-out property <color> on-tertiary-container: #c9c9c9;
+
+    // Error family
+   in-out property <color> error: #b0b0b0;
+    in-out property <color> on-error: #141414;
+    in-out property <color> error-container: #3d3d3d;
+    in-out property <color> on-error-container: #e8e8e8;
+
+    // Surface hierarchy (de menor a mayor elevación)
+    in-out property <color> surface: #1c1c1c;
+    in-out property <color> on-surface: #e6e6e6;
+    in-out property <color> surface-dim: #0f0f0f;
+    in-out property <color> surface-bright: #2e2e2e;
+    in-out property <color> surface-container-lowest: #080808;
+    in-out property <color> surface-container-low: #141414;
+    in-out property <color> surface-container: #1c1c1c;
+    in-out property <color> surface-container-high: #262626;
+    in-out property <color> surface-container-highest: #303030;
+    in-out property <color> on-surface-variant: #b3b3b3;
+
+    // Outlines
+    in-out property <color> outline: #444444;
+    in-out property <color> outline-variant: #333333;
+
+    // Inverse
+    in-out property <color> inverse-surface: #e6e6e6;
+    in-out property <color> inverse-on-surface: #141414;
+    in-out property <color> inverse-primary: #757575;
+
+    // Scrim/shadow
+    in-out property <color> scrim: #000000;
+
+    //----
+    //----
+    // Dominantes
+    in-out property <color> dominant-0: #ffffff;
+    in-out property <color> dominant-1: #9e9e9e;
+    in-out property <color> dominant-2: #555555;
+    in-out property <color> dominant-3: #141414;
+
+    // Layout
+    in-out property <length> bar-height: 36px;
+    in-out property <length> icon-size: 16px;
+    in-out property <length> spacing: 8px;
+    in-out property <length> radius-sm: 4px;
+    in-out property <length> radius-md: 8px;
+    in-out property <length> radius-lg: 14px;
+
+    // Font
+    in-out property <string> font-family: "Rubik";
+    in-out property <string> icon-font-family: "Material Symbols Rounded";
+    in-out property <length> font-size: 12px;
+
+    //---- se eliminara despues
     in-out property <color> background: #0808080f;
     in-out property <color> foreground: #bac7bf;
     in-out property <color> foreground-icon: #c9dfc7;
     in-out property <color> accent: #89b4fa;
     in-out property <color> success: #a6e3a1;
     in-out property <color> warning: #f9e2af;
-    in-out property <color> error: #f38ba8;
+    // in-out property <color> error: #f38ba8;
 
-    in-out property <length> bar-height: 36px;
-    // in-out property <length> bar-height: 38px;
-    in-out property <length> icon-size: 16px;
     in-out property <length> padding: 0px;
-    in-out property <length> spacing: 8px;
-
-    in-out property <string> font-family: "Rubik";
-    in-out property <string> icon-font-family: "Material Symbols Rounded";
-    in-out property <length> font-size: 12px;
 
     in-out property <color> workspaces_bg_color: #1e1f1bee;
     in-out property <color> workspaces_active_color: #B4CCC1;
