@@ -1,0 +1,173 @@
+import { Theme } from "../../../ui/styles/theme.slint";
+
+export component MusicPlayer {
+    in-out property <string> song-title: "Song Title";
+    in-out property <string> artist: "Artist";
+    in-out property <string> status: "playing";
+    in-out property <bool> has-player: true;
+
+    callback play-pause();
+    callback next();
+    callback previous();
+
+    Rectangle {
+        border-radius: 14px;
+        border-width: 1.5px;
+        background: Theme.surface-container-high;
+
+        VerticalLayout {
+            alignment: center;
+            padding: 16px;
+            spacing: 10px;
+
+            HorizontalLayout {
+                alignment: center;
+
+                Rectangle {
+                    width: 90px;
+                    height: 90px;
+                    border-radius: 45px;
+                    background: @linear-gradient(135deg, Theme.primary, Theme.secondary-container);
+                    Text {
+                        text: "music_note";
+                        font-family: Theme.icon-font-family;
+                        font-size: 36px;
+                        color: Theme.on-primary-container;
+                        opacity: 0.8;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Text {
+                text: root.song-title;
+                font-family: Theme.font-family;
+                font-size: 14px;
+                font-weight: 700;
+                color: Theme.on-surface;
+                horizontal-alignment: center;
+            }
+
+            Text {
+                text: root.artist;
+                font-family: Theme.font-family;
+                font-size: 11px;
+                color: Theme.on-surface-variant;
+                horizontal-alignment: center;
+            }
+
+            HorizontalLayout {
+                alignment: center;
+                spacing: 6px;
+
+                TouchArea {
+                    clicked => {
+                        root.previous();
+                    }
+                    Text {
+                        text: "skip_previous";
+                        font-family: Theme.icon-font-family;
+                        font-size: 16px;
+                        color: #999999;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                Text {
+                    text: "fast_rewind";
+                    font-family: Theme.icon-font-family;
+                    font-size: 16px;
+                    color: #999999;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                TouchArea {
+                    width: 36px;
+                    height: 36px;
+                    clicked => {
+                        root.play-pause();
+                    }
+                    Rectangle {
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 18px;
+                        background: Theme.primary;
+                        Text {
+                            text: root.has-player ? (root.status == "playing" ? "pause" : "play_arrow") : "play_arrow";
+                            font-family: Theme.icon-font-family;
+                            font-size: 20px;
+                            color: Theme.on-primary;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+
+                Text {
+                    text: "fast_forward";
+                    font-family: Theme.icon-font-family;
+                    font-size: 16px;
+                    color: #999999;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                TouchArea {
+                    clicked => {
+                        root.next();
+                    }
+                    Text {
+                        text: "skip_next";
+                        font-family: Theme.icon-font-family;
+                        font-size: 16px;
+                        color: #999999;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                height: 3px;
+                border-radius: 2px;
+                background: #444444;
+
+                Rectangle {
+                    x: 0px;
+                    width: parent.width * 0.65;
+                    height: 100%;
+                    border-radius: 2px;
+                    background: Theme.primary;
+                }
+            }
+
+            HorizontalLayout {
+                alignment: center;
+                spacing: 2px;
+                Text {
+                    text: "1:30";
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "/";
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #555555;
+                }
+
+                Text {
+                    text: "2:42";
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+            }
+        }
+    }
+}

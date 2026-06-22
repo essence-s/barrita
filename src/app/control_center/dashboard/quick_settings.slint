@@ -1,0 +1,89 @@
+import { Theme } from "../../../ui/styles/theme.slint";
+
+export component QuickSettings {
+    Rectangle {
+        border-radius: 12px;
+        background: Theme.surface-container-high;
+
+        HorizontalLayout {
+            alignment: center;
+            spacing: 6px;
+            padding: 6px;
+
+            Rectangle {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: Theme.primary;
+                Text {
+                    text: "wifi";
+                    font-family: Theme.icon-font-family;
+                    font-size: 20px;
+                    color: #1a1a1a;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+
+            Rectangle {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: Theme.primary;
+                Text {
+                    text: "bluetooth";
+                    font-family: Theme.icon-font-family;
+                    font-size: 20px;
+                    color: #1a1a1a;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+
+            Rectangle {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: Theme.surface-container;
+                Text {
+                    text: "dark_mode";
+                    font-family: Theme.icon-font-family;
+                    font-size: 20px;
+                    color: #666666;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+
+            Rectangle {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: Theme.surface-container;
+                Text {
+                    text: "local_cafe";
+                    font-family: Theme.icon-font-family;
+                    font-size: 20px;
+                    color: #666666;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+
+            Rectangle {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: Theme.primary;
+                Text {
+                    text: "sports_esports";
+                    font-family: Theme.icon-font-family;
+                    font-size: 20px;
+                    color: #1a1a1a;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}

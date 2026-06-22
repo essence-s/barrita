@@ -1,0 +1,485 @@
+import { Theme } from "../../../ui/styles/theme.slint";
+
+export component CalendarWidget {
+    Rectangle {
+        border-radius: 12px;
+        background: #222222;
+
+        VerticalLayout {
+            padding: 12px;
+            spacing: 6px;
+
+            HorizontalLayout {
+                alignment: center;
+                spacing: 12px;
+                Text {
+                    text: "chevron_left";
+                    font-family: Theme.icon-font-family;
+                    font-size: 14px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Junio 2026";
+                    font-family: Theme.font-family;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "chevron_right";
+                    font-family: Theme.icon-font-family;
+                    font-size: 14px;
+                    color: #999999;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 2px;
+                Text {
+                    text: "Lu";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Ma";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Mi";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Ju";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Vi";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Sa";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+
+                Text {
+                    text: "Do";
+                    min-width: 28px;
+                    horizontal-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 10px;
+                    color: #999999;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 2px;
+                Text {
+                    text: "1";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "2";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Rectangle {
+                    min-width: 28px;
+                    min-height: 22px;
+                    border-radius: 11px;
+                    background: Theme.primary;
+                    Text {
+                        text: "3";
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        font-family: Theme.font-family;
+                        font-size: 11px;
+                        font-weight: 600;
+                        color: Theme.on-primary;
+                    }
+                }
+
+                Text {
+                    text: "4";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "5";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "6";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "7";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 2px;
+                Text {
+                    text: "8";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "9";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "10";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "11";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "12";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "13";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "14";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 2px;
+                Text {
+                    text: "15";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "16";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "17";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "18";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "19";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "20";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "21";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 2px;
+                Text {
+                    text: "22";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "23";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "24";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "25";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "26";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "27";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "28";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 2px;
+                Text {
+                    text: "29";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Text {
+                    text: "30";
+                    min-width: 28px;
+                    min-height: 22px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-family: Theme.font-family;
+                    font-size: 11px;
+                    color: #dddddd;
+                }
+
+                Rectangle {
+                    min-width: 28px;
+                    min-height: 22px;
+                    background: transparent;
+                }
+
+                Rectangle {
+                    min-width: 28px;
+                    min-height: 22px;
+                    background: transparent;
+                }
+
+                Rectangle {
+                    min-width: 28px;
+                    min-height: 22px;
+                    background: transparent;
+                }
+
+                Rectangle {
+                    min-width: 28px;
+                    min-height: 22px;
+                    background: transparent;
+                }
+
+                Rectangle {
+                    min-width: 28px;
+                    min-height: 22px;
+                    background: transparent;
+                }
+            }
+        }
+    }
+}
