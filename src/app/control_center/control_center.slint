@@ -1,8 +1,5 @@
 import { Theme } from "../../ui/styles/theme.slint";
-import { Sidebar } from "sidebar.slint";
-import { MusicPlayer } from "music_player.slint";
-import { CenterPanel } from "center_panel.slint";
-import { Notifications } from "notifications.slint";
+import { Dashboard } from "dashboard/dashboard.slint";
 
 export component ControlCenter inherits Window {
     no-frame: true;
@@ -10,12 +7,95 @@ export component ControlCenter inherits Window {
     height: 450px;
     background: transparent;
 
-    in-out property <string> song-title: "title";
-    in-out property <string> artist: "artist";
-    in-out property <string> status: "playing";
-    in-out property <bool> has-player: true;
+    touch_area := TouchArea {
+        opacity: touch_area.has-hover ? 1.0 : 0.999;
 
-    callback play-pause();
-    callback next();
-    callback previous();
+        Rectangle {
+            background: transparent;
+
+            HorizontalLayout {
+                Rectangle {
+                    Path {
+                        x: 0;
+                        y: 0;
+                        width: 15px;
+                        height: 15px;
+                        fill: Theme.surface-container;
+
+                        MoveTo {
+                            x: 0;
+                            y: 0;
+                        }
+
+                        LineTo {
+                            x: 15;
+                            y: 0;
+                        }
+
+                        LineTo {
+                            x: 15;
+                            y: 15;
+                        }
+
+                        ArcTo {
+                            x: 0;
+                            y: 0;
+                            radius-x: 15;
+                            radius-y: 15;
+                            large-arc: false;
+                            sweep: false;
+                        }
+
+                        Close { }
+                    }
+                }
+
+                Rectangle {
+                    background: Theme.surface-container;
+                    width: parent.width - 30px;
+                    border-bottom-left-radius: 15px;
+                    border-bottom-right-radius: 15px;
+                    VerticalLayout {
+                        Rectangle {
+                            height: 30px;
+                            background: Theme.surface-container;
+                        }
+
+                        Dashboard { }
+                    }
+                }
+
+                Rectangle {
+                    Path {
+                        x: 0;
+                        y: 0;
+                        width: 15px;
+                        height: 15px;
+                        fill: Theme.surface-container;
+
+                        MoveTo {
+                            x: 0;
+                            y: 0;
+                        }
+
+                        LineTo {
+                            x: 15;
+                            y: 0;
+                        }
+
+                        ArcTo {
+                            x: 0;
+                            y: 15;
+                            radius-x: 15;
+                            radius-y: 15;
+                            large-arc: false;
+                            sweep: false;
+                        }
+
+                        Close { }
+                    }
+                }
+            }
+        }
+    }
 }

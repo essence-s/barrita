@@ -20,7 +20,6 @@ export component StatusBarWindow inherits Window {
     width: 1366px;
     height: Theme.bar-height;
 
-    callback popup_toggle();
     callback media_play_pause();
     callback media_next();
     callback media_previous();
@@ -51,10 +50,6 @@ export component StatusBarWindow inherits Window {
                 MediaWidget {
                     horizontal-stretch: 1;
                     max-width: parent.width / 3;
-
-                    clicked => {
-                        root.popup_toggle();
-                    }
                 }
 
                 HorizontalLayout {

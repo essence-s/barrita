@@ -1,0 +1,45 @@
+import { Theme } from "../../../ui/styles/theme.slint";
+import { MusicPlayer } from "music_player.slint";
+import { QuickSettings } from "quick_settings.slint";
+import { CalendarWidget } from "calendar_widget.slint";
+import { NotificationHistory } from "notification_history.slint";
+import { CircularControls } from "circular_controls.slint";
+
+export component Dashboard {
+
+    Rectangle {
+        border-radius: 0px;
+        background: transparent;
+
+        HorizontalLayout {
+            spacing: 8px;
+            padding: 8px;
+
+            VerticalLayout {
+                horizontal-stretch: 1;
+                max-width: parent.width / 3;
+                spacing: 8px;
+
+                QuickSettings { }
+
+                Rectangle {
+                    height: 60px;
+                    border-radius: 12px;
+                    background: #222222;
+                }
+
+                CalendarWidget { }
+            }
+
+            MusicPlayer {
+                horizontal-stretch: 1;
+                max-width: parent.width / 3;
+            }
+
+            NotificationHistory {
+                horizontal-stretch: 1;
+                max-width: parent.width / 3;
+            }
+        }
+    }
+}
