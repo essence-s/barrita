@@ -55,13 +55,16 @@ export component ControlCenter inherits Window {
                     width: parent.width - 30px;
                     border-bottom-left-radius: 15px;
                     border-bottom-right-radius: 15px;
+
                     VerticalLayout {
                         Rectangle {
                             height: 30px;
                             background: Theme.surface-container;
                         }
 
-                        Dashboard { }
+                        Dashboard {
+                            height: parent.height - 30px;
+                        }
                     }
                 }
 
