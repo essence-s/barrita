@@ -20,7 +20,7 @@ export component MediaWidget {
 
         TouchArea {
             Rectangle {
-                background: Theme.workspaces_bg_color;
+                background: Theme.surface;
                 border-radius: 20px;
 
                 HorizontalLayout {
@@ -36,7 +36,7 @@ export component MediaWidget {
                             width: 22px;
                             height: 22px;
                             border-radius: 11px;
-                            background: #ffffff1d;
+                            background: Theme.surface-container-highest;
                             drop-shadow-color: #00000079;
                             drop-shadow-offset-y: 1px;
                             drop-shadow-offset-x: 1px;
@@ -53,6 +53,7 @@ export component MediaWidget {
                                         source: @image-url("../../assets/icons/dashboard.svg");
                                         width: 14px;
                                         height: 14px;
+                                        colorize: Theme.on-surface;
                                     }
                                 }
                             }
@@ -63,7 +64,7 @@ export component MediaWidget {
                         alignment: center;
 
                         Rectangle {
-                            background: #6161616f;
+                            background: Theme.surface-container-high;
                             border-radius: 6px;
                             drop-shadow-color: #00000079;
                             drop-shadow-offset-y: 1px;
@@ -82,6 +83,7 @@ export component MediaWidget {
                                     Image {
                                         source: MediaAdapter.has-player ? @image-url("../../assets/icons/motion_play.svg") : @image-url("../../assets/icons/music_off.svg");
                                         image-fit: contain;
+                                        colorize: Theme.on-surface;
                                     }
                                 }
 
@@ -91,7 +93,7 @@ export component MediaWidget {
                                     text: MediaAdapter.artist;
                                     font-family: Theme.font-family;
                                     font-size: 10px;
-                                    color: Theme.music_artist_color;
+                                    color: Theme.on-surface-variant;
                                     max-width: 70px;
                                     overflow: elide;
                                 }
@@ -101,13 +103,13 @@ export component MediaWidget {
                                     text: MediaAdapter.title;
                                     font-family: Theme.font-family;
                                     font-size: 10px;
-                                    color: Theme.foreground;
+                                    color: Theme.on-surface;
                                     max-width: 100px;
                                     overflow: elide;
                                 }
 
                                 Rectangle {
-                                    background: #464745;
+                                    background: Theme.surface-container-highest;
                                     border-radius: 4px;
                                     drop-shadow-color: #00000079;
                                     drop-shadow-offset-y: 1px;
@@ -142,7 +144,7 @@ export component MediaWidget {
                             width: 22px;
                             height: 22px;
                             border-radius: 11px;
-                            background: #ffffff1d;
+                            background: Theme.surface-container-highest;
                             drop-shadow-color: #00000079;
                             drop-shadow-offset-y: 1px;
                             drop-shadow-offset-x: 1px;
@@ -151,6 +153,7 @@ export component MediaWidget {
                             Image {
                                 source: @image-url("../../assets/icons/notifications_active.svg");
                                 width: 14px;
+                                colorize: Theme.on-surface;
                             }
                         }
                     }

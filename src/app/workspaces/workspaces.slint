@@ -16,7 +16,7 @@ export component WorkspacesWidget {
         alignment: center;
 
         Rectangle {
-            background: Theme.workspaces_bg_color;
+            background: Theme.surface;
             border-radius: Theme.workspaces_border_radius * 1px;
 
             HorizontalLayout {
@@ -44,7 +44,7 @@ export component WorkspacesWidget {
                         border-bottom-left-radius: !leftFilled ? root.button-size / 2 : 0px;
                         border-top-right-radius: !rightFilled ? root.button-size / 2 : 0px;
                         border-bottom-right-radius: !rightFilled ? root.button-size / 2 : 0px;
-                        background: occupied ? Theme.workspaces_occupied_bg : #00000000;
+                        background: occupied ? Theme.surface-container-highest : #00000000;
                         opacity: occupied ? 1 : 0.0;
                     }
 
@@ -53,7 +53,7 @@ export component WorkspacesWidget {
                         height: root.button-size * 0.70;
 
                         border-radius: self.width / 2;
-                        background: Theme.workspaces_active_color;
+                        background: Theme.primary;
 
                         x: (root.button-size - self.width) / 2;
                         y: (root.button-size - self.height) / 2;
@@ -68,7 +68,7 @@ export component WorkspacesWidget {
                         height: root.button-size * 0.20;
 
                         border-radius: self.width / 2;
-                        background: isActive ? Theme.workspaces_text_active : occupied ? Theme.workspaces_text_occupied : Theme.workspaces_text_free;
+                        background: isActive ? Theme.surface-container-highest : occupied ? Theme.primary : Theme.on-surface-variant;
 
                         x: (root.button-size - self.width) / 2;
                         y: (root.button-size - self.height) / 2;
