@@ -22,6 +22,8 @@ toml = "0.8"
 dirs = "5"
 hyprland = { version = "0.4.0-beta.3", default-features = false, features = ["listener"] }
 dbus = "0.9"
+system-tray = "0.8"
+tokio = { version = "1", features = ["rt", "macros", "sync"] }
 
 [build-dependencies]
 slint-build = "1.17"

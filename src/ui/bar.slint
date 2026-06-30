@@ -8,6 +8,7 @@ import { ScreenshotWidget } from "../app/screenshot/screenshot.slint";
 import { ColorizeWidget } from "../app/colorize/colorize.slint";
 import { ArticleWidget } from "../app/article/article.slint";
 import { MediaWidget } from "../app/media/media.slint";
+import { TrayWidget } from "../app/tray/tray.slint";
 import { LogoWidget } from "../app/logo/logo.slint";
 
 export component StatusBarWindow inherits Window {
@@ -61,6 +62,8 @@ export component StatusBarWindow inherits Window {
                     // ScreenshotWidget { }
 
                     // ArticleWidget { }
+
+                    tray := TrayWidget { }
 
                     ClockWidget { }
 

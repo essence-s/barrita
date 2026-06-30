@@ -7,3 +7,4 @@ pub mod screenshot;
 pub mod article;
 pub mod bluetooth;
 pub mod media;
+pub mod tray;

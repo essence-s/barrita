@@ -1,0 +1,69 @@
+import { Theme } from "../../../ui/styles/theme.slint";
+import { TrayAdapter, PopupMenuItem } from "../tray.slint";
+
+export component TrayPopup inherits Window {
+    in-out property <int> render-trigger;
+    no-frame: true;
+    background: transparent;
+    width: 200px;
+    // height: 300px;
+
+    VerticalLayout {
+        Rectangle {
+            background: Theme.surface-container-high;
+            border-radius: 8px;
+            opacity: render-trigger == 0 ? 0.999 : 1.0;
+            VerticalLayout {
+                padding: 4px;
+                spacing: 2px;
+
+                for item in TrayAdapter.popup-items: Rectangle {
+                    height: item.is-separator ? 1px : 28px;
+                    background: ta.has-hover && !item.is-separator && item.enabled ? Theme.surface-container-highest : item.is-separator ? Theme.outline-variant : transparent;
+                    border-radius: 4px;
+
+                    Rectangle {
+                        visible: item.is-separator;
+                        height: 1px;
+                        background: Theme.outline-variant;
+                    }
+
+                    HorizontalLayout {
+                        visible: !item.is-separator;
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        alignment: start;
+                        spacing: 6px;
+
+                        Rectangle {
+                            width: 16px;
+                            height: 16px;
+                            visible: item.is-checked;
+                            Text {
+                                text: "✓";
+                                color: Theme.on-surface;
+                                font-size: 12px;
+                            }
+                        }
+
+                        Text {
+                            text: item.label;
+                            color: item.enabled ? Theme.on-surface : Theme.on-surface-variant;
+                            font-size: 12px;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+                    }
+
+                    ta := TouchArea {
+                        visible: !item.is-separator;
+                        enabled: item.enabled;
+                        clicked => {
+                            TrayAdapter.menu-item-selected(item.id);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
