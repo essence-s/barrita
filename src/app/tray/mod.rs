@@ -39,6 +39,32 @@ fn best_icon<'a>(pixmaps: &'a [IconPixmap], target: u32) -> Option<&'a IconPixma
         .min_by_key(|p| (p.width.max(p.height) as u32 as i32 - target as i32).abs())
 }
 
+fn load_icon_from_path(
+    icon_name: &str,
+    icon_theme_path: Option<&str>,
+) -> Option<(Vec<u8>, i32, i32)> {
+    let path_str = format!("{}/{}.png", icon_theme_path?, icon_name);
+    let img = image::open(&path_str).ok()?.into_rgba8();
+    let (orig_w, orig_h) = (img.width(), img.height());
+    const TARGET: u32 = 18;
+
+    let resized = if orig_w != TARGET || orig_h != TARGET {
+        image::imageops::resize(&img, TARGET, TARGET, image::imageops::CatmullRom)
+    } else {
+        img
+    };
+
+    let raw = resized.into_raw();
+    let mut argb = Vec::with_capacity(raw.len());
+    for rgba in raw.chunks(4) {
+        argb.push(rgba[3]);
+        argb.push(rgba[0]);
+        argb.push(rgba[1]);
+        argb.push(rgba[2]);
+    }
+    Some((argb, TARGET as i32, TARGET as i32))
+}
+
 fn raw_to_image(pixels: &[u8], width: i32, height: i32) -> slint::Image {
     if width <= 0 || height <= 0 || pixels.is_empty() {
         return slint::Image::default();
@@ -65,6 +91,14 @@ fn build_raw_item(
         .and_then(|pixmaps| best_icon(pixmaps, 16))
         .map(|p| (p.pixels.clone(), p.width, p.height))
         .unwrap_or_default();
+    let (icon_pixels, icon_width, icon_height) = if icon_pixels.is_empty() {
+        item.icon_name
+            .as_deref()
+            .and_then(|name| load_icon_from_path(name, item.icon_theme_path.as_deref()))
+            .unwrap_or_default()
+    } else {
+        (icon_pixels, icon_width, icon_height)
+    };
     let tooltip = item
         .title
         .as_deref()

@@ -48,12 +48,12 @@ export component TrayWidget inherits Rectangle {
 
                     for i in TrayAdapter.item-count: Rectangle {
                         visible: i < TrayAdapter.item-icons.length;
-                        width: 16px;
+                        width: 18px;
 
                         Image {
                             source: TrayAdapter.item-icons[i];
-                            width: 16px;
-                            height: 16px;
+                            width: 18px;
+                            height: 18px;
                             image-fit: contain;
                         }
 
