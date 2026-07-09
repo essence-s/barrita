@@ -18,7 +18,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .height(36_u32)
         .anchor_1(LayerAnchor::TOP | LayerAnchor::LEFT | LayerAnchor::RIGHT)
         .exclusive_zone(36)
-        .layer_type(LayerType::Overlay)
+        .layer_type(LayerType::Top)
         .build()
         .unwrap();
 
