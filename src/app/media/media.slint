@@ -88,6 +88,7 @@ export component MediaWidget {
                                 }
 
                                 Text {
+                                    visible: MediaAdapter.artist != "";
                                     font-weight: 600;
                                     vertical-alignment: center;
                                     text: MediaAdapter.artist;
@@ -99,6 +100,7 @@ export component MediaWidget {
                                 }
 
                                 Text {
+                                    visible: MediaAdapter.title != "";
                                     vertical-alignment: center;
                                     text: MediaAdapter.title;
                                     font-family: Theme.font-family;
