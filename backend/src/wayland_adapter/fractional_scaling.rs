@@ -1,6 +1,3 @@
-// Courtesy DrepDays
-// Implementaion is taken and modified from here.
-// https://github.com/DerpDays/draw/blob/main/platform%2Fwayland%2Fsrc%2Ffractional_scale.rs
 use smithay_client_toolkit::globals::GlobalData;
 use smithay_client_toolkit::reexports::{
     client::{
@@ -20,8 +17,6 @@ pub struct FractionalScaleState {
     manager: WpFractionalScaleManagerV1,
 }
 
-/// An owned instance of WpFractionalScaleV1, when this is dropped, the underlying interface is
-/// destroyed, and hence events for the corresponding surface are no longer emitted.
 #[derive(Debug)]
 pub struct FractionalScale {
     fractional_scale: WpFractionalScaleV1,
@@ -103,11 +98,6 @@ where
 }
 
 pub trait FractionalScaleHandler: Sized {
-    /// When this function is called, the compositor is indicating the preferred fractional scale
-    /// for the given surface.
-    ///
-    /// The scale received in this event has a denominator of 120, so the true fractional scale
-    /// would be (scale.to_f64().unwrap() / 120.)
     fn preferred_scale(
         &mut self,
         conn: &Connection,

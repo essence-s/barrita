@@ -1,6 +1,3 @@
-// Courtesy DrepDays
-// Implementaion is taken and modified from here.
-// https://github.com/DerpDays/draw/blob/main/platform%2Fwayland%2Fsrc%2Fviewporter.rs
 use crate::wayland_adapter::fractional_scaling::FractionalScale;
 use smithay_client_toolkit::{
     globals::GlobalData,
@@ -19,12 +16,9 @@ pub struct ViewporterState {
     viewporter: WpViewporter,
 }
 
-/// An owned instance of WpViewport, when this is dropped, the underlying interface is
-/// destroyed.
 #[derive(Debug)]
 pub struct Viewport {
     viewport: WpViewport,
-    // This is not required but yet stored so that it doesn't get distroyed.
     #[allow(dead_code)]
     fractional_scale: FractionalScale,
 }

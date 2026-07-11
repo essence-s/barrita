@@ -1,12 +1,12 @@
 slint::include_modules!();
-spell_framework::generate_widgets![StatusBarWindow, ControlCenter, TrayPopup];
+backend::windows![StatusBarWindow, ControlCenter, TrayPopup];
 
 mod app;
 mod config;
 mod ui;
 
-use spell_framework::{
-    cast_spell,
+use backend::{
+    run_windows,
     layer_properties::{LayerAnchor, LayerType, WindowConf},
 };
 
@@ -42,9 +42,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
-    let bar = StatusBarWindowSpell::invoke_spell("barrita", bar_conf);
-    let ctrl = ControlCenterSpell::invoke_spell("control-center", ctrl_conf);
-    let popup = TrayPopupSpell::invoke_spell("tray-popup", popup_conf);
+    let bar = StatusBarWindowWl::spawn("barrita", bar_conf);
+    let ctrl = ControlCenterWl::spawn("control-center", ctrl_conf);
+    let popup = TrayPopupWl::spawn("tray-popup", popup_conf);
     ctrl.hide();
     popup.hide();
 
@@ -52,11 +52,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let tray_popup_handler = popup.get_handler();
     ui::adapters::connect_all(&bar, ctrl_handler, tray_popup_handler, popup.as_weak());
 
-    // spell's first render happens before the Slint component exists,
+    // first render happens before the Slint component exists,
     // so force a redraw now to ensure content appears on the first frame.
     bar.window().request_redraw();
     ctrl.window().request_redraw();
     // popup.window().request_redraw();
 
-    cast_spell!(windows: [bar, ctrl, popup])
+    run_windows!(windows: [bar, ctrl, popup])
 }

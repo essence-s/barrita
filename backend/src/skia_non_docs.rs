@@ -1,11 +1,11 @@
-// use i_slint_core::item_rendering::DirtyRegion;
 use i_slint_core::window::WindowAdapterInternal;
 use i_slint_core::{items::MouseCursor, partial_renderer::DirtyRegion, platform::WindowAdapter};
-
-#[cfg(not(docsrs))]
+use i_slint_renderer_skia::{
+    skia_safe::{self, ColorType},
+    software_surface::RenderBuffer,
+};
+use i_slint_renderer_skia::{SkiaRenderer, SkiaSharedContext, software_surface::SoftwareSurface};
 use slint::{PhysicalSize, Window};
-#[cfg(not(docsrs))]
-#[cfg(feature = "i-slint-renderer-skia")]
 use smithay_client_toolkit::{
     reexports::client::protocol::wl_shm,
     shm::slot::{Buffer, Slot, SlotPool},
@@ -14,19 +14,11 @@ use std::{
     cell::Cell,
     cell::RefCell,
     fmt::Debug,
+    os::unix::io::RawFd,
     rc::{Rc, Weak},
     sync::{Arc, Mutex},
 };
-use tracing::{info, warn};
 
-#[cfg(feature = "i-slint-renderer-skia")]
-use i_slint_renderer_skia::{
-    skia_safe::{self, ColorType},
-    software_surface::RenderBuffer,
-};
-
-#[cfg(feature = "i-slint-renderer-skia")]
-#[cfg(not(docsrs))]
 pub struct SkiaSoftwareBufferReal {
     pub primary_slot: RefCell<Slot>,
     pub pool: Rc<RefCell<SlotPool>>,
@@ -57,42 +49,15 @@ impl RenderBuffer for SkiaSoftwareBufferReal {
             ColorType,
             u8,
             &'a mut [u8],
-        ) -> Result<
-            Option<DirtyRegion>,
-            slint::PlatformError,
-        >,
+        ) -> Result<Option<DirtyRegion>, slint::PlatformError>,
     ) -> std::result::Result<(), slint::PlatformError> {
-        // debug!("Render from Skia called");
         let Some((width, height)): Option<(std::num::NonZeroU32, std::num::NonZeroU32)> =
             size.width.try_into().ok().zip(size.height.try_into().ok())
         else {
-            // Nothing to render
             return Ok(());
         };
 
-        // let mut shared_pixel_buffer = self.pixels.borrow_mut().take();
-        //
-        // if shared_pixel_buffer.as_ref().is_some_and(|existing_buffer| {
-        //     existing_buffer.width() != width.get() || existing_buffer.height() != height.get()
-        // }) {
-        //     shared_pixel_buffer = None;
-        // }
-
-        // This code ensures that the value need not be null. This can't be a case with
-        // box as the value is ensured to be defined by itself during the creation.
-        // let mut age = 1;
-        // let pixels = shared_pixel_buffer.get_or_insert_with(|| {
-        //     age = 0;
-        //     SharedPixelBuffer::new(width.get(), height.get())
-        // });
         let pool = &mut self.pool.borrow_mut();
-        // let mut native_buffer = {
-        //     let x = self.secondary_slot.borrow().canvas(pool).unwrap();
-        //     // creates a copy
-        //     x.to_vec()
-        // };
-
-        // let bytes = bytemuck::cast_slice_mut(&mut native_buffer);
         *self.last_dirty_region.borrow_mut() = render_callback(
             width,
             height,
@@ -105,17 +70,8 @@ impl RenderBuffer for SkiaSoftwareBufferReal {
     }
 }
 
-#[cfg(feature = "i-slint-renderer-skia")]
-use i_slint_renderer_skia::{SkiaRenderer, SkiaSharedContext, software_surface::SoftwareSurface};
-#[cfg(feature = "i-slint-renderer-skia")]
-/// It is the main struct handling the rendering of pixels in the wayland window. It implements slint's
-/// [WindowAdapter](https://docs.rs/slint/latest/slint/platform/trait.WindowAdapter.html) trait.
-/// It is used internally by [SpellMultiWinHandler] and previously by [SpellLayerShell]. This
-/// adapter internally uses [Skia](https://skia.org/) 2D graphics library for rendering.
-pub struct SpellSkiaWinAdapterReal {
+pub struct SkiaWindowAdapter {
     pub(crate) window: Window,
-    // TODO size is no longer required to be in cell as it is never modified
-    // and scaling is handled on the end of wayland only.
     pub(crate) size: Cell<PhysicalSize>,
     pub(crate) size_original: Cell<PhysicalSize>,
     pub(crate) renderer: SkiaRenderer,
@@ -125,29 +81,26 @@ pub struct SpellSkiaWinAdapterReal {
     pub(crate) scale_factor: Cell<f32>,
     #[allow(clippy::type_complexity)]
     pub(crate) slint_event_proxy: Arc<Mutex<Vec<Box<dyn FnOnce() + Send>>>>,
+    pub(crate) eventfd: RawFd,
     pub(crate) current_cursor: Cell<MouseCursor>,
 }
 
-impl Debug for SpellSkiaWinAdapterReal {
+impl Debug for SkiaWindowAdapter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SpellSkiaWinAdapter")
+        f.debug_struct("SkiaWindowAdapter")
             .field("size", &self.size)
             .field("redraw", &self.needs_redraw)
             .finish()
     }
 }
 
-impl WindowAdapterInternal for SpellSkiaWinAdapterReal {
-    ///? Current approach uses an internal (normally private) api.
-    ///? According to the slint docs, they are planning on making it public
-    ///? Both this trait impl & the MouseCursor enum are currently private, but still accessible
-    ///? through the slint internal crate.
+impl WindowAdapterInternal for SkiaWindowAdapter {
     fn set_mouse_cursor(&self, cursor: MouseCursor) {
         self.current_cursor.set(cursor);
     }
 }
 
-impl WindowAdapter for SpellSkiaWinAdapterReal {
+impl WindowAdapter for SkiaWindowAdapter {
     fn window(&self) -> &slint::Window {
         &self.window
     }
@@ -161,7 +114,7 @@ impl WindowAdapter for SpellSkiaWinAdapterReal {
     }
 
     fn set_size(&self, size: slint::WindowSize) {
-        info!("Set_size is called");
+        log::info!("Set_size is called");
         self.size.set(size.to_physical(self.scale_factor.get()));
         self.window
             .dispatch_event(slint::platform::WindowEvent::Resized {
@@ -178,7 +131,7 @@ impl WindowAdapter for SpellSkiaWinAdapterReal {
     }
 }
 
-impl SpellSkiaWinAdapterReal {
+impl SkiaWindowAdapter {
     #[allow(clippy::type_complexity)]
     pub fn new(
         pool: Rc<RefCell<SlotPool>>,
@@ -186,6 +139,7 @@ impl SpellSkiaWinAdapterReal {
         width: u32,
         height: u32,
         slint_proxy: Arc<Mutex<Vec<Box<dyn FnOnce() + Send>>>>,
+        eventfd: RawFd,
     ) -> Rc<Self> {
         let buffer = Rc::new(SkiaSoftwareBufferReal {
             primary_slot,
@@ -205,15 +159,16 @@ impl SpellSkiaWinAdapterReal {
             scale_factor: Cell::new(1.),
             needs_redraw: Cell::new(true),
             slint_event_proxy: slint_proxy,
+            eventfd,
             current_cursor: Cell::new(MouseCursor::Default),
         })
     }
 
     pub fn draw(&self) -> bool {
         if self.needs_redraw.replace(false) {
-            self.renderer.render().unwrap_or_else(|err| {
-                warn!("Panicking because of error: {}", err);
-                panic!("Seems like you have initialised slint before SpellWin");
+            let _ = self.renderer.render().unwrap_or_else(|err| {
+                log::warn!("Panicking because of error: {}", err);
+                panic!("Seems like you have initialised slint before WaylandWindow");
             });
             true
         } else {
@@ -238,8 +193,7 @@ impl SpellSkiaWinAdapterReal {
         let scale_factor: f32 = scale as f32 / 120.0;
         self.scale_factor.set(scale_factor);
         self.size.set(PhysicalSize { width, height });
-        info!("Physical Size: width: {}, height: {}", width, height);
-        // self.needs_redraw.set(true);
+        log::info!("Physical Size: width: {}, height: {}", width, height);
         (
             self.buffer_slint
                 .refresh_buffer(width as i32, height as i32),
@@ -248,17 +202,4 @@ impl SpellSkiaWinAdapterReal {
             scale_factor,
         )
     }
-
-    // fn last_dirty_region_bounding_box_size(&self) -> Option<slint::LogicalSize> {
-    //     self.buffer.last_dirty_region.borrow().as_ref().map(|r| {
-    //         let size = r.bounding_rect().size;
-    //         slint::LogicalSize::new(size.width as _, size.height as _)
-    //     })
-    // }
-    // fn last_dirty_region_bounding_box_origin(&self) -> Option<slint::LogicalPosition> {
-    //     self.buffer.last_dirty_region.borrow().as_ref().map(|r| {
-    //         let origin = r.bounding_rect().origin;
-    //         slint::LogicalPosition::new(origin.x as _, origin.y as _)
-    //     })
-    // }
 }

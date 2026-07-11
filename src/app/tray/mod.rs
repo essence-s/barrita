@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use system_tray::client::{ActivateRequest, Client};
 use system_tray::item::IconPixmap;
-use spell_framework::wayland_adapter::WinHandle;
+use backend::wayland_adapter::WinHandle;
 use system_tray::menu::{MenuType, ToggleState, ToggleType, TrayMenu};
 
 pub mod popup;
@@ -88,7 +88,7 @@ fn build_raw_item(
     let (icon_pixels, icon_width, icon_height) = item
         .icon_pixmap
         .as_ref()
-        .and_then(|pixmaps| best_icon(pixmaps, 16))
+        .and_then(|pixmaps| best_icon(pixmaps, 22))
         .map(|p| (p.pixels.clone(), p.width, p.height))
         .unwrap_or_default();
     let (icon_pixels, icon_width, icon_height) = if icon_pixels.is_empty() {
