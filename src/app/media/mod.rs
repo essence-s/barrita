@@ -1,7 +1,7 @@
 use dbus::ffidisp::{BusType, Connection, ConnectionItem};
 use mpris::{PlaybackStatus, PlayerFinder};
 use slint::ComponentHandle;
-use backend::wayland_adapter::WinHandle;
+use slint_layer_shell::wayland_adapter::WinHandle;
 use std::thread;
 use std::time::Duration;
 

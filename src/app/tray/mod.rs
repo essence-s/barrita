@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use system_tray::client::{ActivateRequest, Client};
 use system_tray::item::IconPixmap;
-use backend::wayland_adapter::WinHandle;
+use slint_layer_shell::wayland_adapter::WinHandle;
 use system_tray::menu::{MenuType, ToggleState, ToggleType, TrayMenu};
 
 pub mod popup;

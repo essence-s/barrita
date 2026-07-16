@@ -1,11 +1,11 @@
 slint::include_modules!();
-backend::windows![StatusBarWindow, ControlCenter, TrayPopup];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup];
 
 mod app;
 mod config;
 mod ui;
 
-use backend::{
+use slint_layer_shell::{
     run_windows,
     layer_properties::{LayerAnchor, LayerType, WindowConf},
 };

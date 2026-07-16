@@ -9,7 +9,7 @@ use crate::app::screenshot::ScreenshotController;
 use crate::app::tray::TrayController;
 use crate::app::workspaces::WorkspacesController;
 use crate::StatusBarWindow;
-use backend::wayland_adapter::WinHandle;
+use slint_layer_shell::wayland_adapter::WinHandle;
 
 pub fn connect_all(window: &StatusBarWindow, ctrl_handler: WinHandle, tray_popup_handler: WinHandle, popup_weak: slint::Weak<crate::TrayPopup>) {
     ArticleController::connect(window);
