@@ -52,11 +52,6 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let tray_popup_handler = popup.get_handler();
     ui::adapters::connect_all(&bar, ctrl_handler, tray_popup_handler, popup.as_weak());
 
-    // first render happens before the Slint component exists,
-    // so force a redraw now to ensure content appears on the first frame.
-    bar.window().request_redraw();
-    ctrl.window().request_redraw();
-    // popup.window().request_redraw();
 
     run_windows!(windows: [bar, ctrl, popup])
 }
