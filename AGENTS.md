@@ -1,55 +1,25 @@
 # Barrita — Status bar (Slint + Rust + Wayland)
 
-## Backend crate (`backend/`)
+## Integración Wayland (`slint-layer-shell`)
 
-Crate reutilizable que maneja la conexión Wayland y el renderizado Slint+Skia.
+Crate externo que maneja la conexión Wayland, layer surfaces y el event loop.
+Se usa como dependencia git:
 
-### API pública
-
-```rust
-backend::windows![StatusBarWindow, ControlCenter];
-// Genera: StatusBarWindowWl, ControlCenterWl
-//          (wrappers Slint + WaylandWindow)
-
-let w = StatusBarWindowWl::spawn("name", window_conf);
-w.toggle();
-w.hide();
-let handle: WinHandle = w.get_handler();
-let (ui, way): (StatusBarWindow, WaylandWindow) = w.parts();
-
-run_windows!(windows: [w1, w2]);  // event loop
+```toml
+slint-layer-shell = { git = "https://github.com/essence-s/slint-layer-shell" }
 ```
-
-### Tipos principales
-
-| Tipo | Rol |
-|---|---|
-| `WaylandWindow` | Ventana Wayland (layer shell, compositor, seat) |
-| `SkiaWindowAdapter` | Implementa `slint::platform::WindowAdapter` con Skia |
-| `SlintPlatform` | Implementa `slint::platform::Platform` |
-| `WindowHandler` | Trait para ventanas que participan en el event loop |
-| `WinHandle` | Handle para controlar ventanas desde cualquier thread |
-| `WindowConf` / `WindowConfBuilder` | Configuración de layer surface |
 
 ### Dependencias clave
 
-- `sctk = "0.20"` (smithay-client-toolkit)
 - `slint = "1.17"` con renderer-skia
-- `calloop` event loop
-- `wayland-protocols` (wlr-layer, fractional-scale, viewporter, cursor-shape)
-
-### Parche local (FIFO fix)
-
-`backend/src/wayland_adapter/way_helper.rs` procesa eventos de
-`slint::invoke_from_event_loop` con `drain(..)` en vez de `pop()` (FIFO, no LIFO).
-Esto evita que eventos encolados rápido (ej: tray icons) se ejecuten en orden
-incorrecto.
-
-### Build & Run
-
-```sh
-cargo run
-```
+- `slint-layer-shell` (git) — Wayland layer-shell, compositor, seat, event loop
+- `mpris = "2.1"` — MPRIS media player D-Bus
+- `dbus = "0.9"` — D-Bus (battery/UPower, media)
+- `hyprland = "0.4.0-beta.3"` — Hyprland IPC (workspaces)
+- `system-tray = "0.8"` — StatusNotifierItem (system tray)
+- `tokio = "1"` — Async runtime para tray client
+- `chrono = "0.4"` — Fecha/hora para clock widget
+- `image = "0.25"` — Decodificación de imágenes (tray icons)
 
 ## Widget Architecture Pattern
 
@@ -102,12 +72,21 @@ Orquesta todos los controllers:
 
 ```rust
 use crate::StatusBarWindow;
-use crate::app::screenshot::ScreenshotController;
 use crate::app::clock::ClockController;
+use crate::app::media::MediaController;
+use crate::app::tray::TrayController;
+use slint_layer_shell::wayland_adapter::WinHandle;
 
-pub fn connect_all(window: &StatusBarWindow) {
-    ScreenshotController::connect(window);
+pub fn connect_all(
+    window: &StatusBarWindow,
+    ctrl_handler: WinHandle,
+    tray_popup_handler: WinHandle,
+    popup_weak: slint::Weak<crate::TrayPopup>,
+) {
     ClockController::connect(window);
+    MediaController::connect(window, ctrl_handler);
+    TrayController::connect(window, tray_popup_handler, popup_weak);
+    // ... resto de controllers
 }
 ```
 
@@ -136,59 +115,36 @@ fn main() {
 
 ```rust
 slint::include_modules!();
-backend::windows![StatusBarWindow, ControlCenter, TrayPopup];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup];
+
+use slint_layer_shell::{
+    run_windows,
+    layer_properties::{LayerAnchor, LayerType, WindowConf},
+};
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let bar_conf = WindowConf::builder()
+        .width(1366_u32).height(36_u32)
+        .anchor_1(LayerAnchor::TOP | LayerAnchor::LEFT | LayerAnchor::RIGHT)
+        .exclusive_zone(36).layer_type(LayerType::Top)
+        .build().unwrap();
+
     let bar = StatusBarWindowWl::spawn("barrita", bar_conf);
     let ctrl = ControlCenterWl::spawn("control-center", ctrl_conf);
-    run_windows!(windows: [bar, ctrl])
+    let popup = TrayPopupWl::spawn("tray-popup", popup_conf);
+    ctrl.hide(); popup.hide();
+
+    let ctrl_handler = ctrl.get_handler();
+    ui::adapters::connect_all(&bar, ctrl_handler, ...);
+
+    run_windows!(windows: [bar, ctrl, popup])
 }
-```
-
-## Flujo completo
-
-```
-Usuario interactúa con widget
-  → widget.slint: TouchArea.clicked
-    → WidgetAdapter.callback()
-      → Controller::connect() (Rust)
-        → lógica, timers, servicios
-          → adapter.set_property(...) → UI se actualiza sola
-```
-
-## Ventajas
-
-- **Widget autónomo**: su `.slint` + `mod.rs` están en la misma carpeta
-- **Sin forwarding**: no hay callbacks que burbujean hasta StatusBarWindow
-- **Un adaptador central**: `ui/adapters.rs` es el único punto de cableado
-- **main.rs minimal**: no toca nada del dominio
-- **Backend reutilizable**: Wayland + Slint en un crate separado
-
-## Comandos útiles
-
-```sh
-cargo build
-cargo run
 ```
 
 ## Estructura del proyecto
 
 ```
 barrita/
-├── backend/
-│   └── src/
-│       ├── lib.rs                  # WindowHandler trait, run_event_loop
-│       ├── configure.rs            # WindowConf builder
-│       ├── event_macros.rs         # windows!, run_windows!
-│       ├── skia_non_docs.rs        # SkiaWindowAdapter
-│       ├── slint_adapter.rs        # SlintPlatform
-│       └── wayland_adapter/
-│           ├── mod.rs              # WaylandWindow, WinHandle
-│           ├── win_impl.rs         # Seat, Keyboard, Pointer, Touch handlers
-│           ├── way_helper.rs       # PointerState, event draining
-│           ├── fractional_scaling.rs
-│           ├── viewporter.rs
-│           └── slint_to_wl_cursor_mapping.rs
 ├── src/
 │   ├── main.rs
 │   ├── lib.rs
@@ -208,6 +164,9 @@ barrita/
 │       ├── bluetooth/
 │       ├── colorize/
 │       ├── article/
+│       ├── logo/
+│       ├── tray/
+│       ├── control_center/
 │       └── workspaces/
 └── assets/icons/
 ```
