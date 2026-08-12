@@ -1,5 +1,6 @@
 import { Theme } from "../../ui/styles/theme.slint";
 import { Dashboard } from "dashboard/dashboard.slint";
+import { ControlCenterAdapter } from "adapter.slint";
 
 export component ControlCenter inherits Window {
     no-frame: true;
@@ -8,93 +9,101 @@ export component ControlCenter inherits Window {
     background: transparent;
 
     touch_area := TouchArea {
-        opacity: touch_area.has-hover ? 1.0 : 0.999;
-
+        // opacity: touch_area.has-hover ? 1.0 : 0.999;
+    
+    
         Rectangle {
-            background: transparent;
+            clip: true;
 
-            HorizontalLayout {
-                Rectangle {
-                    Path {
-                        x: 0;
-                        y: 0;
-                        width: 15px;
-                        height: 15px;
-                        fill: Theme.surface-container;
-
-                        MoveTo {
-                            x: 0;
-                            y: 0;
-                        }
-
-                        LineTo {
-                            x: 15;
-                            y: 0;
-                        }
-
-                        LineTo {
-                            x: 15;
-                            y: 15;
-                        }
-
-                        ArcTo {
-                            x: 0;
-                            y: 0;
-                            radius-x: 15;
-                            radius-y: 15;
-                            large-arc: false;
-                            sweep: false;
-                        }
-
-                        Close { }
-                    }
+            content := Rectangle {
+                y: touch_area.has-hover ? 0px : -root.height;
+                animate y {
+                    duration: 200ms;
+                    easing: ease-in-out-quad;
                 }
+                HorizontalLayout {
+                    Rectangle {
+                        Path {
+                            x: 0;
+                            y: 0;
+                            width: 15px;
+                            height: 15px;
+                            fill: Theme.surface-container;
 
-                Rectangle {
-                    background: Theme.surface-container;
-                    width: parent.width - 30px;
-                    border-bottom-left-radius: 15px;
-                    border-bottom-right-radius: 15px;
+                            MoveTo {
+                                x: 0;
+                                y: 0;
+                            }
 
-                    VerticalLayout {
-                        Rectangle {
-                            height: 30px;
-                        }
+                            LineTo {
+                                x: 15;
+                                y: 0;
+                            }
 
-                        Dashboard {
-                            height: parent.height - 30px;
+                            LineTo {
+                                x: 15;
+                                y: 15;
+                            }
+
+                            ArcTo {
+                                x: 0;
+                                y: 0;
+                                radius-x: 15;
+                                radius-y: 15;
+                                large-arc: false;
+                                sweep: false;
+                            }
+
+                            Close { }
                         }
                     }
-                }
 
-                Rectangle {
-                    Path {
-                        x: 0;
-                        y: 0;
-                        width: 15px;
-                        height: 15px;
-                        fill: Theme.surface-container;
+                    Rectangle {
+                        background: Theme.surface-container;
+                        width: parent.width - 30px;
+                        border-bottom-left-radius: 15px;
+                        border-bottom-right-radius: 15px;
 
-                        MoveTo {
+                        VerticalLayout {
+                            Rectangle {
+                                height: 30px;
+                            }
+
+                            Dashboard {
+                                height: parent.height - 30px;
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Path {
                             x: 0;
                             y: 0;
-                        }
+                            width: 15px;
+                            height: 15px;
+                            fill: Theme.surface-container;
 
-                        LineTo {
-                            x: 15;
-                            y: 0;
-                        }
+                            MoveTo {
+                                x: 0;
+                                y: 0;
+                            }
 
-                        ArcTo {
-                            x: 0;
-                            y: 15;
-                            radius-x: 15;
-                            radius-y: 15;
-                            large-arc: false;
-                            sweep: false;
-                        }
+                            LineTo {
+                                x: 15;
+                                y: 0;
+                            }
 
-                        Close { }
+                            ArcTo {
+                                x: 0;
+                                y: 15;
+                                radius-x: 15;
+                                radius-y: 15;
+                                large-arc: false;
+                                sweep: false;
+                            }
+
+                            Close { }
+                        }
                     }
                 }
             }

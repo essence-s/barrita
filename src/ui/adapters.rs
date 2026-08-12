@@ -3,6 +3,7 @@ use crate::app::battery::BatteryController;
 use crate::app::bluetooth::BluetoothController;
 use crate::app::clock::ClockController;
 use crate::app::colorize::ColorizeController;
+use crate::app::control_center::ControlCenterController;
 use crate::app::media::MediaController;
 use crate::app::network::NetworkController;
 use crate::app::screenshot::ScreenshotController;
@@ -17,7 +18,8 @@ pub fn connect_all(window: &StatusBarWindow, ctrl_handler: WinHandle, tray_popup
     BluetoothController::connect(window);
     ClockController::connect(window);
     ColorizeController::connect(window);
-    MediaController::connect(window, ctrl_handler);
+    ControlCenterController::connect(window, ctrl_handler.clone());
+    MediaController::connect(window);
     NetworkController::connect(window);
     ScreenshotController::connect(window);
     TrayController::connect(window, tray_popup_handler, popup_weak);

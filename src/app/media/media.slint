@@ -1,4 +1,5 @@
 import { Theme } from "../../ui/styles/theme.slint";
+import { ControlCenterAdapter } from "../control_center/adapter.slint";
 
 export global MediaAdapter {
     in-out property <string> status: "stopped";
@@ -9,7 +10,6 @@ export global MediaAdapter {
     callback play-pause();
     callback next();
     callback previous();
-    callback toggle-control-center();
 }
 
 export component MediaWidget {
@@ -161,7 +161,7 @@ export component MediaWidget {
             }
 
             clicked => {
-                MediaAdapter.toggle-control-center();
+                ControlCenterAdapter.toggle-control-center();
             }
         }
     }

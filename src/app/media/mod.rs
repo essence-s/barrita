@@ -1,7 +1,6 @@
 use dbus::ffidisp::{BusType, Connection, ConnectionItem};
 use mpris::{PlaybackStatus, PlayerFinder};
 use slint::ComponentHandle;
-use slint_layer_shell::wayland_adapter::WinHandle;
 use std::thread;
 use std::time::Duration;
 
@@ -60,11 +59,7 @@ fn clear_ui(window: &slint::Weak<crate::StatusBarWindow>) {
 pub struct MediaController;
 
 impl MediaController {
-    pub fn connect(window: &crate::StatusBarWindow, ctrl_handler: WinHandle) {
-        window.global::<crate::MediaAdapter>().on_toggle_control_center(move || {
-            ctrl_handler.toggle();
-        });
-
+    pub fn connect(window: &crate::StatusBarWindow) {
         window.global::<crate::MediaAdapter>().on_play_pause(|| {
             log::info!("[media] play-pause not yet implemented");
         });
