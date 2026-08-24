@@ -13,6 +13,7 @@ use types::BatteryStatusInfo;
 const UPOWER_DEVICE: &str = "/org/freedesktop/UPower/devices/DisplayDevice";
 const UPOWER_SERVICE: &str = "org.freedesktop.UPower";
 const UPOWER_IFACE: &str = "org.freedesktop.UPower.Device";
+const LOW_THRESHOLD: i32 = 20;
 
 fn find_line_power(conn: &Connection) -> Option<String> {
     let candidates = [
@@ -49,7 +50,7 @@ fn read_battery(conn: &Connection, ac_path: Option<&str>) -> Option<BatteryStatu
     let charging = ac_path
         .map(|p| read_ac_online(conn, p))
         .unwrap_or(from_state);
-    let low = !charging && level <= 20;
+    let low = !charging && level <= LOW_THRESHOLD;
 
     Some(BatteryStatusInfo {
         percentage: format!("{}%", level),
@@ -67,6 +68,16 @@ fn push_to_ui(window: &slint::Weak<crate::StatusBarWindow>, info: &BatteryStatus
         adapter.set_charging(info.charging);
         adapter.set_low(info.low);
     }
+}
+
+fn notify_low_battery(level: i32) {
+    crate::app::notification::push(
+        "Batería baja",
+        &format!("Te queda {level}% de batería"),
+        "battery_alert",
+        crate::app::notification::SEVERITY_WARNING,
+        5000,
+    );
 }
 
 pub struct BatteryController;
@@ -114,12 +125,18 @@ impl BatteryController {
                     }
                 }
             };
+            let mut notified_low = last.low;
 
             let w = weak.clone();
             let info = last.clone();
             let _ = slint::invoke_from_event_loop(move || {
                 push_to_ui(&w, &info);
             });
+
+            if last.low {
+                log::info!("[battery] low battery at startup — {}%", last.level);
+                notify_low_battery(last.level);
+            }
 
             log::info!("[battery] listening for UPower D-Bus events");
 
@@ -156,6 +173,17 @@ impl BatteryController {
                             }
 
                             last = current;
+
+                            if last.low {
+                                if !notified_low {
+                                    notified_low = true;
+                                    log::info!("[battery] low battery — {}%", last.level);
+                                    notify_low_battery(last.level);
+                                }
+                            } else {
+                                notified_low = false;
+                            }
+
                             let w = weak.clone();
                             let p = pending.clone();
                             if !p.swap(true, Ordering::AcqRel) {

@@ -8,4 +8,5 @@ pub mod article;
 pub mod bluetooth;
 pub mod control_center;
 pub mod media;
+pub mod notification;
 pub mod tray;

@@ -1,0 +1,123 @@
+import { Theme } from "../../ui/styles/theme.slint";
+
+export struct ToastData {
+    id: int,
+    title: string,
+    message: string,
+    icon: string,
+    severity: int,
+    duration-ms: int,
+}
+
+export global NotificationAdapter {
+    in-out property <[ToastData]> toasts: [];
+    callback dismiss(int);
+}
+
+component ToastCard inherits Rectangle {
+    in property <ToastData> toast;
+    width: 280px;
+    height: 84px;
+    background: Theme.surface-container-high;
+    border-radius: Theme.radius-lg;
+    border-width: 1px;
+    border-color: Theme.outline-variant;
+    drop-shadow-color: #00000079;
+    drop-shadow-offset-y: 2px;
+    drop-shadow-blur: 6px;
+
+    HorizontalLayout {
+        padding: 10px;
+        padding-left: 20px;
+        spacing: 10px;
+        // alignment: center;
+
+        VerticalLayout {
+            horizontal-stretch: 1;
+            spacing: 2px;
+            alignment: center;
+
+            Rectangle {
+                width: 34px;
+                height: 34px;
+                border-radius: 8px;
+                // background: red;
+
+                Text {
+                    text: toast.icon;
+                    font-family: Theme.icon-font-family;
+                    font-size: 28px;
+                    color: toast.severity == 2 ? Theme.error : (toast.severity == 1 ? Theme.secondary : Theme.primary);
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        VerticalLayout {
+            horizontal-stretch: 1;
+            spacing: 2px;
+            alignment: center;
+
+            Text {
+                text: toast.title;
+                font-family: Theme.font-family;
+                font-size: 12px;
+                font-weight: 600;
+                color: Theme.on-surface;
+            }
+
+            Text {
+                text: toast.message;
+                font-family: Theme.font-family;
+                font-size: 11px;
+                color: Theme.on-surface-variant;
+                wrap: word-wrap;
+                max-height: 34px;
+            }
+        }
+
+        TouchArea {
+            width: 24px;
+            height: 24px;
+            clicked => { NotificationAdapter.dismiss(toast.id); }
+
+            Rectangle {
+                width: 24px;
+                height: 24px;
+                border-radius: 6px;
+
+                Text {
+                    text: "close";
+                    font-family: Theme.icon-font-family;
+                    font-size: 16px;
+                    color: Theme.on-surface-variant;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}
+
+export component NotificationPopup inherits Window {
+    no-frame: true;
+    background: transparent;
+    width: 300px;
+    height: 500px;
+    in-out property <length> content-height: toasts-layout.preferred-height;
+
+    VerticalLayout {
+        alignment: start;
+        padding-left: 10px;
+        padding-right: 10px;
+
+        toasts-layout := VerticalLayout {
+            spacing: 8px;
+
+            for t in NotificationAdapter.toasts: ToastCard {
+                toast: t;
+            }
+        }
+    }
+}

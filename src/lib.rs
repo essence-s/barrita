@@ -1,5 +1,5 @@
 slint::include_modules!();
-slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup];
 
 mod app;
 mod config;
@@ -42,16 +42,35 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
+    let notif_conf = WindowConf::builder()
+        .width(300_u32)
+        .height(500_u32)
+        .anchor_1(LayerAnchor::TOP | LayerAnchor::RIGHT)
+        .margins(40, 0, 0, 8)
+        .exclusive_zone(-1)
+        .layer_type(LayerType::Overlay)
+        .build()
+        .unwrap();
+
     let bar = StatusBarWindowWl::spawn("barrita", bar_conf);
     let ctrl = ControlCenterWl::spawn("control-center", ctrl_conf);
     let popup = TrayPopupWl::spawn("tray-popup", popup_conf);
+    let notif = NotificationPopupWl::spawn("notification-popup", notif_conf);
     ctrl.hide();
     popup.hide();
+    notif.hide();
 
     let ctrl_handler = ctrl.get_handler();
     let tray_popup_handler = popup.get_handler();
-    ui::adapters::connect_all(&bar, ctrl_handler, tray_popup_handler, popup.as_weak());
+    let notif_handler = notif.get_handler();
+    ui::adapters::connect_all(
+        &bar,
+        ctrl_handler,
+        tray_popup_handler,
+        popup.as_weak(),
+        notif_handler,
+        notif.as_weak(),
+    );
 
-
-    run_windows!(windows: [bar, ctrl, popup])
+    run_windows!(windows: [bar, ctrl, popup, notif])
 }
