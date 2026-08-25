@@ -106,10 +106,18 @@ fn push_toast(mut toast: crate::ToastData, ctx: &Ctx) {
     TIMERS.with(|t| t.borrow_mut().push((id, timer)));
 }
 
-pub fn push(title: &str, message: &str, icon: &str, severity: i32, duration_ms: i32) {
+pub fn push(
+    title: &str,
+    message: &str,
+    icon: &str,
+    severity: i32,
+    duration_ms: i32,
+    tag: &str,
+) {
     let title = title.to_string();
     let message = message.to_string();
     let icon = icon.to_string();
+    let tag = tag.to_string();
     let _ = slint::invoke_from_event_loop(move || {
         let Some(ctx) = CTX.with(|c| c.borrow().clone()) else {
             log::warn!("[notification] push called before connect — ignoring");
@@ -122,8 +130,32 @@ pub fn push(title: &str, message: &str, icon: &str, severity: i32, duration_ms: 
             icon: icon.into(),
             severity,
             duration_ms,
+            tag: tag.into(),
         };
         push_toast(toast, &ctx);
+    });
+}
+
+pub fn dismiss_tagged(tag: &str) {
+    let tag = tag.to_string();
+    let _ = slint::invoke_from_event_loop(move || {
+        let Some(ctx) = CTX.with(|c| c.borrow().clone()) else {
+            return;
+        };
+        let (ref popup_handler, ref popup_weak, ref model) = ctx;
+        let mut i = 0;
+        while i < model.row_count() {
+            if model.row_data(i).is_some_and(|t| t.tag.as_str() == tag.as_str()) {
+                let removed = model.remove(i);
+                forget_timer(removed.id);
+            } else {
+                i += 1;
+            }
+        }
+        update_input_region(popup_handler, popup_weak);
+        if model.row_count() == 0 {
+            popup_handler.hide();
+        }
     });
 }
 

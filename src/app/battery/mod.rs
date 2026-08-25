@@ -77,6 +77,7 @@ fn notify_low_battery(level: i32) {
         "battery_alert",
         crate::app::notification::SEVERITY_WARNING,
         5000,
+        "battery",
     );
 }
 
@@ -154,6 +155,7 @@ impl BatteryController {
                                         "[battery] charger connected — {}% and charging",
                                         current.level
                                     );
+                                    crate::app::notification::dismiss_tagged("battery");
                                 } else {
                                     log::info!(
                                         "[battery] charger disconnected — {}% and discharging",
