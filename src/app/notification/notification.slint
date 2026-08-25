@@ -26,6 +26,21 @@ component ToastCard inherits Rectangle {
     drop-shadow-offset-y: 2px;
     drop-shadow-blur: 6px;
 
+    in-out property <bool> entered: false;
+    in-out property <length> hidden-x: 316px;
+
+    x: entered ? 0px : hidden-x;
+    opacity: entered ? 1.0 : 0.0;
+
+    animate x { duration: 300ms; easing: ease-out; }
+    animate opacity { duration: 180ms; easing: ease-out; }
+
+    Timer {
+        interval: 32ms;
+        running: !entered;
+        triggered => { entered = true; }
+    }
+
     HorizontalLayout {
         padding: 10px;
         padding-left: 20px;
@@ -115,8 +130,15 @@ export component NotificationPopup inherits Window {
         toasts-layout := VerticalLayout {
             spacing: 8px;
 
-            for t in NotificationAdapter.toasts: ToastCard {
-                toast: t;
+            for t in NotificationAdapter.toasts: Rectangle {
+                height: 84px;
+
+                ToastCard {
+                    width: 100%;
+                    height: 100%;
+                    toast: t;
+                    hidden-x: parent.width + 24px;
+                }
             }
         }
     }

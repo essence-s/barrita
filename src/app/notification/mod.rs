@@ -1,4 +1,4 @@
-use slint::ComponentHandle;
+use slint::{ComponentHandle, Model};
 use slint_layer_shell::wayland_adapter::WinHandle;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -15,12 +15,16 @@ const WINDOW_H: i32 = 500;
 const MAX_TOASTS: usize = 5;
 const DEFAULT_DURATION_MS: i32 = 5000;
 
+type Ctx = (
+    WinHandle,
+    slint::Weak<crate::NotificationPopup>,
+    Rc<slint::VecModel<crate::ToastData>>,
+);
+
 thread_local! {
     static NEXT_ID: Cell<i32> = const { Cell::new(0) };
-    static QUEUE: RefCell<Vec<crate::ToastData>> = const { RefCell::new(Vec::new()) };
     static TIMERS: RefCell<Vec<(i32, slint::Timer)>> = const { RefCell::new(Vec::new()) };
-    static CTX: RefCell<Option<(WinHandle, slint::Weak<crate::NotificationPopup>)>> =
-        const { RefCell::new(None) };
+    static CTX: RefCell<Option<Ctx>> = const { RefCell::new(None) };
 }
 
 fn next_id() -> i32 {
@@ -29,16 +33,6 @@ fn next_id() -> i32 {
         c.set(id);
         id
     })
-}
-
-fn rebuild_model(popup_weak: &slint::Weak<crate::NotificationPopup>) {
-    let toasts = QUEUE.with(|q| q.borrow().clone());
-    let model = Rc::new(slint::VecModel::from(toasts));
-    if let Some(popup) = popup_weak.upgrade() {
-        popup
-            .global::<crate::NotificationAdapter>()
-            .set_toasts(model.into());
-    }
 }
 
 fn update_input_region(
@@ -55,14 +49,9 @@ fn update_input_region(
     }
 }
 
-fn remove_toast(
-    id: i32,
-    popup_handler: &WinHandle,
-    popup_weak: &slint::Weak<crate::NotificationPopup>,
-) {
+fn forget_timer(id: i32) {
     TIMERS.with(|t| {
-        let mut timers = t.borrow_mut();
-        timers.retain(|(tid, timer)| {
+        t.borrow_mut().retain(|(tid, timer)| {
             if *tid == id {
                 timer.stop();
                 false
@@ -71,19 +60,23 @@ fn remove_toast(
             }
         });
     });
-    QUEUE.with(|q| q.borrow_mut().retain(|t| t.id != id));
-    rebuild_model(popup_weak);
+}
+
+fn remove_toast(id: i32, ctx: &Ctx) {
+    let (popup_handler, popup_weak, model) = ctx;
+    forget_timer(id);
+    let row = (0..model.row_count()).find(|&i| model.row_data(i).is_some_and(|t| t.id == id));
+    if let Some(idx) = row {
+        model.remove(idx);
+    }
     update_input_region(popup_handler, popup_weak);
-    if QUEUE.with(|q| q.borrow().is_empty()) {
+    if model.row_count() == 0 {
         popup_handler.hide();
     }
 }
 
-fn push_toast(
-    mut toast: crate::ToastData,
-    popup_handler: &WinHandle,
-    popup_weak: &slint::Weak<crate::NotificationPopup>,
-) {
+fn push_toast(mut toast: crate::ToastData, ctx: &Ctx) {
+    let (popup_handler, popup_weak, model) = ctx;
     let id = next_id();
     toast.id = id;
     let duration = if toast.duration_ms <= 0 {
@@ -92,36 +85,22 @@ fn push_toast(
         toast.duration_ms
     };
 
-    QUEUE.with(|q| {
-        let mut queue = q.borrow_mut();
-        queue.push(toast);
-        if queue.len() > MAX_TOASTS {
-            let removed = queue.remove(0);
-            TIMERS.with(|t| {
-                t.borrow_mut().retain(|(tid, timer)| {
-                    if *tid == removed.id {
-                        timer.stop();
-                        false
-                    } else {
-                        true
-                    }
-                });
-            });
-        }
-    });
+    model.push(toast);
+    if model.row_count() > MAX_TOASTS {
+        let evicted = model.remove(0);
+        forget_timer(evicted.id);
+    }
 
-    rebuild_model(popup_weak);
     update_input_region(popup_handler, popup_weak);
     popup_handler.show_again();
 
-    let ph = popup_handler.clone();
-    let pw = popup_weak.clone();
     let timer = slint::Timer::default();
+    let timer_ctx = (popup_handler.clone(), popup_weak.clone(), Rc::clone(model));
     timer.start(
         slint::TimerMode::SingleShot,
         Duration::from_millis(duration as u64),
         move || {
-            remove_toast(id, &ph, &pw);
+            remove_toast(id, &timer_ctx);
         },
     );
     TIMERS.with(|t| t.borrow_mut().push((id, timer)));
@@ -132,12 +111,9 @@ pub fn push(title: &str, message: &str, icon: &str, severity: i32, duration_ms: 
     let message = message.to_string();
     let icon = icon.to_string();
     let _ = slint::invoke_from_event_loop(move || {
-        let (ph, pw) = match CTX.with(|c| c.borrow().clone()) {
-            Some(ctx) => ctx,
-            None => {
-                log::warn!("[notification] push called before connect — ignoring");
-                return;
-            }
+        let Some(ctx) = CTX.with(|c| c.borrow().clone()) else {
+            log::warn!("[notification] push called before connect — ignoring");
+            return;
         };
         let toast = crate::ToastData {
             id: 0,
@@ -147,25 +123,26 @@ pub fn push(title: &str, message: &str, icon: &str, severity: i32, duration_ms: 
             severity,
             duration_ms,
         };
-        push_toast(toast, &ph, &pw);
+        push_toast(toast, &ctx);
     });
 }
 
 pub struct NotificationController;
 
 impl NotificationController {
-    pub fn connect(
-        popup_handler: WinHandle,
-        popup_weak: slint::Weak<crate::NotificationPopup>,
-    ) {
-        CTX.with(|c| {
-            *c.borrow_mut() = Some((popup_handler.clone(), popup_weak.clone()));
-        });
+    pub fn connect(popup_handler: WinHandle, popup_weak: slint::Weak<crate::NotificationPopup>) {
+        let model = Rc::new(slint::VecModel::from(Vec::<crate::ToastData>::new()));
+        if let Some(popup) = popup_weak.upgrade() {
+            popup.global::<crate::NotificationAdapter>().set_toasts(model.clone().into());
+        }
+
+        CTX.with(|c| *c.borrow_mut() = Some((popup_handler.clone(), popup_weak.clone(), model)));
 
         if let Some(popup) = popup_weak.upgrade() {
             popup.global::<crate::NotificationAdapter>().on_dismiss(move |id| {
-                let (ph, pw) = CTX.with(|c| c.borrow().clone().unwrap());
-                remove_toast(id, &ph, &pw);
+                if let Some(ctx) = CTX.with(|c| c.borrow().clone()) {
+                    remove_toast(id, &ctx);
+                }
             });
         }
     }
