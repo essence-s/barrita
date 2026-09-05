@@ -188,26 +188,28 @@ impl TrayController {
             }
         });
 
-        let ph = popup_handler.clone();
-        adapter.on_menu_item_selected({
-            let active_menu = active_menu.clone();
-            let cmd_tx = cmd_tx.clone();
-            let ph = ph.clone();
-            move |item_id| {
-                let (address, menu_path) = match active_menu.lock().unwrap().clone() {
-                    Some(a) => a,
-                    None => return,
-                };
-                let _ = cmd_tx.try_send(TrayCommand::Activate(
-                    ActivateRequest::MenuItem {
-                        address,
-                        menu_path,
-                        submenu_id: item_id,
-                    },
-                ));
-                ph.hide();
-            }
-        });
+        if let Some(popup) = popup_weak.upgrade() {
+            let pa = popup.global::<crate::TrayAdapter>();
+            pa.on_menu_item_selected({
+                let active_menu = active_menu.clone();
+                let cmd_tx = cmd_tx.clone();
+                let ph = popup_handler.clone();
+                move |item_id| {
+                    let (address, menu_path) = match active_menu.lock().unwrap().clone() {
+                        Some(a) => a,
+                        None => return,
+                    };
+                    let _ = cmd_tx.try_send(TrayCommand::Activate(
+                        ActivateRequest::MenuItem {
+                            address,
+                            menu_path,
+                            submenu_id: item_id,
+                        },
+                    ));
+                    ph.hide();
+                }
+            });
+        }
 
         adapter.on_show_popup({
             let ph = popup_handler.clone();
