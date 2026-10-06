@@ -12,7 +12,7 @@ slint-layer-shell = { git = "https://github.com/essence-s/slint-layer-shell" }
 ### Dependencias clave
 
 - `slint = "1.17"` con renderer-skia
-- `slint-layer-shell` (git) — Wayland layer-shell, compositor, seat, event loop
+- `slint-layer-shell` (git) — Wayland layer-shell, compositor, seat, event loop. Despacha `PointerExited` al salir el puntero (resetea `has-hover`).
 - `mpris = "2.1"` — MPRIS media player D-Bus
 - `dbus = "0.9"` — D-Bus (battery/UPower, media)
 - `hyprland = "0.4.0-beta.3"` — Hyprland IPC (workspaces)
@@ -48,6 +48,7 @@ Reglas:
 - El `global` **se exporta** (para que Rust pueda accederlo)
 - El componente **no tiene** `callback` propio — usa el global directo
 - El componente **no recibe** `in property` de state — lee del global
+- `TouchArea` hermanos solapados = hover exclusivo (gana el superior). Para enter/leave fiables: un solo `TouchArea` sin solapes (`src/app/dock/`).
 
 ### 2. Controller (`mod.rs`) — Lógica Rust
 
@@ -115,7 +116,7 @@ fn main() {
 
 ```rust
 slint::include_modules!();
-slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, Dock, DockHotspot];
 
 use slint_layer_shell::{
     run_windows,
@@ -156,6 +157,7 @@ barrita/
 │   │   ├── adapters.rs
 │   │   └── image.rs
 │   └── app/
+│       ├── dock/            # Dock + hotspot (auto-hide por eventos, [dock] en config.toml)
 │       ├── screenshot/
 │       ├── clock/
 │       ├── media/
