@@ -1,5 +1,5 @@
 slint::include_modules!();
-slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup, Dock];
 
 mod app;
 mod config;
@@ -52,19 +52,39 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
+    let dock_conf = WindowConf::builder()
+        .width(320_u32)
+        .height(70_u32)
+        .anchor_1(LayerAnchor::BOTTOM)
+        .margins(0, 0, 6, 0)
+        .exclusive_zone(-1)
+        .layer_type(LayerType::Top)
+        .build()
+        .unwrap();
+
     let bar = StatusBarWindowWl::spawn("barrita", bar_conf);
     let ctrl = ControlCenterWl::spawn("control-center", ctrl_conf);
     let popup = TrayPopupWl::spawn("tray-popup", popup_conf);
     let notif = NotificationPopupWl::spawn("notification-popup", notif_conf);
+    let dock = DockWl::spawn("dock", dock_conf);
     ctrl.hide();
     popup.hide();
     notif.hide();
+
+    // Clicks solo en la barra: recorta los margenes transparentes
+    // (area util x25..295, y8..59; recalcular si cambia el layout).
+    let dock_handler = dock.get_handler();
+    dock_handler.subtract_input_region(0, 0, 320, 8);
+    dock_handler.subtract_input_region(0, 59, 320, 11);
+    dock_handler.subtract_input_region(0, 0, 25, 70);
+    dock_handler.subtract_input_region(295, 0, 25, 70);
 
     let ctrl_handler = ctrl.get_handler();
     let tray_popup_handler = popup.get_handler();
     let notif_handler = notif.get_handler();
     ui::adapters::connect_all(
         &bar,
+        &dock,
         ctrl_handler,
         tray_popup_handler,
         popup.as_weak(),
@@ -72,5 +92,5 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         notif.as_weak(),
     );
 
-    run_windows!(windows: [bar, ctrl, popup, notif])
+    run_windows!(windows: [bar, ctrl, popup, notif, dock])
 }

@@ -1,0 +1,77 @@
+// Fondo translucido: el blur lo aplica Hyprland (layerrule "dock").
+
+export component Dock inherits Window {
+    title: "Dock";
+    no-frame: true;
+    background: transparent;
+    width: 320px;
+    height: 70px;
+
+    property <length> tile-size: 40px;
+    property <length> tile-radius: 9px;
+    property <length> bar-radius: 16px;
+
+    VerticalLayout {
+        alignment: end;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 6px;
+        padding-bottom: 9px;
+
+        HorizontalLayout {
+            alignment: center;
+            spacing: 0px;
+
+            bar := Rectangle {
+                border-radius: root.bar-radius;
+
+                background: @linear-gradient(180deg, #ffffff1f, #ffffff0d);
+                border-width: 1px;
+                border-color: #ffffff29;
+
+                // Sin drop-shadow: Hyprland difuminaria la sombra fuera del contorno.
+
+                // Linea superior inserta en el tramo recto para no sobresalir.
+                Rectangle {
+                    x: 20px;
+                    y: 1px;
+                    width: parent.width - 40px;
+                    height: 1px;
+                    background: #ffffff40;
+                }
+
+                HorizontalLayout {
+                    alignment: center;
+                    padding-left: 7px;
+                    padding-right: 7px;
+                    padding-top: 7px;
+                    padding-bottom: 8px;
+                    spacing: 4px;
+
+                    for n in 6: item := Rectangle {
+                        width: root.tile-size;
+                        height: root.tile-size;
+                        border-radius: root.tile-radius;
+
+                        background: @linear-gradient(135deg, #7c879add, #3c414add);
+                        border-width: 1px;
+                        border-color: #ffffff40;
+
+                        drop-shadow-color: #00000059;
+                        drop-shadow-blur: 6px;
+                        drop-shadow-offset-y: 2px;
+                        drop-shadow-offset-x: 0px;
+
+                        states [
+                            hovered when touch.has-hover: {
+                                background: @linear-gradient(135deg, #a3b0d9ee, #4e5466ee);
+                            }
+                        ]
+
+                        touch := TouchArea { }
+                    }
+                }
+            }
+        }
+    }
+}

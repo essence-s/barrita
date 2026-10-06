@@ -1,3 +1,4 @@
+pub mod dock;
 pub mod network;
 pub mod workspaces;
 pub mod battery;
