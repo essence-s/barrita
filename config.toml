@@ -32,6 +32,10 @@ screenshot = true
 
 [workspaces]
 total-workspaces = 8
+
+[dock]
+autohide = true
+hide-timeout-ms = 800
 # Por defecto: numeros [1,2,3,4,5,6,7,8,9,10]
 # Si quieres usar kanji japoneses u otros caracteres, especificalos:
 # format = ["一","二","三","四","五","六","七","八","九","十"]

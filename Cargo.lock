@@ -4298,7 +4298,7 @@ dependencies = [
 [[package]]
 name = "slint-layer-shell"
 version = "0.1.0"
-source = "git+https://github.com/essence-s/slint-layer-shell#a54f4309ffeb11858b6e37a2789dfc6ac0f8005f"
+source = "git+https://github.com/essence-s/slint-layer-shell#97f53d62d733c59923f44a639be7bae07405b147"
 dependencies = [
  "i-slint-core",
  "i-slint-renderer-skia",

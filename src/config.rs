@@ -10,6 +10,7 @@ pub struct Config {
     pub widget: WidgetStylesConfig,
     pub widgets: WidgetsConfig,
     pub workspaces: WorkspacesConfig,
+    pub dock: DockConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,6 +90,13 @@ pub struct WorkspacesConfig {
     pub format: Option<Vec<String>>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DockConfig {
+    pub autohide: bool,
+    #[serde(alias = "hide-timeout-ms")]
+    pub hide_timeout_ms: u64,
+}
+
 impl Default for DisplayConfig {
     fn default() -> Self {
         Self {
@@ -132,6 +140,15 @@ impl Default for WorkspacesConfig {
     }
 }
 
+impl Default for DockConfig {
+    fn default() -> Self {
+        Self {
+            autohide: true,
+            hide_timeout_ms: 800,
+        }
+    }
+}
+
 impl Default for Config {
     fn default() -> Self {
         Self {
@@ -140,6 +157,7 @@ impl Default for Config {
             widget: WidgetStylesConfig::default(),
             widgets: WidgetsConfig::default(),
             workspaces: WorkspacesConfig::default(),
+            dock: DockConfig::default(),
         }
     }
 }

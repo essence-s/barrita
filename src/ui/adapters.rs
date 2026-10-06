@@ -16,6 +16,9 @@ use slint_layer_shell::wayland_adapter::WinHandle;
 pub fn connect_all(
     window: &StatusBarWindow,
     dock: &crate::Dock,
+    hotspot: &crate::DockHotspot,
+    dock_handler: WinHandle,
+    hotspot_handler: WinHandle,
     ctrl_handler: WinHandle,
     tray_popup_handler: WinHandle,
     popup_weak: slint::Weak<crate::TrayPopup>,
@@ -27,7 +30,7 @@ pub fn connect_all(
     BluetoothController::connect(window);
     ClockController::connect(window);
     ColorizeController::connect(window);
-    crate::app::dock::DockController::connect(dock);
+    crate::app::dock::DockController::connect(dock, hotspot, dock_handler, hotspot_handler);
     ControlCenterController::connect(window, ctrl_handler.clone());
     MediaController::connect(window);
     NetworkController::connect(window);

@@ -1,5 +1,5 @@
 slint::include_modules!();
-slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup, Dock];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup, Dock, DockHotspot];
 
 mod app;
 mod config;
@@ -58,7 +58,19 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .anchor_1(LayerAnchor::BOTTOM)
         .margins(0, 0, 6, 0)
         .exclusive_zone(-1)
-        .layer_type(LayerType::Top)
+        .layer_type(LayerType::Overlay)
+        .build()
+        .unwrap();
+
+    // Franja de 4px al borde inferior que despierta el dock.
+    // Ancho de pantalla: sin input no hay hover que la despierte.
+    let hotspot_conf = WindowConf::builder()
+        .width(1366_u32)
+        .height(4_u32)
+        .anchor_1(LayerAnchor::BOTTOM)
+        .margins(0, 0, 0, 0)
+        .exclusive_zone(-1)
+        .layer_type(LayerType::Overlay)
         .build()
         .unwrap();
 
@@ -67,6 +79,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let popup = TrayPopupWl::spawn("tray-popup", popup_conf);
     let notif = NotificationPopupWl::spawn("notification-popup", notif_conf);
     let dock = DockWl::spawn("dock", dock_conf);
+    let hotspot = DockHotspotWl::spawn("dock-hotspot", hotspot_conf);
     ctrl.hide();
     popup.hide();
     notif.hide();
@@ -82,9 +95,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let ctrl_handler = ctrl.get_handler();
     let tray_popup_handler = popup.get_handler();
     let notif_handler = notif.get_handler();
+    let hotspot_handler = hotspot.get_handler();
     ui::adapters::connect_all(
         &bar,
         &dock,
+        &hotspot,
+        dock_handler,
+        hotspot_handler,
         ctrl_handler,
         tray_popup_handler,
         popup.as_weak(),
@@ -92,5 +109,5 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         notif.as_weak(),
     );
 
-    run_windows!(windows: [bar, ctrl, popup, notif, dock])
+    run_windows!(windows: [bar, ctrl, popup, notif, dock, hotspot])
 }

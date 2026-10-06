@@ -1,5 +1,13 @@
 // Fondo translucido: el blur lo aplica Hyprland (layerrule "dock").
 
+export global DockAdapter {
+    callback hotspot-entered();
+    callback hotspot-left();
+    callback dock-entered();
+    callback dock-left();
+    callback tile-clicked(int);
+}
+
 export component Dock inherits Window {
     title: "Dock";
     no-frame: true;
@@ -10,6 +18,22 @@ export component Dock inherits Window {
     property <length> tile-size: 40px;
     property <length> tile-radius: 9px;
     property <length> bar-radius: 16px;
+
+    // Tile bajo el cursor (-1 = ninguno). Hit-test manual porque hay un
+    // unico TouchArea sin solapes: hermanos solapados = hover exclusivo.
+    property <int> hover-tile: touch.has-hover ? hit(touch.mouse-x, touch.mouse-y) : -1;
+
+    // tiles 40px, spacing 4px, padding 7px: tile i en [7+44i, 7+44i+40).
+    // Recalcular si cambia el layout.
+    function hit(x: length, y: length) -> int {
+        y < 7px || y >= 47px ? -1 :
+            x < 7px ? -1 : x < 47px ? 0 :
+            x < 51px ? -1 : x < 91px ? 1 :
+            x < 95px ? -1 : x < 135px ? 2 :
+            x < 139px ? -1 : x < 179px ? 3 :
+            x < 183px ? -1 : x < 223px ? 4 :
+            x < 227px ? -1 : x < 267px ? 5 : -1
+    }
 
     VerticalLayout {
         alignment: end;
@@ -25,20 +49,24 @@ export component Dock inherits Window {
             bar := Rectangle {
                 border-radius: root.bar-radius;
 
+                // Unico TouchArea de la barra: sin solapes no hay
+                // exclusividad de hover y dock-left dispara siempre.
+                touch := TouchArea {
+                    changed has-hover => {
+                        if (self.has-hover) {
+                            DockAdapter.dock-entered();
+                        } else {
+                            DockAdapter.dock-left();
+                        }
+                    }
+                    clicked => {
+                        DockAdapter.tile-clicked(root.hit(self.mouse-x, self.mouse-y));
+                    }
+                }
+
                 background: @linear-gradient(180deg, #ffffff1f, #ffffff0d);
                 border-width: 1px;
                 border-color: #ffffff29;
-
-                // Sin drop-shadow: Hyprland difuminaria la sombra fuera del contorno.
-
-                // Linea superior inserta en el tramo recto para no sobresalir.
-                Rectangle {
-                    x: 20px;
-                    y: 1px;
-                    width: parent.width - 40px;
-                    height: 1px;
-                    background: #ffffff40;
-                }
 
                 HorizontalLayout {
                     alignment: center;
@@ -48,12 +76,14 @@ export component Dock inherits Window {
                     padding-bottom: 8px;
                     spacing: 4px;
 
-                    for n in 6: item := Rectangle {
+                    for n in 6: Rectangle {
                         width: root.tile-size;
                         height: root.tile-size;
                         border-radius: root.tile-radius;
 
-                        background: @linear-gradient(135deg, #7c879add, #3c414add);
+                        background: n == root.hover-tile
+                            ? @linear-gradient(135deg, #a3b0d9ee, #4e5466ee)
+                            : @linear-gradient(135deg, #7c879add, #3c414add);
                         border-width: 1px;
                         border-color: #ffffff40;
 
@@ -61,14 +91,6 @@ export component Dock inherits Window {
                         drop-shadow-blur: 6px;
                         drop-shadow-offset-y: 2px;
                         drop-shadow-offset-x: 0px;
-
-                        states [
-                            hovered when touch.has-hover: {
-                                background: @linear-gradient(135deg, #a3b0d9ee, #4e5466ee);
-                            }
-                        ]
-
-                        touch := TouchArea { }
                     }
                 }
             }

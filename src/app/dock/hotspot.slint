@@ -1,0 +1,27 @@
+import { DockAdapter } from "dock.slint";
+
+// Franja invisible al borde inferior que despierta el dock.
+// Alfa 1%: invisible pero con hit-testing (con 0.0 el compositor
+// salta la superficie y el hover nunca llega).
+
+export component DockHotspot inherits Window {
+    title: "DockHotspot";
+    no-frame: true;
+    background: transparent;
+    width: 1366px;
+    height: 4px;
+
+    Rectangle {
+        background: #ffffff03;
+
+        TouchArea {
+            changed has-hover => {
+                if (self.has-hover) {
+                    DockAdapter.hotspot-entered();
+                } else {
+                    DockAdapter.hotspot-left();
+                }
+            }
+        }
+    }
+}
