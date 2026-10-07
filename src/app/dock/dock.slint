@@ -5,35 +5,28 @@ export global DockAdapter {
     callback hotspot-left();
     callback dock-entered();
     callback dock-left();
-    callback tile-clicked(int);
+    callback tile-clicked(float);
+    // Plantilla: default 6. El modelo real pone el count.
+    in-out property <int> tile-count: 10;
 }
 
 export component Dock inherits Window {
     title: "Dock";
     no-frame: true;
     background: transparent;
-    width: 320px;
+    width: 1366px;
     height: 70px;
 
-    property <length> tile-size: 40px;
-    property <length> tile-radius: 9px;
+    // Crece fijo hasta el tope (~1100px de barra), encoge despues.
+    // Rust replica la formula (apply_input_for_count): si cambian las
+    // constantes (padding 7/7/7/8, spacing 4), cambiar ambos lados.
+    property <length> tile-size: min(40px, max(24px, (1100px - 14px - (max(1, DockAdapter.tile-count) - 1) * 4px) / max(1, DockAdapter.tile-count)));
+    property <length> tile-radius: tile-size * 0.2237;
     property <length> bar-radius: 16px;
 
-    // Tile bajo el cursor (-1 = ninguno). Hit-test manual porque hay un
-    // unico TouchArea sin solapes: hermanos solapados = hover exclusivo.
-    property <int> hover-tile: touch.has-hover ? hit(touch.mouse-x, touch.mouse-y) : -1;
-
-    // tiles 40px, spacing 4px, padding 7px: tile i en [7+44i, 7+44i+40).
-    // Recalcular si cambia el layout.
-    function hit(x: length, y: length) -> int {
-        y < 7px || y >= 47px ? -1 :
-            x < 7px ? -1 : x < 47px ? 0 :
-            x < 51px ? -1 : x < 91px ? 1 :
-            x < 95px ? -1 : x < 135px ? 2 :
-            x < 139px ? -1 : x < 179px ? 3 :
-            x < 183px ? -1 : x < 223px ? 4 :
-            x < 227px ? -1 : x < 267px ? 5 : -1
-    }
+    // Posicion en celdas (tile+gap), -1 = fuera. Un unico TouchArea.
+    property <float> hover-pos: touch.has-hover && touch.mouse-y >= 7px && touch.mouse-y < 7px + tile-size
+        ? round((touch.mouse-x - 7px) / (tile-size + 4px)) : -1;
 
     VerticalLayout {
         alignment: end;
@@ -60,13 +53,17 @@ export component Dock inherits Window {
                         }
                     }
                     clicked => {
-                        DockAdapter.tile-clicked(root.hit(self.mouse-x, self.mouse-y));
+                        if (self.mouse-y >= 7px && self.mouse-y < 7px + root.tile-size) {
+                            DockAdapter.tile-clicked(round((self.mouse-x - 7px) / (root.tile-size + 4px)));
+                        }
                     }
                 }
 
                 background: @linear-gradient(180deg, #ffffff1f, #ffffff0d);
                 border-width: 1px;
                 border-color: #ffffff29;
+
+                // Sin drop-shadow: Hyprland difuminaria la sombra fuera del contorno.
 
                 HorizontalLayout {
                     alignment: center;
@@ -76,12 +73,12 @@ export component Dock inherits Window {
                     padding-bottom: 8px;
                     spacing: 4px;
 
-                    for n in 6: Rectangle {
+                    for idx in DockAdapter.tile-count: Rectangle {
                         width: root.tile-size;
                         height: root.tile-size;
                         border-radius: root.tile-radius;
 
-                        background: n == root.hover-tile
+                        background: root.hover-pos >= idx && root.hover-pos < idx + 1
                             ? @linear-gradient(135deg, #a3b0d9ee, #4e5466ee)
                             : @linear-gradient(135deg, #7c879add, #3c414add);
                         border-width: 1px;

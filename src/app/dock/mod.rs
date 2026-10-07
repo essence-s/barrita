@@ -9,6 +9,37 @@ use std::time::Duration;
 // en reposo nada se ejecuta hasta que el compositor empuja un enter.
 const SHOW_DWELL: Duration = Duration::from_millis(50);
 
+// Geometria compartida con dock.slint (ventana 1366x70, padding 7/7/7/8,
+// spacing 4, tope de barra 1100). Si cambian, cambiar ambos lados.
+const WIN_W: i32 = 1366;
+const WIN_H: i32 = 70;
+const BAR_CAP: f32 = 1100.0;
+const TILE_MAX: f32 = 40.0;
+const TILE_MIN: f32 = 24.0;
+const TILE_PAD_X: f32 = 14.0;
+const TILE_GAP: f32 = 4.0;
+const BAR_PAD_TOP: f32 = 7.0;
+const BAR_PAD_BOTTOM: f32 = 8.0;
+const LAYOUT_PAD_BOTTOM: f32 = 9.0;
+
+fn tile_size_for(count: i32) -> f32 {
+    let n = count.max(1) as f32;
+    TILE_MAX.min(TILE_MIN.max((BAR_CAP - TILE_PAD_X - (n - 1.0) * TILE_GAP) / n))
+}
+
+// Clicks solo en la barra: resetea la region y suma el rect util con
+// 2px de margen hacia dentro.
+fn apply_input_for_count(handler: &WinHandle, count: i32) {
+    let t = tile_size_for(count);
+    let n = count.max(1) as f32;
+    let w = n * t + (n - 1.0) * TILE_GAP + TILE_PAD_X;
+    let h = t + BAR_PAD_TOP + BAR_PAD_BOTTOM;
+    let x0 = ((WIN_W as f32 - w) / 2.0 + 2.0).round() as i32;
+    let y0 = ((WIN_H as f32 - LAYOUT_PAD_BOTTOM - h) + 2.0).round() as i32;
+    handler.subtract_input_region(0, 0, WIN_W, WIN_H);
+    handler.add_input_region(x0, y0, (w - 4.0).round() as i32, (h - 4.0).round() as i32);
+}
+
 struct Autohide {
     visible: bool,
     hide_timeout: Duration,
@@ -56,6 +87,8 @@ impl DockController {
         hotspot_handler: WinHandle,
     ) {
         let cfg = crate::config::load_or_create_config().dock;
+        let count = dock.global::<crate::DockAdapter>().get_tile_count();
+        apply_input_for_count(&dock_handler, count);
         if !cfg.autohide {
             hotspot_handler.hide();
             log::info!("[dock] autohide disabled");
@@ -106,8 +139,9 @@ impl DockController {
                 Autohide::schedule_hide(&s);
             });
 
-            adapter.on_tile_clicked(move |idx| {
-                if idx >= 0 {
+            adapter.on_tile_clicked(move |v: f32| {
+                let idx = v.floor() as i32;
+                if idx >= 0 && idx < count {
                     log::info!("[dock] tile clicked: {idx}");
                 }
             });

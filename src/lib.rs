@@ -53,7 +53,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     let dock_conf = WindowConf::builder()
-        .width(320_u32)
+        .width(1366_u32)
         .height(70_u32)
         .anchor_1(LayerAnchor::BOTTOM)
         .margins(0, 0, 6, 0)
@@ -84,13 +84,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     popup.hide();
     notif.hide();
 
-    // Clicks solo en la barra: recorta los margenes transparentes
-    // (area util x25..295, y8..59; recalcular si cambia el layout).
+    // El input del dock lo recorta DockController por count
+    // (apply_input_for_count): la ventana es de ancho completo.
     let dock_handler = dock.get_handler();
-    dock_handler.subtract_input_region(0, 0, 320, 8);
-    dock_handler.subtract_input_region(0, 59, 320, 11);
-    dock_handler.subtract_input_region(0, 0, 25, 70);
-    dock_handler.subtract_input_region(295, 0, 25, 70);
 
     let ctrl_handler = ctrl.get_handler();
     let tray_popup_handler = popup.get_handler();
