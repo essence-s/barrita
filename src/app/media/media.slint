@@ -6,6 +6,8 @@ export global MediaAdapter {
     in-out property <bool> has-player: true;
     in-out property <string> title: "Sin música";
     in-out property <string> artist: "Artista";
+    in-out property <image> cover;
+    in-out property <bool> has-cover: false;
 
     callback play-pause();
     callback next();
@@ -64,12 +66,36 @@ export component MediaWidget {
                         alignment: center;
 
                         Rectangle {
-                            background: Theme.surface-container-high;
+                            background: MediaAdapter.has-cover ? transparent : Theme.surface-container-high;
                             border-radius: 6px;
+                            clip: true;
                             drop-shadow-color: #00000079;
                             drop-shadow-offset-y: 1px;
                             drop-shadow-offset-x: 1px;
                             drop-shadow-blur: 3px;
+
+                            // Fondo: carátula difuminada en Rust + velo para legibilidad.
+                            // No participan en el layout (siguen el tamaño del contenido).
+                            Image {
+                                x: 0;
+                                y: 0;
+                                width: parent.width;
+                                height: parent.height;
+                                source: MediaAdapter.cover;
+                                visible: MediaAdapter.has-cover;
+                                image-fit: cover;
+                                // opacity: 0.68;
+                            }
+
+                            Rectangle {
+                                x: 0;
+                                y: 0;
+                                width: parent.width;
+                                height: parent.height;
+                                background: Theme.surface-container-high;
+                                visible: MediaAdapter.has-cover;
+                                opacity: 0.35;
+                            }
 
                             HorizontalLayout {
                                 spacing: 5px;
@@ -93,7 +119,7 @@ export component MediaWidget {
                                     text: MediaAdapter.artist;
                                     font-family: Theme.font-family;
                                     font-size: 10px;
-                                    color: Theme.on-surface-variant;
+                                    color: Theme.on-surface;
                                     max-width: 70px;
                                     overflow: elide;
                                 }

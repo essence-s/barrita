@@ -1,6 +1,8 @@
 use dbus::ffidisp::{BusType, Connection, ConnectionItem};
 use mpris::{PlaybackStatus, PlayerFinder};
 use slint::ComponentHandle;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 use std::time::Duration;
 
@@ -12,6 +14,7 @@ struct MediaState {
     status: String,
     title: String,
     artist: String,
+    art_url: String,
 }
 
 impl MediaState {
@@ -21,6 +24,7 @@ impl MediaState {
             status: "stopped".into(),
             title: "Sin música".into(),
             artist: String::new(),
+            art_url: String::new(),
         }
     }
 }
@@ -48,15 +52,17 @@ fn read_active(finder: &PlayerFinder) -> MediaState {
         Err(_) => return MediaState::empty(),
     };
 
-    let (title, artist) = match player.get_metadata() {
-        Ok(m) => (
+    let metadata = player.get_metadata().ok();
+    let (title, artist, art_url) = match metadata.as_ref() {
+        Some(m) => (
             m.title().map(|s| s.to_string()).unwrap_or_default(),
             m.artists()
                 .and_then(|a| a.first().copied())
                 .map(|s| s.to_string())
                 .unwrap_or_default(),
+            m.art_url().map(|s| s.to_string()).unwrap_or_default(),
         ),
-        Err(_) => (String::new(), String::new()),
+        None => (String::new(), String::new(), String::new()),
     };
 
     let (has_player, status) = match player.get_playback_status() {
@@ -76,6 +82,7 @@ fn read_active(finder: &PlayerFinder) -> MediaState {
         status: status.into(),
         title,
         artist,
+        art_url,
     }
 }
 
@@ -105,13 +112,14 @@ fn should_refresh(msg: &dbus::Message) -> bool {
     false
 }
 
-/// Refresca una vez y pushea a UI solo si cambió. Retorna el estado actual.
+/// Refresca una vez y pushea a UI solo si cambió. Retorna el estado actual
+/// para que el llamador gestione la carátula por separado.
 fn refresh_if_changed(
     finder: &PlayerFinder,
     window: &slint::Weak<crate::StatusBarWindow>,
     last: &mut MediaState,
     initialized: &mut bool,
-) {
+) -> MediaState {
     let current = read_active(finder);
     if !*initialized || current != *last {
         *last = current.clone();
@@ -128,6 +136,54 @@ fn refresh_if_changed(
         );
         push_state(window, &current);
     }
+    current
+}
+
+/// Carga la carátula en un thread aparte (red + decode + blur) y la pushea
+/// solo si sigue vigente (evita races al saltar de canción rápido).
+/// Solo se llama cuando cambia la URL, nunca en idle.
+fn spawn_cover_load(
+    window: &slint::Weak<crate::StatusBarWindow>,
+    generation: &Arc<AtomicU64>,
+    url: String,
+) {
+    // Bumpeo siempre: invalida loaders en vuelo de la canción anterior.
+    let cur = generation.fetch_add(1, Ordering::Relaxed) + 1;
+
+    if url.is_empty() {
+        let w = window.clone();
+        let _ = slint::invoke_from_event_loop(move || {
+            if let Some(w) = w.upgrade() {
+                w.global::<crate::MediaAdapter>().set_has_cover(false);
+            }
+        });
+        return;
+    }
+
+    let w = window.clone();
+    let g = generation.clone();
+    thread::spawn(move || {
+        // Píxeles crudos (`Vec` sí es `Send`); el `slint::Image` se
+        // construye dentro del event-loop como hace el tray.
+        let cover = crate::ui::image::load_cover(&url);
+        if g.load(Ordering::Relaxed) != cur {
+            return;
+        }
+        let _ = slint::invoke_from_event_loop(move || {
+            if let Some(w) = w.upgrade() {
+                let a = w.global::<crate::MediaAdapter>();
+                match cover {
+                    Some((raw, cw, ch)) => {
+                        a.set_cover(crate::ui::image::rgba_to_slint_image(raw, cw, ch));
+                        a.set_has_cover(true);
+                    }
+                    None => {
+                        a.set_has_cover(false);
+                    }
+                }
+            }
+        });
+    });
 }
 
 fn control_action(action: &str) {
@@ -220,7 +276,13 @@ impl MediaController {
             // Sync inicial: la barra muestra el estado real al arrancar.
             let mut last = MediaState::default();
             let mut initialized = false;
-            refresh_if_changed(&finder, &weak, &mut last, &mut initialized);
+            let generation = Arc::new(AtomicU64::new(0));
+            let mut last_art = String::new();
+            let current = refresh_if_changed(&finder, &weak, &mut last, &mut initialized);
+            if current.art_url != last_art {
+                last_art = current.art_url.clone();
+                spawn_cover_load(&weak, &generation, current.art_url);
+            }
 
             log::info!("[media] escuchando eventos MPRIS (sin polling)");
 
@@ -231,7 +293,12 @@ impl MediaController {
                 if let ConnectionItem::Signal(msg) = &item
                     && should_refresh(msg)
                 {
-                    refresh_if_changed(&finder, &weak, &mut last, &mut initialized);
+                    let current =
+                        refresh_if_changed(&finder, &weak, &mut last, &mut initialized);
+                    if current.art_url != last_art {
+                        last_art = current.art_url.clone();
+                        spawn_cover_load(&weak, &generation, current.art_url);
+                    }
                 }
                 // Nothing/MethodReturn/etc: ignorar sin consultar D-Bus.
             }
