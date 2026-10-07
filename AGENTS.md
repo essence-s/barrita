@@ -19,7 +19,8 @@ slint-layer-shell = { git = "https://github.com/essence-s/slint-layer-shell" }
 - `system-tray = "0.8"` — StatusNotifierItem (system tray)
 - `tokio = "1"` — Async runtime para tray client
 - `chrono = "0.4"` — Fecha/hora para clock widget
-- `image = "0.25"` — Decodificación de imágenes (tray icons)
+- `image = "0.25"` — Decodificación de imágenes (tray icons, carátulas media con blur)
+- `ureq = "3"` — Cliente HTTP blocking (carátulas MPRIS `https://`, solo hilo fondo)
 
 ## Widget Architecture Pattern
 
@@ -49,6 +50,8 @@ Reglas:
 - El componente **no tiene** `callback` propio — usa el global directo
 - El componente **no recibe** `in property` de state — lee del global
 - `TouchArea` hermanos solapados = hover exclusivo (gana el superior). Para enter/leave fiables: un solo `TouchArea` sin solapes (`src/app/dock/`).
+- D-Bus por eventos, no polling: `iter(-1)` bloqueante + filtrar señal (`should_refresh`) + diff de estado + un solo `invoke_from_event_loop` solo si cambió (`src/app/media/`, `src/app/battery/`).
+- `slint::Image` no es `Send`: cruzar píxeles crudos (`Vec<u8>` + dims) al event-loop y construir la imagen dentro (`src/ui/image.rs:rgba_to_slint_image`, como el tray).
 
 ### 2. Controller (`mod.rs`) — Lógica Rust
 
