@@ -1,8 +1,12 @@
 import { Theme } from "../../ui/styles/theme.slint";
 
 export global NetworkAdapter {
-    in-out property <string> current-status: "WiFi";
-    in-out property <bool> connected: true;
+    // "wifi" | "ethernet" | "none" — se mantiene sincronizado con connection-type.
+    in-out property <string> current-status: "none";
+    // Bearer activo cuando hay internet: "wifi" | "ethernet" | "none".
+    in-out property <string> connection-type: "none";
+    // true solo con internet real (NM State GLOBAL). Portal/LAN sin salida => false.
+    in-out property <bool> connected: false;
     callback network-clicked();
 }
 
@@ -12,7 +16,7 @@ export component NetworkWidget {
         alignment: center;
 
         Image {
-            source: NetworkAdapter.connected ? @image-url("../../assets/icons/network_wifi.svg") : @image-url("../../assets/icons/globe_2_cancel.svg");
+            source: !NetworkAdapter.connected ? @image-url("../../assets/icons/globe_2_cancel.svg") : NetworkAdapter.connection-type == "ethernet" ? @image-url("../../assets/icons/network_ethernet.svg") : @image-url("../../assets/icons/network_wifi.svg");
             width: 18px;
             height: 18px;
             image-fit: contain;
