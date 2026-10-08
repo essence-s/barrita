@@ -1,4 +1,15 @@
 // Fondo translucido: el blur lo aplica Hyprland (layerrule "dock").
+import { Theme } from "../../ui/styles/theme.slint";
+
+export struct DockApp {
+    address: string,
+    app-id: string,
+    title: string,
+    icon: image,
+    has-icon: bool,
+    letter: string,
+    active: bool,
+}
 
 export global DockAdapter {
     callback hotspot-entered();
@@ -6,8 +17,10 @@ export global DockAdapter {
     callback dock-entered();
     callback dock-left();
     callback tile-clicked(float);
-    // Plantilla: default 6. El modelo real pone el count.
-    in-out property <int> tile-count: 10;
+    callback activate(string);
+    callback apps-changed();
+    in-out property <int> tile-count: 6;
+    in-out property <[DockApp]> apps;
 }
 
 export component Dock inherits Window {
@@ -18,15 +31,21 @@ export component Dock inherits Window {
     height: 70px;
 
     // Crece fijo hasta el tope (~1100px de barra), encoge despues.
-    // Rust replica la formula (apply_input_for_count): si cambian las
-    // constantes (padding 7/7/7/8, spacing 4), cambiar ambos lados.
+    // Rust replica la formula (apply_input_for_count): padding 7/7/7,
+    // 8px bajo el tile (carril 6 + pad 2), spacing 4. Cambiar ambos lados.
     property <length> tile-size: min(40px, max(24px, (1100px - 14px - (max(1, DockAdapter.tile-count) - 1) * 4px) / max(1, DockAdapter.tile-count)));
     property <length> tile-radius: tile-size * 0.2237;
     property <length> bar-radius: 16px;
 
     // Posicion en celdas (tile+gap), -1 = fuera. Un unico TouchArea.
     property <float> hover-pos: touch.has-hover && touch.mouse-y >= 7px && touch.mouse-y < 7px + tile-size
-        ? round((touch.mouse-x - 7px) / (tile-size + 4px)) : -1;
+        ? cell(touch.mouse-x, tile-size, DockAdapter.tile-count) : -1;
+
+    function cell(x: length, t: length, n: int) -> float {
+        (x - 7px) / (t + 4px) < 0 || (x - 7px) / (t + 4px) >= n ? -1
+        : (x - 7px) - floor((x - 7px) / (t + 4px)) * (t + 4px) >= t ? -1
+        : floor((x - 7px) / (t + 4px))
+    }
 
     VerticalLayout {
         alignment: end;
@@ -54,7 +73,7 @@ export component Dock inherits Window {
                     }
                     clicked => {
                         if (self.mouse-y >= 7px && self.mouse-y < 7px + root.tile-size) {
-                            DockAdapter.tile-clicked(round((self.mouse-x - 7px) / (root.tile-size + 4px)));
+                            DockAdapter.tile-clicked(root.cell(self.mouse-x, root.tile-size, DockAdapter.tile-count));
                         }
                     }
                 }
@@ -70,24 +89,56 @@ export component Dock inherits Window {
                     padding-left: 7px;
                     padding-right: 7px;
                     padding-top: 7px;
-                    padding-bottom: 8px;
+                    padding-bottom: 2px;
                     spacing: 4px;
 
-                    for idx in DockAdapter.tile-count: Rectangle {
-                        width: root.tile-size;
-                        height: root.tile-size;
-                        border-radius: root.tile-radius;
+                    for app[idx] in DockAdapter.apps: VerticalLayout {
+                        spacing: 0px;
 
-                        background: root.hover-pos >= idx && root.hover-pos < idx + 1
-                            ? @linear-gradient(135deg, #a3b0d9ee, #4e5466ee)
-                            : @linear-gradient(135deg, #7c879add, #3c414add);
-                        border-width: 1px;
-                        border-color: #ffffff40;
+                        Rectangle {
+                            width: root.tile-size;
+                            height: root.tile-size;
+                            border-radius: root.tile-radius;
+                            clip: true;
 
-                        drop-shadow-color: #00000059;
-                        drop-shadow-blur: 6px;
-                        drop-shadow-offset-y: 2px;
-                        drop-shadow-offset-x: 0px;
+                            background: root.hover-pos >= idx && root.hover-pos < idx + 1
+                                ? @linear-gradient(135deg, Theme.surface-container-high, Theme.surface-container)
+                                : @linear-gradient(135deg, Theme.surface-container, Theme.surface-dim);
+
+                            if (app.has-icon): Image {
+                                source: app.icon;
+                                width: 100%;
+                                height: 100%;
+                                image-fit: contain;
+                            }
+
+                            if (!app.has-icon): Text {
+                                text: app.letter;
+                                font-size: 18px;
+                                color: #e6e6e6;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+
+                            drop-shadow-color: #00000059;
+                            drop-shadow-blur: 6px;
+                            drop-shadow-offset-y: 2px;
+                            drop-shadow-offset-x: 0px;
+                        }
+
+                        // Indicador de activa debajo del tile.
+                        Rectangle {
+                            height: 6px;
+
+                            if (app.active): Rectangle {
+                                width: 4px;
+                                height: 4px;
+                                border-radius: 2px;
+                                background: #ffffffdd;
+                                x: (parent.width - self.width) / 2;
+                                y: 2px;
+                            }
+                        }
                     }
                 }
             }
