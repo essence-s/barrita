@@ -11,6 +11,8 @@ pub struct Config {
     pub widgets: WidgetsConfig,
     pub workspaces: WorkspacesConfig,
     pub dock: DockConfig,
+    #[serde(default)]
+    pub osd: OsdConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -149,6 +151,18 @@ impl Default for DockConfig {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OsdConfig {
+    #[serde(alias = "timeout-ms")]
+    pub timeout_ms: u64,
+}
+
+impl Default for OsdConfig {
+    fn default() -> Self {
+        Self { timeout_ms: 1400 }
+    }
+}
+
 impl Default for Config {
     fn default() -> Self {
         Self {
@@ -158,6 +172,7 @@ impl Default for Config {
             widgets: WidgetsConfig::default(),
             workspaces: WorkspacesConfig::default(),
             dock: DockConfig::default(),
+            osd: OsdConfig::default(),
         }
     }
 }

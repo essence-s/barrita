@@ -1,5 +1,5 @@
 slint::include_modules!();
-slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup, Dock, DockHotspot];
+slint_layer_shell::windows![StatusBarWindow, ControlCenter, TrayPopup, NotificationPopup, OsdPopup, Dock, DockHotspot];
 
 mod app;
 mod config;
@@ -52,6 +52,18 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
+    // Píldora OSD: top-center debajo de la barra, sin zona exclusiva,
+    // click-through (el controller vacía la input region).
+    let osd_conf = WindowConf::builder()
+        .width(190_u32)
+        .height(72_u32)
+        .anchor_1(LayerAnchor::TOP)
+        .margins(44, 0, 0, 0)
+        .exclusive_zone(-1)
+        .layer_type(LayerType::Overlay)
+        .build()
+        .unwrap();
+
     let dock_conf = WindowConf::builder()
         .width(1366_u32)
         .height(70_u32)
@@ -78,11 +90,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let ctrl = ControlCenterWl::spawn("control-center", ctrl_conf);
     let popup = TrayPopupWl::spawn("tray-popup", popup_conf);
     let notif = NotificationPopupWl::spawn("notification-popup", notif_conf);
+    let osd = OsdPopupWl::spawn("osd-popup", osd_conf);
     let dock = DockWl::spawn("dock", dock_conf);
     let hotspot = DockHotspotWl::spawn("dock-hotspot", hotspot_conf);
     ctrl.hide();
     popup.hide();
     notif.hide();
+    osd.hide();
 
     // El input del dock lo recorta DockController por count
     // (apply_input_for_count): la ventana es de ancho completo.
@@ -91,6 +105,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let ctrl_handler = ctrl.get_handler();
     let tray_popup_handler = popup.get_handler();
     let notif_handler = notif.get_handler();
+    let osd_handler = osd.get_handler();
     let hotspot_handler = hotspot.get_handler();
     ui::adapters::connect_all(
         &bar,
@@ -103,7 +118,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         popup.as_weak(),
         notif_handler,
         notif.as_weak(),
+        osd_handler,
+        osd.as_weak(),
     );
 
-    run_windows!(windows: [bar, ctrl, popup, notif, dock, hotspot])
+    run_windows!(windows: [bar, ctrl, popup, notif, osd, dock, hotspot])
 }

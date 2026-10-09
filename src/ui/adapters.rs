@@ -7,6 +7,7 @@ use crate::app::control_center::ControlCenterController;
 use crate::app::media::MediaController;
 use crate::app::network::NetworkController;
 use crate::app::notification::NotificationController;
+use crate::app::osd::OsdController;
 use crate::app::screenshot::ScreenshotController;
 use crate::app::tray::TrayController;
 use crate::app::workspaces::WorkspacesController;
@@ -24,6 +25,8 @@ pub fn connect_all(
     popup_weak: slint::Weak<crate::TrayPopup>,
     notif_handler: WinHandle,
     notif_weak: slint::Weak<crate::NotificationPopup>,
+    osd_handler: WinHandle,
+    osd_weak: slint::Weak<crate::OsdPopup>,
 ) {
     ArticleController::connect(window);
     BatteryController::connect(window);
@@ -35,6 +38,7 @@ pub fn connect_all(
     MediaController::connect(window);
     NetworkController::connect(window);
     NotificationController::connect(notif_handler, notif_weak);
+    OsdController::connect(osd_handler, osd_weak);
     ScreenshotController::connect(window);
     TrayController::connect(window, tray_popup_handler, popup_weak);
     WorkspacesController::connect(window);

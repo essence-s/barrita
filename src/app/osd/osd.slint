@@ -1,0 +1,155 @@
+import { Theme } from "../../ui/styles/theme.slint";
+
+// Píldora OSD. Sin TouchArea: click-through (ver mod.rs).
+export global OsdAdapter {
+    in-out property <bool> visible: false;
+    in-out property <string> kind: "volume";
+    in-out property <string> label: "Volumen";
+    in-out property <string> icon: "volume_up";
+    in-out property <int> value: 0;
+    in-out property <bool> muted: false;
+    in-out property <string> percent-text: "0%";
+}
+
+export component OsdPopup inherits Window {
+    no-frame: true;
+    background: transparent;
+    width: 190px;
+    height: 72px;
+
+    property <bool> shown: OsdAdapter.visible;
+    // Overdrive en segmento `over` (solo volumen); base siempre accent.
+    property <color> fill-color: OsdAdapter.muted ? Theme.on-surface-variant : Theme.accent;
+    // Solo volumen: base 90px + over 16px (90 + 4 + 16 = 110).
+    property <bool> is-vol: OsdAdapter.kind == "volume";
+
+    pill := Rectangle {
+        x: 7px;
+        y: shown ? 0px : -12px;
+        opacity: shown ? 1.0 : 0.0;
+        animate y {
+            duration: 180ms;
+            easing: ease-out;
+        }
+        animate opacity {
+            duration: 180ms;
+            easing: ease-out;
+        }
+
+        width: 176px;
+        height: 56px;
+        background: Theme.surface-container-high;
+        border-radius: 18px;
+        border-width: 1px;
+        border-color: Theme.outline-variant;
+        drop-shadow-color: #00000080;
+        drop-shadow-offset-y: 2px;
+        drop-shadow-blur: 8px;
+
+        HorizontalLayout {
+            padding-left: 14px;
+            padding-right: 14px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            spacing: 10px;
+            alignment: center;
+
+            // Caja fija 28px: el glifo cambia centrado, no empuja la barra.
+            Text {
+                text: OsdAdapter.icon;
+                font-family: Theme.icon-font-family;
+                font-size: 24px;
+                width: 28px;
+                horizontal-alignment: center;
+                color: OsdAdapter.muted ? Theme.on-surface-variant : Theme.on-surface;
+                vertical-alignment: center;
+            }
+
+            VerticalLayout {
+                horizontal-stretch: 1;
+                spacing: 4px;
+                alignment: center;
+
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    // Fijo 64px ("Micrófono"): la fila siempre mide 64+8+38.
+                    Text {
+                        text: OsdAdapter.label;
+                        font-family: Theme.font-family;
+                        font-size: 11px;
+                        width: 64px;
+                        horizontal-alignment: left;
+                        overflow: elide;
+                        color: Theme.on-surface-variant;
+                        vertical-alignment: top;
+                        y: -2px;
+                    }
+
+                    // Fijo 38px a la derecha: el dígito de unidades no se mueve.
+                    Text {
+                        text: OsdAdapter.percent-text;
+                        font-family: Theme.font-family;
+                        font-size: 11px;
+                        font-weight: 600;
+                        width: 38px;
+                        horizontal-alignment: right;
+                        color: Theme.on-surface;
+                        vertical-alignment: top;
+                        y: -2px;
+                    }
+                }
+
+                HorizontalLayout {
+                    spacing: is-vol ? 4px : 0px;
+
+                    track := Rectangle {
+                        width: is-vol ? 90px : 110px;
+                        height: 6px;
+                        border-radius: 3px;
+                        background: Theme.surface-container-highest;
+                        clip: true;
+
+                        // Solo mic florece del centro; el resto barre de izquierda.
+                        Rectangle {
+                            x: OsdAdapter.kind == "mic" ? (track.width - self.width) / 2 : 0px;
+                            width: track.width * min(OsdAdapter.value, 100) / 100;
+                            height: 100%;
+                            border-radius: 3px;
+                            background: fill-color;
+                            animate width {
+                                duration: 120ms;
+                                easing: ease-out;
+                            }
+                            animate background {
+                                duration: 180ms;
+                                easing: ease-out;
+                            }
+                        }
+                    }
+
+                    // Extra 100-150% en ámbar, solo volumen (ancho 0 si no).
+                    over := Rectangle {
+                        width: is-vol ? 16px : 0px;
+                        height: 6px;
+                        border-radius: 3px;
+                        background: Theme.surface-container-highest;
+                        clip: true;
+
+                        Rectangle {
+                            x: 0px;
+                            width: over.width * (is-vol ? min(max(OsdAdapter.value - 100, 0), 50) / 50 : 0);
+                            height: 100%;
+                            border-radius: 3px;
+                            background: OsdAdapter.muted ? Theme.on-surface-variant : Theme.warning;
+                            animate width {
+                                duration: 120ms;
+                                easing: ease-out;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
