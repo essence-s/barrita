@@ -47,20 +47,20 @@ export component OsdPopup inherits Window {
         drop-shadow-blur: 8px;
 
         HorizontalLayout {
-            padding-left: 14px;
-            padding-right: 14px;
+            padding-left: -2px;
+            // padding-right: 14px;
             padding-top: 8px;
             padding-bottom: 8px;
             spacing: 10px;
             alignment: center;
 
-            // Caja fija 28px: el glifo cambia centrado, no empuja la barra.
+            // Caja fija 24px: el glifo cambia centrado, no empuja la barra.
             Text {
                 text: OsdAdapter.icon;
                 font-family: Theme.icon-font-family;
                 font-size: 24px;
-                width: 28px;
-                horizontal-alignment: center;
+                width: 24px;
+                // horizontal-alignment: center;
                 color: OsdAdapter.muted ? Theme.on-surface-variant : Theme.on-surface;
                 vertical-alignment: center;
             }
