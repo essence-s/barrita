@@ -8,15 +8,19 @@ export component ControlCenter inherits Window {
     height: 450px;
     background: transparent;
 
-    touch_area := TouchArea {
-        // opacity: touch_area.has-hover ? 1.0 : 0.999;
-    
-    
+    TouchArea {
+        changed has-hover => {
+            ControlCenterAdapter.panel-hover(self.has-hover);
+        }
+
         Rectangle {
             clip: true;
 
             content := Rectangle {
-                y: touch_area.has-hover ? 0px : -root.height;
+                // Reveal por estado, no por hover: al abrir el puntero esta
+                // sobre la barra, asi que has-hover nunca se activaba y el
+                // panel quedaba fuera del surface (invisible para siempre).
+                y: ControlCenterAdapter.is-open ? 0px : -root.height;
                 animate y {
                     duration: 200ms;
                     easing: ease-in-out-quad;

@@ -22,6 +22,33 @@ slint-layer-shell = { git = "https://github.com/essence-s/slint-layer-shell" }
 - `image = "0.25"` — Decodificación de imágenes (tray icons, carátulas media con blur)
 - `ureq = "3"` — Cliente HTTP blocking (carátulas MPRIS `https://`, solo hilo fondo)
 
+## Paneles layer-shell (popups sobre la barra)
+
+`control-center`, `tray-popup`, `notification-popup` y `osd-popup` son layer surfaces propias: se muestran/ocultan con el `WinHandle` (`show_again()` / `hide()`), no con `visible`.
+
+Reglas que ya costaron un bug (el widget de media no abría el panel):
+
+- **Margen superior = alto de la barra.** `exclusive_zone(-1)` pega el surface al borde de la pantalla: con `margins(0,...)` arranca en `y=0`, tapa la barra y su `TouchArea` se come el input de los widgets aunque el panel esté cerrado. Con `margins(36,...)` (alto de barra) queda justo debajo y la barra sigue clickeable.
+- **Reveal por estado, no por hover del panel.** Al abrir, el puntero está en la barra, así que `has-hover` del panel es `false` y el contenido queda fuera del surface (invisible para siempre). Se anima con `y: ControlCenterAdapter.is-open ? 0px : -root.height`.
+- **`is-open` se escribe en la instancia del panel.** Los globals de Slint son **por-window**: setearlo desde `StatusBarWindow` no mueve nada. El controller recibe `slint::Weak<crate::ControlCenter>` (mismo patrón que `popup.as_weak()` para el tray) y lo usa para el estado que dibuja el .slint.
+- **Mostrar y después marcar el estado.** `show_again()` y recién 16ms después `is-open = true`, si no la animación aparece ya terminada; al cerrar, `is-open = false`, animar (200ms) y ocultar a los 210ms.
+- Verificación rápida de geometría real: `hyprctl layers` muestra `xywh` de cada surface por namespace.
+
+### Apertura por hover
+
+El widget de media abre el control center solo con el puntero (`src/app/control_center/mod.rs`): un único `TouchArea` despacha `changed has-hover` a callbacks del global (sin solapes, como el dock).
+
+```slint
+TouchArea {
+    changed has-hover => {
+        if (self.has-hover) { MediaAdapter.hover-enter(); }
+        else { MediaAdapter.hover-leave(); }
+    }
+}
+```
+
+En Rust: dwell de 120ms antes de abrir (no se abre al pasar de camino), gracia de 400ms al salir cancelada por `ControlCenterAdapter.panel-hover(true)` cuando el puntero entra al panel, y el click sigue funcionando como toggle. Los timers (`Timer` single-shot) viven en `thread_local` y los callbacks corren en el hilo de UI.
+
 ## Widget Architecture Pattern
 
 Cada widget sigue este patrón (`src/app/<widget>/`):

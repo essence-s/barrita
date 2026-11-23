@@ -22,11 +22,14 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
+    // Margen superior = alto de la barra: con margins(0,...) el surface
+    // arranca en y=0, tapa la barra y su TouchArea se come el input de los
+    // widgets (el de media incluido) aunque el panel esté cerrado.
     let ctrl_conf = WindowConf::builder()
         .width(800_u32)
         .height(450_u32)
         .anchor_1(LayerAnchor::TOP)
-        .margins(0, 0, 0, 0)
+        .margins(36, 0, 0, 0)
         .exclusive_zone(-1)
         .layer_type(LayerType::Top)
         .build()
@@ -114,6 +117,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         dock_handler,
         hotspot_handler,
         ctrl_handler,
+        ctrl.as_weak(),
         tray_popup_handler,
         popup.as_weak(),
         notif_handler,

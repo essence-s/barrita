@@ -12,6 +12,8 @@ export global MediaAdapter {
     callback play-pause();
     callback next();
     callback previous();
+    callback hover-enter();
+    callback hover-leave();
 }
 
 export component MediaWidget {
@@ -21,6 +23,15 @@ export component MediaWidget {
         height: 28px;
 
         TouchArea {
+            // Hover abre el control center (con dwell en Rust).
+            changed has-hover => {
+                if (self.has-hover) {
+                    MediaAdapter.hover-enter();
+                } else {
+                    MediaAdapter.hover-leave();
+                }
+            }
+
             Rectangle {
                 background: Theme.surface;
                 border-radius: 20px;

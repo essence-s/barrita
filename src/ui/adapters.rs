@@ -21,6 +21,7 @@ pub fn connect_all(
     dock_handler: WinHandle,
     hotspot_handler: WinHandle,
     ctrl_handler: WinHandle,
+    ctrl_weak: slint::Weak<crate::ControlCenter>,
     tray_popup_handler: WinHandle,
     popup_weak: slint::Weak<crate::TrayPopup>,
     notif_handler: WinHandle,
@@ -34,7 +35,7 @@ pub fn connect_all(
     ClockController::connect(window);
     ColorizeController::connect(window);
     crate::app::dock::DockController::connect(dock, hotspot, dock_handler, hotspot_handler);
-    ControlCenterController::connect(window, ctrl_handler.clone());
+    ControlCenterController::connect(window, ctrl_weak, ctrl_handler.clone());
     MediaController::connect(window);
     NetworkController::connect(window);
     NotificationController::connect(notif_handler, notif_weak);
