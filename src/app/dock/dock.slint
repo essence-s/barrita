@@ -43,8 +43,8 @@ export component Dock inherits Window {
 
     function cell(x: length, t: length, n: int) -> float {
         (x - 7px) / (t + 4px) < 0 || (x - 7px) / (t + 4px) >= n ? -1
-        : (x - 7px) - floor((x - 7px) / (t + 4px)) * (t + 4px) >= t ? -1
-        : floor((x - 7px) / (t + 4px))
+            : (x - 7px) - floor((x - 7px) / (t + 4px)) * (t + 4px) >= t ? -1
+            : floor((x - 7px) / (t + 4px))
     }
 
     VerticalLayout {
@@ -78,9 +78,9 @@ export component Dock inherits Window {
                     }
                 }
 
-                background: @linear-gradient(180deg, #ffffff1f, #ffffff0d);
+                background: Theme.surface;
                 border-width: 1px;
-                border-color: #ffffff29;
+                border-color: Theme.outline-variant;
 
                 // Sin drop-shadow: Hyprland difuminaria la sombra fuera del contorno.
 
@@ -102,8 +102,8 @@ export component Dock inherits Window {
                             clip: true;
 
                             background: root.hover-pos >= idx && root.hover-pos < idx + 1
-                                ? @linear-gradient(135deg, Theme.surface-container-high, Theme.surface-container)
-                                : @linear-gradient(135deg, Theme.surface-container, Theme.surface-dim);
+                                ? @linear-gradient(135deg, Theme.surface-container-highest, Theme.surface-container-high)
+                                : @linear-gradient(135deg, Theme.surface-container-high, Theme.surface-container-low);
 
                             if (app.has-icon): Image {
                                 source: app.icon;
@@ -115,7 +115,7 @@ export component Dock inherits Window {
                             if (!app.has-icon): Text {
                                 text: app.letter;
                                 font-size: 18px;
-                                color: #e6e6e6;
+                                color: Theme.on-surface;
                                 horizontal-alignment: center;
                                 vertical-alignment: center;
                             }
@@ -134,7 +134,7 @@ export component Dock inherits Window {
                                 width: 4px;
                                 height: 4px;
                                 border-radius: 2px;
-                                background: #ffffffdd;
+                                background: Theme.primary;
                                 x: (parent.width - self.width) / 2;
                                 y: 2px;
                             }
