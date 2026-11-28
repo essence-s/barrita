@@ -20,11 +20,27 @@ export component ControlCenter inherits Window {
                 // Reveal por estado, no por hover: al abrir el puntero esta
                 // sobre la barra, asi que has-hover nunca se activaba y el
                 // panel quedaba fuera del surface (invisible para siempre).
-                y: ControlCenterAdapter.is-open ? 0px : -root.height;
-                animate y {
-                    duration: 200ms;
-                    easing: ease-in-out-quad;
-                }
+                y: -root.height;
+
+                // Asimétrico: abrir puede tomar su tiempo, salir no. Al dejar
+                // el hover el panel tiene que irse rápido, no arrastrarse.
+                states [
+                    opened when ControlCenterAdapter.is-open: {
+                        y: 0px;
+                        in {
+                            animate y {
+                                duration: 200ms;
+                                easing: ease-out;
+                            }
+                        }
+                        out {
+                            animate y {
+                                duration: 130ms;
+                                easing: ease-in-quad;
+                            }
+                        }
+                    }
+                ]
                 HorizontalLayout {
                     Rectangle {
                         Path {

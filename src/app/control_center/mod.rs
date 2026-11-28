@@ -9,13 +9,15 @@ use std::time::Duration;
 // widget de la barra, el panel no llega a abrirse.
 const HOVER_DWELL: Duration = Duration::from_millis(120);
 // Gracia al salir: el panel arranca justo debajo de la barra, así que hay
-// que dar tiempo a cruzar desde el widget hasta el panel.
-const LEAVE_GRACE: Duration = Duration::from_millis(400);
+// que dar tiempo a cruzar desde el widget hasta el panel. Corta a propósito:
+// al dejar el hover la reacción tiene que sentirse inmediata.
+const LEAVE_GRACE: Duration = Duration::from_millis(130);
 // Mostrar el surface y recién después marcar is-open: la animación arranca
 // desde arriba en vez de aparecer ya abierta.
 const SHOW_DELAY: Duration = Duration::from_millis(16);
-// Igual al `animate y` del .slint: ocultar cuando terminó de subir.
-const HIDE_DELAY: Duration = Duration::from_millis(210);
+// Igual al `animate y` de salida del .slint (130ms): ocultar cuando
+// terminó de subir.
+const HIDE_DELAY: Duration = Duration::from_millis(140);
 
 thread_local! {
     static HIDE_TIMER: RefCell<Option<slint::Timer>> = const { RefCell::new(None) };
